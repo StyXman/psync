@@ -1,0 +1,21 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<!DOCTYPE KDevPrjSession>
+<KDevPrjSession>
+ <DocsAndViews NumberOfDocuments="2" >
+  <Doc0 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/README" >
+   <View0 Type="Source" />
+  </Doc0>
+  <Doc1 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/psync.py" >
+   <View0 line="112" Type="Source" />
+  </Doc1>
+ </DocsAndViews>
+ <pluginList>
+  <kdevbookmarks>
+   <bookmarks>
+    <bookmark url="/home/mdione/src/projects/httpsync/httpsync-cholex" >
+     <mark line="130" />
+    </bookmark>
+   </bookmarks>
+  </kdevbookmarks>
+ </pluginList>
+</KDevPrjSession>

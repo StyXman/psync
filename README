@@ -1,0 +1,35 @@
+psync is a tool for maintaining debian mirrors for only one arch and one distro.
+right now the status is alfa, which means that it works but lacks of important
+things like, configurability and CL options.
+
+it depends in the following packages (debian only):
+* curl.
+* python-apt.
+
+if you want to use if you:
+0) install it in the root of the mirrors.
+1) modify the `config' list.
+2) ./psync/py --help.
+3) fire at will.
+
+I guess that's all. enjoy.
+
+TODO:
+* configurability
+* Release's
+* make it a class
+* debian package
+* [06:35] <cholo> StyXman: y los udebs para netinst???
+* checksum support?
+* summary.
+
+[05:27] <cholo> define tmp='.'
+[05:27] <cholo> o sea que hay que correrlo desde el directorio donde esta el mirror
+[05:27] <StyXman> yah
+[05:27] <StyXman> eso es otra limitación
+
+[05:25] <cholo> no termino de entender cómo anda con cont=True (anda?)
+[05:25] <StyXman> cholo: en vez de bajar un Packages nuevo, trata de usar uno anterior
+[05:26] <StyXman> aunque no es muy inteligente con eso aún
+[05:26] <StyXman> en realdad toma el Packages ya movido al lugar que le corresponde
+[05:26] <StyXman> pero si lo tenés en un tmp* no se dá cuenta
