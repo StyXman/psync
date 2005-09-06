@@ -9,9 +9,6 @@ from tempfile import mkdtemp
 import sys
 from optparse import OptionParser
 
-# from psync.core import Psync
-from psync.debian import Debian
-
 if __name__=='__main__':
     parser= OptionParser ()
     parser.add_option ('-c', '--continue', dest='c', action='store_true', default=False)
@@ -29,6 +26,35 @@ if __name__=='__main__':
     verbose= opts.v
     distros= opts.d
 
-    # syncer= Psync (cont, consistent, limit, verbose)
-    syncer= Debian (cont, consistent, limit, verbose)
-    syncer.main (distros)
+    # configFile= os.environ['HOME']+'.psync.conf.py'
+    configVars= {}
+    configFile= 'psync.conf.py'
+    execfile(configFile, configVars)
+    config= configVars['config']
+    # print config
+    del configVars
+
+    if distros is not None:
+        distros= [ x for x in config if x['local'] in distros ]
+    else:
+        distros= config
+
+    finished= True
+
+    try:
+        for distro in distros:
+            driverName= distro['driver']
+            DriverClass= getattr(__import__('psync.drivers.'+driverName, {}, {}, [driverName]), driverName)
+            driver= DriverClass(cont, consistent, limit, verbose, **distro)
+            driver.processDistro (distro)
+
+    except KeyboardInterrupt:
+        finished= False
+        # curl stays always in the same line
+        print
+    except (), e:
+        try:
+            print "error prcessing %s" % filename
+        except:
+            pass
+        raise e

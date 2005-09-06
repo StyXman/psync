@@ -3,16 +3,16 @@
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
 from os import listdir
-from os.path import basename, dirname
+from os.path import dirname
 import apt_pkg
 import gzip
 
 from psync.core import Psync
-from psync.utils import makedirs, stat
+from psync.utils import stat
 
 class Debian(Psync):
     distroPath= "dists/%s/"
-    def __init__ (self, cont=False, consistent=True, limit=20, verbose=False):
+    def __init__ (self, cont=False, consistent=True, limit=20, verbose=False, **kwargs):
         super (Debian, self).__init__ (cont, consistent, limit, verbose)
         apt_pkg.init ()
         self.firstDatabase= True
@@ -33,7 +33,8 @@ class Debian(Psync):
         if not self.cont or not stat (packagesGz):
             ans.append ("dists/%s/%s/binary-%s/Packages.gz" % (distro, module, arch))
         
-        print ans
+        if self.verbose:
+            print ans
         return ans
 
     def files(self, prefix, distro, module, arch):
@@ -45,7 +46,6 @@ class Debian(Psync):
         f= gzip.open (packagesGz)
         o= open (packages, "w+")
 
-        # for line in f.xreadlines ():
         line= f.readline ()
         while line:
             # print line
@@ -80,18 +80,15 @@ class Debian(Psync):
         
             ans.append ("dists/%s/Contents-%s.gz" % (distro, arch))
 
-        print ans
+        if self.verbose:
+            print ans
         return ans
 
-    def checkold(self, _file):
+    def checkold(self, filename):
         """ Checks for present files for an older version of this package.
             Also creates the directory just in case it doesn't exist.
         """
-        filename = basename(_file)
         (name, version) = filename.split('_')[:2]
-
-        _dir = dirname(_file)
-        makedirs(_dir)
 
         ans = []
 

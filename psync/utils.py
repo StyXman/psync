@@ -44,7 +44,7 @@ def grab(self, filename, url, cont=True):
     if not cont and stat (filename):
         unlink (filename)
 
-    command = "curl -f -C - --limit-rate %sk -o %s %s" % (self.limit, filename, url)
+    command = "curl -L -f -C - --limit-rate %sk -o %s %s" % (self.limit, filename, url)
 
     # Curl has not an equivalent parameter for Wget's -t (number of tries)...
     # Curl returns 0 on successful download, 2 when interrupted by the user

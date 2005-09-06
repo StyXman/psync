@@ -3,7 +3,7 @@
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
 from os import unlink, rename, removedirs
-from os.path import dirname
+from os.path import dirname, basename
 import os
 
 from psync.utils import stat, makedirs, grab
@@ -27,7 +27,10 @@ class Psync(object):
         url= "%s/%s" % (baseUrl, fileName)
         _file= "%s/%s" % (localDir, fileName)
 
-        old= self.checkold (_file)
+        _dir = dirname(_file)
+        makedirs(_dir)
+
+        old= self.checkold (basename(_file))
         if old:
             if not self.saveSpace:
                 for i in old:
@@ -41,18 +44,18 @@ class Psync(object):
         try:
             s= os.stat (_file)
             # print "%d<>%d" % (s.st_size, size)
-            if s.st_size!=size:
+        except OSError:
+            if self.verbose:
+                print "%s: not here" % _file
+            ans= self.grab (_file, url)
+        else:
+            if size is not None and s.st_size!=size:
                 if self.verbose:
                     print "%s: wrong size %d" % (_file, s.st_size)
                 ans= self.grab (_file, url, cont=True)
             else:
                 if self.verbose:
                     print "%s: already here, skipping" % _file
-
-        except OSError:
-            if self.verbose:
-                print "%s: not here" % _file
-            ans= self.grab (_file, url)
 
         if ans==0x1600:
             self.failed.append ("%s/%s" % (localDir, fileName))
@@ -118,36 +121,5 @@ class Psync(object):
             for _file in delete:
                 print "unlinking %s" % _file
                 unlink (_file)
-
-    def main(self, onlyThese=None):
-        # configFile= os.environ['HOME']+'.psync.conf.py'
-        configVars= {}
-        configFile= 'psync.conf.py'
-        execfile(configFile, configVars)
-        config= configVars['config']
-        # print config
-        del configVars
-
-        if onlyThese is not None:
-            distros= [ x for x in config if x['local'] in onlyThese ]
-        else:
-            distros= config
-
-        finished= True
-
-        try:
-            for distro in distros:
-                self.processDistro (distro)
-
-        except KeyboardInterrupt:
-            finished= False
-            # curl stays always in the same line
-            print
-        except (), e:
-            try:
-                print "error prcessing %s" % filename
-            except:
-                pass
-            raise e
 
     grab= grab
