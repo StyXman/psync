@@ -15,14 +15,23 @@ class Urpmi (Psync):
         self.__dict__.update(kwargs)
     
     def databases (self, distro, module, arch):
+        varDict= self.__dict__
+        self.module= module
+        self.arch= arch
+        self.distroPath= self.distroSpec % varDict
+        self.rpmPath= self.distroPath+'/'+(self.rpmSpec % varDict)
+        self.synthesis= self.rpmPath+'/'+(self.hdlist % varDict)
+        # if self.verbose:
+            # print self.__dict__
+        
         # luckly curl manages relative paths correctly
-        synthesis= distro+'/'+module+'/'+self.hdlist
-        hdlist= synthesis.replace ('synthesis.', '')
+        # synthesis= distro+'/'+module+'/'+self.hdlist
+        hdlist= self.synthesis.replace ('synthesis.', '')
         # return [synthesis, hdlist]
-        return [synthesis]
+        return [ self.synthesis ]
 
     def files(self, prefix, distro, module, arch):
-        synthesis= "%s/%s/%s/%s" % (prefix, distro, module, self.hdlist)
+        synthesis= "%s/%s" % (prefix, self.synthesis)
         
         if self.verbose:
             print "opening %s" % synthesis
@@ -37,8 +46,8 @@ class Urpmi (Psync):
                 print rpm
                 rpmArch= rpm.split ('.')[-1]
                 print rpm
-                if rpmArch==arch:
-                    yield (distro+'/'+module+'/'+arch+'/'+rpm+'.rpm', None)
+                if rpmArch==arch or rpmArch=='all':
+                    yield (self.rpmPath+'/'+rpm+'.rpm', None)
             
             line= f.readline ()
         

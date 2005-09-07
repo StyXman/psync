@@ -33,21 +33,37 @@ config+= [{
 
 config+= [{
     'local': 'plf-free',
-    'driver': 'PLF',
+    'driver': 'Urpmi',
     'url': 'http://ftp.club-internet.fr/pub/linux/plf/mandrake/free',
     'distro': '10.2',
+    'distroSpec': '%(distro)s',
+    'rpmSpec': '%(arch)s',
     'arch': 'i586',
     'modules': [''],
-    'hdlist': 'synthesis.hdlist.cz',
+    'hdlist': '../synthesis.hdlist.cz',
+}]
+
+config+= [{
+    'local': 'mandrake',
+    'driver': 'Urpmi',
+    'url': 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
+    'distro': '2005',
+    'arch': 'i586',
+    'distroSpec': '%(distro)s/%(arch)s',
+    'rpmSpec': 'media/%(module)s',
+    'modules': [ 'main', 'contrib', 'jpackage' ],
+    'hdlist': '../media_info/synthesis.hdlist_%(module)s.cz',
 }]
 
 config+= [{
     'local': 'mandrake/updates',
-    'driver': 'Mandrake',
+    'driver': 'Urpmi',
     'url': 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
     'distro': 'LE2005',
     'arch': 'i586',
-    'modules': [ 'RPMS' ],
+    'distroSpec': '%(distro)s',
+    'rpmSpec': 'main_updates',
+    'modules': [ '' ],
     'hdlist': 'media_info/synthesis.hdlist.cz',
 }]
 
