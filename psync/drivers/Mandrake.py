@@ -10,7 +10,7 @@ import re
 from psync.drivers.Urpmi import Urpmi
 
 class Mandrake (Urpmi):
-    def files(self, prefix, distro, module, arch):
+    def _files(self, prefix, distro, module, arch):
         for (_file, size) in super (Mandrake, self).files (prefix, distro, module, arch):
             _file= _file.replace(arch, '', 1)
             yield (_file, size)
