@@ -88,6 +88,7 @@ class Debian(Psync):
         """ Checks for present files for an older version of this package.
             Also creates the directory just in case it doesn't exist.
         """
+        _dir= dirname (filename)
         (name, version) = filename.split('_')[:2]
 
         ans = []

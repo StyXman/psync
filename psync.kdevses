@@ -1,10 +1,22 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
- <DocsAndViews NumberOfDocuments="1" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync.py" >
-   <View0 line="334" Type="Source" />
+ <DocsAndViews NumberOfDocuments="5" >
+  <Doc0 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync.conf.py" >
+   <View0 Type="Source" />
   </Doc0>
+  <Doc1 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/drivers/Urpmi.py" >
+   <View0 line="45" Type="Source" />
+  </Doc1>
+  <Doc2 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/core.py" >
+   <View0 line="32" Type="Source" />
+  </Doc2>
+  <Doc3 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync.py" >
+   <View0 line="48" Type="Source" />
+  </Doc3>
+  <Doc4 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/drivers/Debian.py" >
+   <View0 line="86" Type="Source" />
+  </Doc4>
  </DocsAndViews>
  <pluginList>
   <kdevbookmarks>

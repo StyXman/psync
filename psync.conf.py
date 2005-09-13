@@ -77,6 +77,15 @@ config+= [{
 }]
 
 config+= [{
+    'local': 'ubuntu-security',
+    'driver': 'Debian',
+    'url': 'http://security.ubuntu.com/ubuntu',
+    'distro': 'hoary-security',
+    'arch': 'i386',
+    'modules': [ 'main' ],
+}]
+
+config+= [{
     'local': 'ubuntu-warty',
     'url': 'http://archive.ubuntu.com/ubuntu',
     'distro': 'warty',

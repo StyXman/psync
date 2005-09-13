@@ -30,7 +30,7 @@ class Psync(object):
         _dir = dirname(_file)
         makedirs(_dir)
 
-        old= self.checkold (basename(_file))
+        old= self.checkold (_file)
         if old:
             if not self.saveSpace:
                 for i in old:
