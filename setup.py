@@ -12,7 +12,7 @@ Psync aims to be a repository mirrorer with this goals:
 """,
       author='Marcos D. Dione',
       author_email='mdione@grulic.org.ar',
-      url='http://plantalta.homalinux.net/~mdione/projects/psync/',
+      url='http://plantalta.homelinux.net/~mdione/projects/psync/',
       license='GPL',
       packages=['psync',
                 'psync.drivers',
