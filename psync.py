@@ -13,6 +13,7 @@ if __name__=='__main__':
     parser= OptionParser ()
     parser.add_option ('-c', '--continue', dest='c', action='store_true', default=False)
     parser.add_option ('-d', '--distro', dest='d', action='append')
+    parser.add_option ('-f', '--config-file', dest='f', default='psync.conf.py')
     parser.add_option ('-l', '--limit', dest='l', type='int', default=20)
     parser.add_option ('-q', '--quiet', dest='v', action='store_false', default=False)
     parser.add_option ('-s', '--save-space', dest='t', action='store_false')
@@ -28,7 +29,7 @@ if __name__=='__main__':
 
     # configFile= os.environ['HOME']+'.psync.conf.py'
     configVars= {}
-    configFile= 'psync.conf.py'
+    configFile= opts.f
     execfile(configFile, configVars)
     config= configVars['config']
     # print config

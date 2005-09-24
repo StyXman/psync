@@ -15,6 +15,7 @@ config+= [{
 }]
 config+=[{
     'local': 'debian-non-US',
+    'driver': 'Debian',
     'url': 'http://non-us.debian.org/debian-non-US',
     'distro': 'sid/non-US',
     'arch': 'i386',
@@ -69,7 +70,8 @@ config+= [{
 
 # ubuntu
 config+= [{
-    'local': 'ubuntu',
+    'local': 'ubuntu-hoary',
+    'driver': 'Debian',
     'url': 'http://archive.ubuntu.com/ubuntu',
     'distro': 'hoary',
     'arch': 'i386',
@@ -87,6 +89,7 @@ config+= [{
 
 config+= [{
     'local': 'ubuntu-warty',
+    'driver': 'Debian',
     'url': 'http://archive.ubuntu.com/ubuntu',
     'distro': 'warty',
     'arch': 'i386',
