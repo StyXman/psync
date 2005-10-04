@@ -7,3 +7,8 @@ check: test
 
 fullcheck:
 	$(CHECKER) -t -9 -v -a -8 --changetypes *.py 2>&1 | less -S
+
+dist:
+	./setup.py sdist
+
+.PHONY: test check fullcheck dist
