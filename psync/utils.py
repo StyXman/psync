@@ -3,7 +3,7 @@
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
 import os
-from os import mkdir, unlink, system
+from os import mkdir, unlink, system, utime
 from os.path import dirname
 
 def stat(f):
@@ -15,7 +15,7 @@ def stat(f):
         ans = False
     return ans
 
-def makedirs(_dirname):
+def makedirs(_dirname, verbose=False):
     """ Better replacement for os.makedirs():
         doesn't fails if some intermediate dir already exists.
     """
@@ -30,6 +30,9 @@ def makedirs(_dirname):
         except OSError, e:
             # print "%s failed: %s" % (i, e)
             pass
+	else:
+	    if verbose:
+		print 'make dir %s' % i
 
 def grab(self, filename, url, cont=True):
     """ Fetches a file if it does not exist or continues downloading
@@ -60,3 +63,13 @@ def grab(self, filename, url, cont=True):
         raise KeyboardInterrupt
 
     return curlExitCode
+
+def touch (path):
+    """
+    Does the same than touch(1).
+    """
+    if stat (path):
+        utime (startStamp, None)
+    else:
+        f= open (path, 'w+')
+        f.close()
