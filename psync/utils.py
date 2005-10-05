@@ -73,3 +73,23 @@ def touch (path):
     else:
         f= open (path, 'w+')
         f.close()
+
+def rename (old, new):
+    try:
+        os.rename (old, new)
+    except OSError, e:
+        if e.errno==18:
+            # [Errno 18] Invalid cross-device link
+            # ufa, then copy it, lazy bastard
+            oldFile= open (old)
+            newFile= open (new, 'w+')
+            
+            data= oldFile.read (10240)
+            while data!='':
+                newFile.write (data)
+                data= oldFile.read (10240)
+
+            oldFile.close ()
+            newFile.close ()
+        else:
+            raise e
