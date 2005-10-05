@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='psync',
-      version='0.2',
+      version='0.2.1',
       description="mirror sync'er",
       long_description="""
 Psync aims to be a repository mirrorer with this goals:
