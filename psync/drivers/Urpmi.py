@@ -28,7 +28,7 @@ class Urpmi (Psync):
         # synthesis= distro+'/'+module+'/'+self.hdlist
         hdlist= self.synthesis.replace ('synthesis.', '')
         # return [synthesis, hdlist]
-        return [ self.synthesis ]
+        return [ (self.synthesis, True) ]
 
     def files(self, prefix, distro, module, arch):
         synthesis= "%s/%s" % (prefix, self.synthesis)

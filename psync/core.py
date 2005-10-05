@@ -80,8 +80,9 @@ class Psync(object):
         failed= []
         for module in modules:
             # download databases
-            for database in self.databases (distro, module, arch):
-                self.grab (_dir+local+'/'+database, baseurl+'/'+database, cont=self.cont)
+            for (database, critic) in self.databases (distro, module, arch):
+                found= self.grab (_dir+local+'/'+database,
+                           baseurl+'/'+database, cont=self.cont)
 
             # now files
             for filename, size in self.files (_dir+local, distro, module, arch):
@@ -98,7 +99,7 @@ class Psync(object):
         # clean up/rollover
         if not self.cont:
             for module in modules:
-                for database in self.finalDBs(distro, module, arch):
+                for (database, critic) in self.finalDBs(distro, module, arch):
                     new= local+"/"+database
                     old= _dir+new
                     try:
@@ -108,15 +109,16 @@ class Psync(object):
                         if stat (new):
                             unlink (new)
                         rename (old, new)
-                    except OSError, e:
+                    except IOError, e:
                         # better error report!
                         print e
                         try:
                             unlink (old)
                         except OSError, e:
-                            # was here anyways
-                            print e
-                            pass
+                            if not critic:
+                                print e
+                            else:
+                                raise e
                 # removedirs (dirname (old))
 
         if not self.saveSpace:

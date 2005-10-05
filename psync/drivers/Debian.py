@@ -12,7 +12,8 @@ from psync.utils import stat
 
 class Debian(Psync):
     distroPath= "dists/%s/"
-    def __init__ (self, cont=False, consistent=True, limit=20, verbose=False, **kwargs):
+    def __init__ (self, cont=False, consistent=True, limit=20, verbose=False,
+                  **kwargs):
         super (Debian, self).__init__ (cont, consistent, limit, verbose)
         apt_pkg.init ()
         self.firstDatabase= True
@@ -23,7 +24,7 @@ class Debian(Psync):
 
         # Contents
         if self.firstDatabase:
-            ans.append ("dists/%s/Contents-%s.gz" % (distro, arch))
+            ans.append (("dists/%s/Contents-%s.gz" % (distro, arch), False))
             self.firstDatabase= False
         
         # download the .gz only and process from there
@@ -31,14 +32,16 @@ class Debian(Psync):
         packagesGz= packages+".gz"
 
         if not self.cont or not stat (packagesGz):
-            ans.append ("dists/%s/%s/binary-%s/Packages.gz" % (distro, module, arch))
+            ans.append (("dists/%s/%s/binary-%s/Packages.gz" % (distro, module,
+                                                               arch), True))
         
         if self.verbose:
             print ans
         return ans
 
     def files(self, prefix, distro, module, arch):
-        packages= "%s/dists/%s/%s/binary-%s/Packages" % (prefix, distro, module, arch)
+        packages= "%s/dists/%s/%s/binary-%s/Packages" % (prefix, distro, module,
+                                                         arch)
         packagesGz= packages+".gz"
         
         if self.verbose:
@@ -72,13 +75,14 @@ class Debian(Psync):
 
         # Packages
         for ext in ('', '.gz'):
-            ans.append ("dists/%s/%s/binary-%s/Packages%s" % (distro, module, arch, ext))
+            ans.append (("dists/%s/%s/binary-%s/Packages%s" % (distro, module,
+                                                              arch, ext), True))
 
         # Contents
         if self.firstDatabase:
             self.firstDatabase= False
         
-            ans.append ("dists/%s/Contents-%s.gz" % (distro, arch))
+            ans.append (("dists/%s/Contents-%s.gz" % (distro, arch), False))
 
         if self.verbose:
             print ans
