@@ -6,7 +6,7 @@ from os import unlink, removedirs
 from os.path import dirname, basename
 import os
 
-from psync.utils import stat, makedirs, grab, rename
+from psyncpkg.utils import stat, makedirs, grab, rename
 
 class Psync(object):
     def __init__ (self, cont=False, consistent=True, limit=20, verbose=False):
