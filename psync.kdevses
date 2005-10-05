@@ -2,20 +2,20 @@
 <!DOCTYPE KDevPrjSession>
 <KDevPrjSession>
  <DocsAndViews NumberOfDocuments="5" >
-  <Doc0 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync.conf.py" >
-   <View0 Type="Source" />
+  <Doc0 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/core.py" >
+   <View0 line="111" Type="Source" />
   </Doc0>
-  <Doc1 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/drivers/Urpmi.py" >
-   <View0 Type="Source" />
+  <Doc1 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync.py" >
+   <View0 line="0" Type="Source" />
   </Doc1>
-  <Doc2 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/core.py" >
-   <View0 Type="Source" />
+  <Doc2 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/utils.py" >
+   <View0 line="0" Type="Source" />
   </Doc2>
-  <Doc3 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync.py" >
-   <View0 Type="Source" />
+  <Doc3 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/drivers/Debian.py" >
+   <View0 line="35" Type="Source" />
   </Doc3>
-  <Doc4 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/drivers/Debian.py" >
-   <View0 line="86" Type="Source" />
+  <Doc4 NumberOfViews="1" URL="file:///home/mdione/src/projects/psync/trunk/psync/drivers/Urpmi.py" >
+   <View0 line="30" Type="Source" />
   </Doc4>
  </DocsAndViews>
  <pluginList>

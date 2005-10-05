@@ -5,11 +5,36 @@
 # example config file
 
 config= []
+config+= [dict(
+    local= 'test',
+    driver= 'Debian',
+    url= 'http://localhost:8099/~mdione/repo',
+    distro= 'hoary-security',
+    arch= 'i386',
+    modules= [ 'main' ],
+)]
+# config+= [{
+#     'local': 'test',
+#     'driver': 'Debian',
+#     'url': 'http://localhost:8099/~mdione/repo',
+#     'distro': 'hoary-security',
+#     'arch': 'i386',
+#     'modules': [ 'main' ],
+# }]
+
 config+= [{
-    'local': 'debian',
+    'local': 'debian/sarge',
     'driver': 'Debian',
     'url': 'http://http.us.debian.org/debian',
-    'distro': 'sid',
+    'distro': 'sarge',
+    'arch': 'i386',
+    'modules': [ 'main', 'non-free', 'contrib' ],
+}]
+config+= [{
+    'local': 'debian/updates/sarge',
+    'driver': 'Debian',
+    'url': 'http://security.debian.org/debian-security',
+    'distro': 'sarge/updates',
     'arch': 'i386',
     'modules': [ 'main', 'non-free', 'contrib' ],
 }]
@@ -27,7 +52,7 @@ config+= [{
     'local': 'marillat',
     'driver': 'Debian',
     'url': 'ftp://ftp.nerim.net/debian-marillat',
-    'distro': 'unstable',
+    'distro': 'sid',
     'arch': 'i386',
     'modules': [ 'main' ],
 }]
@@ -79,7 +104,7 @@ config+= [{
 }]
 
 config+= [{
-    'local': 'ubuntu-security',
+    'local': 'ubuntu/updates/hoary',
     'driver': 'Debian',
     'url': 'http://security.ubuntu.com/ubuntu',
     'distro': 'hoary-security',
@@ -94,4 +119,13 @@ config+= [{
     'distro': 'warty',
     'arch': 'i386',
     'modules': [ 'main', 'restricted', 'universe' ],
+}]
+
+config+= [{
+    'local': 'ubuntu/updates/breezy',
+    'driver': 'Debian',
+    'url': 'http://security.ubuntu.com/ubuntu',
+    'distro': 'breezy-security',
+    'arch': 'i386',
+    'modules': [ 'main' ],
 }]

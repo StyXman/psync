@@ -17,6 +17,8 @@ Psync aims to be a repository mirrorer with this goals:
       packages=['psync',
                 'psync.drivers',
                 ],
+      scripts= ['psync.py'],
+      # data_files= [('examples', ['psync.conf.py'])],
       classifiers=['Development Status :: 4 - Beta',
                    'Environment :: Console',
                    'Intended Audience :: Developers',

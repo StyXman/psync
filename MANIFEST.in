@@ -1,1 +1,1 @@
-include psync.py psync.conf.py
+include psync.conf.py
