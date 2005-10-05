@@ -80,7 +80,7 @@ def rename (old, new):
     except OSError, e:
         if e.errno==18:
             # [Errno 18] Invalid cross-device link
-            # ufa, then copy it, lazy bastard
+            # ufa. then copy it, you lazy bastard
             oldFile= open (old)
             newFile= open (new, 'w+')
             
@@ -91,5 +91,7 @@ def rename (old, new):
 
             oldFile.close ()
             newFile.close ()
+            # bye bye you old man
+	    unlink (old)
         else:
             raise e
