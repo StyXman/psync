@@ -102,19 +102,22 @@ class Psync(object):
                     new= local+"/"+database
                     old= _dir+new
                     try:
-                        makedirs (dirname (new))
+                        makedirs (dirname (new), self.verbose)
                         if self.verbose:
                             print "moving %s -> %s" % (old, new)
-                        unlink (new)
+                        if stat (new):
+                            unlink (new)
                         rename (old, new)
-                    except OSError:
+                    except OSError, e:
                         # better error report!
+                        print e
                         try:
                             unlink (old)
-                        except OSError:
+                        except OSError, e:
                             # was here anyways
+                            print e
                             pass
-                    removedirs (dirname (old))
+                # removedirs (dirname (old))
 
         if not self.saveSpace:
             # they're old anyways
