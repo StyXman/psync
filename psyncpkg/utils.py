@@ -74,7 +74,9 @@ def touch (path):
         f= open (path, 'w+')
         f.close()
 
-def rename (old, new):
+def rename (old, new, verbose=False):
+    if verbose:
+        print old, '->', new
     try:
         os.rename (old, new)
     except OSError, e:
