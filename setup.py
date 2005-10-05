@@ -3,12 +3,15 @@
 from distutils.core import setup
 
 setup(name='psync',
-      version='0.2.1',
-      description="mirror sync'er",
+      version='0.2.1a',
+      description="psync is a distribution mirroring utility with consistency in mind.",
       long_description="""
-Psync aims to be a repository mirrorer with this goals:
-  * keep the mirror usable while it's updating.
-  * be able to handle any kind of repository.
+psync is a mirroring utility. its main goal is to be able to update a  
+distribution mirror but keep it as consistent as possible. one of the main  
+problems updating a mirror is that if the mirroring process is stopped for any  
+reason, the mirror stays inconsistent: either some of the packages in the old  
+databases were removed or not all the new packages were downloaded. psync aims  
+to fix this. it also aims to support as many distributions as possible. 
 """,
       author='Marcos D. Dione',
       author_email='mdione@grulic.org.ar',
@@ -19,14 +22,16 @@ Psync aims to be a repository mirrorer with this goals:
                 ],
       scripts= ['psync.py'],
       # data_files= [('examples', ['psync.conf.py'])],
-      classifiers=['Development Status :: 4 - Beta',
+      classifiers=['Development Status :: 3 - Alpha',
                    'Environment :: Console',
-                   'Intended Audience :: Developers',
+                   'Intended Audience :: System Administrators',
                    'License :: OSI Approved :: GNU General Public License (GPL)',
                    'Natural Language :: Spanish',
                    'Natural Language :: English',
                    'Operating System :: POSIX',
                    'Programming Language :: Python',
                    'Topic :: Internet',
+		   'Topic :: System :: Archiving :: Mirroring',
+		   'Topic :: Utilities',
                    ],
       )

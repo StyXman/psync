@@ -27,12 +27,10 @@ if __name__=='__main__':
     verbose= opts.v
     distros= opts.d
 
-    # configFile= os.environ['HOME']+'.psync.conf.py'
     configVars= {}
     configFile= opts.f
     execfile(configFile, configVars)
     config= configVars['config']
-    # print config
     del configVars
 
     if distros is not None:
@@ -40,22 +38,13 @@ if __name__=='__main__':
     else:
         distros= config
 
-    finished= True
-
     try:
         for distro in distros:
             driverName= distro['driver']
-            DriverClass= getattr(__import__('psync.drivers.'+driverName, {}, {}, [driverName]), driverName)
+            DriverClass= getattr(__import__('psyncpkg.drivers.'+driverName, {}, {}, [driverName]), driverName)
             driver= DriverClass(cont, consistent, limit, verbose, **distro)
             driver.processDistro (distro)
 
     except KeyboardInterrupt:
-        finished= False
         # curl stays always in the same line
         print
-    except (), e:
-        try:
-            print "error prcessing %s" % filename
-        except:
-            pass
-        raise e

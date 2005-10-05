@@ -7,8 +7,8 @@ from os.path import dirname
 import apt_pkg
 import gzip
 
-from psync.core import Psync
-from psync.utils import stat
+from psyncpkg.core import Psync
+from psyncpkg.utils import stat
 
 class Debian(Psync):
     distroPath= "dists/%s/"

@@ -7,7 +7,7 @@ from os.path import basename, dirname, join
 import gzip
 import re
 
-from psync.core import Psync
+from psyncpkg.core import Psync
 
 class Urpmi (Psync):
     def __init__ (self, cont=False, consistent=True, limit=20, verbose=False, **kwargs):
