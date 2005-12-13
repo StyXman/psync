@@ -86,6 +86,8 @@ Subject: %(subject)s\r\n
             # print mail
             server.sendmail (mailFrom, mailTo, mail)
             server.quit ()
+        else:
+            print "\n".join (mail)
 
     except KeyboardInterrupt:
         # curl stays always in the same line

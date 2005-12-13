@@ -19,6 +19,7 @@ class Psync(object):
         self.verbose= verbose
         self.delete= []
         self.failed= []
+        self.updatedFiles= []
         self.dryRun= dryRun
         self.__dict__.update(kwargs)
 
@@ -53,12 +54,14 @@ class Psync(object):
                 print "%s: not here" % _file
             if not self.dryRun:
                 ans= self.grab (_file, url)
+            self.updatedFiles.append (basename(_file))
         else:
             if size is not None and s.st_size!=size:
                 if self.verbose:
                     print "%s: wrong size %d" % (_file, s.st_size)
                 if not self.dryRun:
                     ans= self.grab (_file, url, cont=True)
+                self.updatedFiles.append (basename(_file))
             else:
                 if self.verbose:
                     print "%s: already here, skipping" % _file
@@ -96,7 +99,6 @@ class Psync(object):
             # now files
             for filename, size in self.files (_dir+local, distro, module, arch):
                 self.getPackage (baseurl, local, filename, size)
-                files.append (basename(filename))
 
         # summary of failed pkgs
         if failed:
@@ -131,6 +133,6 @@ class Psync(object):
                 print "unlinking %s" % _file
                 unlink (_file)
 
-        return files
+        return self.updatedFiles
 
     grab= grab
