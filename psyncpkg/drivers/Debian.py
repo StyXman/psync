@@ -12,9 +12,8 @@ from psyncpkg.utils import stat
 
 class Debian(Psync):
     distroPath= "dists/%s/"
-    def __init__ (self, cont=False, consistent=True, limit=20, verbose=False,
-                  **kwargs):
-        super (Debian, self).__init__ (cont, consistent, limit, verbose)
+    def __init__ (self, **kwargs):
+        super (Debian, self).__init__ (**kwargs)
         apt_pkg.init ()
         self.firstDatabase= True
 

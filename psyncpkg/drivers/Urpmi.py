@@ -10,9 +10,6 @@ import re
 from psyncpkg.core import Psync
 
 class Urpmi (Psync):
-    def __init__ (self, cont=False, consistent=True, limit=20, verbose=False, **kwargs):
-        super (Urpmi, self).__init__ (cont, consistent, limit, verbose)
-        self.__dict__.update(kwargs)
     
     def databases (self, distro, module, arch):
         varDict= self.__dict__
