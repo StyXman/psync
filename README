@@ -4,7 +4,12 @@ things like, configurability and CL options, but is not considered final.
 
 it depends in the following packages (debian only):
 * curl.
-* python-apt.
+for Debian repos:
+    * python-apt (python2.3 only)
+for Yum repos:
+    * yum
+    * rpm-python
+    * python-celementtree
 
 if you want to use if you:
 0) install it in the root of the mirrors.

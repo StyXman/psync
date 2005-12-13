@@ -17,28 +17,27 @@ class Debian(Psync):
         apt_pkg.init ()
         self.firstDatabase= True
 
-    def databases(self, distro, module, arch):
+    def databases(self, distro_name, module, arch):
         ans= []
         # skipping Release
 
         # Contents
         if self.firstDatabase:
-            ans.append (("dists/%s/Contents-%s.gz" % (distro, arch), False))
+            ans.append (("dists/%s/Contents-%s.gz" % (distro_name, arch), False))
             self.firstDatabase= False
         
         # download the .gz only and process from there
-        packages= "dists/%s/%s/binary-%s/Packages" % (distro, module, arch)
+        packages= "dists/%s/%s/binary-%s/Packages" % (distro_name, module, arch)
         packagesGz= packages+".gz"
 
         if not self.cont or not stat (packagesGz):
-            ans.append (("dists/%s/%s/binary-%s/Packages.gz" % (distro, module,
-                                                               arch), True))
+            ans.append ((packagesGz, True))
         
         if self.verbose:
             print ans
         return ans
 
-    def files(self, prefix, distro, module, arch):
+    def files(self, prefix, localBase, distro, module, arch):
         packages= "%s/dists/%s/%s/binary-%s/Packages" % (prefix, distro, module,
                                                          arch)
         packagesGz= packages+".gz"
@@ -110,3 +109,5 @@ class Debian(Psync):
                     print "ignoring %s" % f
 
         return ans
+
+# end

@@ -53,14 +53,14 @@ class Psync(object):
             if self.verbose:
                 print "%s: not here" % _file
             if not self.dryRun:
-                ans= self.grab (_file, url)
+                ans= self.grab (_file, url, verbose=self.verbose)
             self.updatedFiles.append (basename(_file))
         else:
             if size is not None and s.st_size!=size:
                 if self.verbose:
-                    print "%s: wrong size %d" % (_file, s.st_size)
+                    print "%s: wrong size %d; should be %d" % (_file, s.st_size, size)
                 if not self.dryRun:
-                    ans= self.grab (_file, url, cont=True)
+                    ans= self.grab (_file, url, cont=True, verbose=self.verbose)
                 self.updatedFiles.append (basename(_file))
             else:
                 if self.verbose:
@@ -97,7 +97,7 @@ class Psync(object):
                            baseurl+'/'+database, cont=self.cont)
 
             # now files
-            for filename, size in self.files (_dir+local, distro, module, arch):
+            for filename, size in self.files (_dir+local, local, distro, module, arch):
                 self.getPackage (baseurl, local, filename, size)
 
         # summary of failed pkgs
@@ -136,3 +136,5 @@ class Psync(object):
         return self.updatedFiles
 
     grab= grab
+
+# end

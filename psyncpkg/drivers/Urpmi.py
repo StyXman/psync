@@ -27,7 +27,7 @@ class Urpmi (Psync):
         # return [synthesis, hdlist]
         return [ (self.synthesis, True) ]
 
-    def files(self, prefix, distro, module, arch):
+    def files(self, prefix, localBase, distro, module, arch):
         synthesis= "%s/%s" % (prefix, self.synthesis)
         
         if self.verbose:
@@ -58,3 +58,5 @@ class Urpmi (Psync):
 
     def finalDBs (self, distro, module, arch):
         return []
+
+# end

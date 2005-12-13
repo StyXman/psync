@@ -5,6 +5,7 @@
 import os
 from os import mkdir, unlink, system, utime
 from os.path import dirname
+from gzip import GzipFile
 
 def stat(f):
     """ Safe replacement for os.stat() """
@@ -34,7 +35,7 @@ def makedirs(_dirname, verbose=False):
 	    if verbose:
 		print 'make dir %s' % i
 
-def grab(self, filename, url, cont=True):
+def grab(self, filename, url, cont=True, verbose=False):
     """ Fetches a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
@@ -48,6 +49,8 @@ def grab(self, filename, url, cont=True):
         unlink (filename)
 
     command = "curl -L -f -C - --limit-rate %sk -o %s %s" % (self.limit, filename, url)
+    if verbose:
+        print command
 
     # Curl has not an equivalent parameter for Wget's -t (number of tries)...
     # Curl returns 0 on successful download, 2 when interrupted by the user
@@ -97,3 +100,18 @@ def rename (old, new, verbose=False):
 	    unlink (old)
         else:
             raise e
+
+def gunzip (gzFileName, fileName):
+    inFile= GzipFile (gzFileName)
+    outFile= open (fileName, "w+")
+
+    line= inFile.readline ()
+    while line:
+        # print line
+        outFile.write (line)
+        line= inFile.readline ()
+
+    inFile.close ()
+    outFile.close ()
+
+#end

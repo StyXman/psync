@@ -129,3 +129,25 @@ config+= [{
     'arch': 'i386',
     'modules': [ 'main' ],
 }]
+
+config+= [{
+    'local': 'fedora',
+    'driver': 'Yum',
+    'url': 'http://www.las.ic.unicamp.br/pub/fedora/linux/core',
+    'distro': '4',
+    'arch': 'i386',
+    'modules': [ '' ],
+    'baseDir': "%(distro_name)s/%(arch)s/os",
+    'rpmDir': 'Fedora/RPMS',
+}]
+
+config+= [{
+    'local': 'fedora/updates',
+    'driver': 'Yum',
+    'url': 'http://www.las.ic.unicamp.br/pub/fedora/linux/core/updates',
+    'distro': '3',
+    'arch': 'i386',
+    'modules': [ '' ],
+    'baseDir': "%(distro_name)s/%(arch)s",
+    'rpmDir': '.',
+}]

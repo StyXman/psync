@@ -1,0 +1,47 @@
+a driver needs to derive from psyncpkg.core.Psync and implement the following
+methods:
+
+    def databases (self, distro_name, module, arch):
+
+    def files (self, prefix, distro_name, module, arch):
+    def checkold(self, filename):
+    def finalDBs (self, distro, module, arch):
+
+dividing URLs:
+
+Fedora (Yum)
+http://mirrors.kernel.org/fedora/core/ 4/i386/os/ Fedora/RPMS/
+baseUrl distroBase rpmBase
+http://mirrors.kernel.org/fedora/core/ 4/i386/os/ repodata/primary.xml.gz
+baseUrl distroBase
+http://mirrors.kernel.org/fedora/core/updates/ 4/i386/
+baseUrl distroBase
+http://mirrors.kernel.org/fedora/core/updates/ 4/i386/ repodata/primary.xml.gz
+baseUrl distroBase
+
+PLF (Urpmi)
+http://ftp.club-internet.fr/pub/linux/plf/mandrake/free/ 10.1/i586/
+baseUrl distroBase
+http://ftp.club-internet.fr/pub/linux/plf/mandrake/free/ 10.1/i586/ ../synthesis.hdlist.cz
+baseUrl distroBase
+
+Mandriva (Urpmi)
+http://mirrors.kernel.org/mandrake/Mandrakelinux/official/ 2006.0/i586/ media/main/
+baseUrl distroBase rpmBase
+http://mirrors.kernel.org/mandrake/Mandrakelinux/official/ 2006.0/i586/ media/main/ media_info/synthesis.hdlist.cz
+baseUrl distroBase rpmBase
+http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates/ 2006.0/ RPMS/
+baseUrl distroBase rpmBase
+http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates/ 2006.0/ RPMS/ media_info/synthesis.hdlist.cz
+
+Debian (Debian)
+http://mirrors.kernel.org/debian/
+baseUrl
+http://mirrors.kernel.org/debian/ dists/sarge/main/binary-i386/Packages.gz
+baseUrl
+
+Marillat
+ftp.nerim.net:/debian-marillat/
+baseUrl
+ftp.nerim.net:/debian-marillat/ dists/sarge/main/binary-i386/Packages.gz
+baseUrl
