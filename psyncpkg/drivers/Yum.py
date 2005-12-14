@@ -19,9 +19,9 @@ class Yum (Psync):
         baseDir= self.baseDir % locals ()
         ans= []
 
-        # for i in ('repomd.xml', 'comps.xml',
-                  # 'filelists.xml.gz', 'other.xml.gz', 'primary.xml.gz'):
-        for i in ('repomd.xml', 'primary.xml.gz'):
+        # actually, it should download comps.xml and take from there
+        for i in ('repomd.xml', 'comps.xml',
+                  'filelists.xml.gz', 'other.xml.gz', 'primary.xml.gz'):
             ans.append (('%s/repodata/%s' % (baseDir, i), True))
         if self.verbose:
             print ans
@@ -54,7 +54,7 @@ class Yum (Psync):
                 pass
             # (filename, size)
             if i.nevra[4]!='src':
-                # nevra= (name, epoch (?!?), version, release, arch)
+                # nevra= (name, epoch, version, release, arch)
                 # ans.append (("%s/%s/%s-%s-%s.%s.rpm" % (baseDir, self.rpmDir, i.nevra[0], i.nevra[2], i.nevra[3], i.nevra[4]), i.size['package']))
                 ans.append (("%s/%s/%s" % (baseDir, self.rpmDir, i.location['href']), int(i.size['package'])))
         

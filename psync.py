@@ -25,6 +25,8 @@ if __name__=='__main__':
     parser.add_option ('-m', '--mail-to', dest='m')
     parser.add_option ('-n', '--dry-run', dest='n', action='store_true',
         default=False)
+    parser.add_option ('-p', '--progress', dest='p', action='store_true',
+        default=False)
     parser.add_option ('-q', '--quiet', dest='v', action='store_false',
         default=False)
     parser.add_option ('-s', '--save-space', dest='t', action='store_false')
@@ -41,6 +43,7 @@ if __name__=='__main__':
     mailTo= opts.m
     dryRun= opts.n
     subject= opts.j
+    progress= opts.p
 
     configVars= {}
     configFile= opts.f
@@ -65,7 +68,7 @@ if __name__=='__main__':
             DriverClass= getattr(__import__('psyncpkg.drivers.'+driverName, {},
                                  {}, [driverName]), driverName)
             driver= DriverClass(cont=cont, consistent=consistent, limit=limit,
-                verbose=verbose, dryRun=dryRun, **distro)
+                verbose=verbose, dryRun=dryRun, progress=progress, **distro)
             mail+= driver.processDistro (distro)
             mail.append ('')
 

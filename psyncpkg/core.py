@@ -10,7 +10,7 @@ from psyncpkg.utils import stat, makedirs, grab, rename
 
 class Psync(object):
     def __init__ (self, cont=False, consistent=True, limit=20, verbose=False,
-            dryRun=False, **kwargs):
+            dryRun=False, progress=False, **kwargs):
         """_attr means readonly
         """
         self.cont= cont
@@ -21,6 +21,7 @@ class Psync(object):
         self.failed= []
         self.updatedFiles= []
         self.dryRun= dryRun
+        self.progress= progress
         self.__dict__.update(kwargs)
 
     def getPackage (self, baseUrl, localDir, fileName, size):
@@ -53,14 +54,14 @@ class Psync(object):
             if self.verbose:
                 print "%s: not here" % _file
             if not self.dryRun:
-                ans= self.grab (_file, url, verbose=self.verbose)
+                ans= grab (_file, url, limit=self.limit, verbose=self.verbose, progress=self.progress)
             self.updatedFiles.append (basename(_file))
         else:
             if size is not None and s.st_size!=size:
                 if self.verbose:
                     print "%s: wrong size %d; should be %d" % (_file, s.st_size, size)
                 if not self.dryRun:
-                    ans= self.grab (_file, url, cont=True, verbose=self.verbose)
+                    ans= grab (_file, url, limit=self.limit, cont=True, verbose=self.verbose, progress=self.progress)
                 self.updatedFiles.append (basename(_file))
             else:
                 if self.verbose:
@@ -93,8 +94,9 @@ class Psync(object):
             for (database, critic) in self.databases (distro, module, arch):
                 # yes: per design, we don't follow the dryRun option here,
                 # but neither the databases will be swaped at the end.
-                found= self.grab (_dir+local+'/'+database,
-                           baseurl+'/'+database, cont=self.cont)
+                found= grab (_dir+local+'/'+database,
+                           baseurl+'/'+database, limit=self.limit,
+                           verbose=self.verbose, progress=self.progress)
 
             # now files
             for filename, size in self.files (_dir+local, local, distro, module, arch):
@@ -134,7 +136,5 @@ class Psync(object):
                 unlink (_file)
 
         return self.updatedFiles
-
-    grab= grab
 
 # end

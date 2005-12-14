@@ -35,7 +35,7 @@ def makedirs(_dirname, verbose=False):
 	    if verbose:
 		print 'make dir %s' % i
 
-def grab(self, filename, url, cont=True, verbose=False):
+def grab(filename, url, limit=20, cont=True, verbose=False, progress=False):
     """ Fetches a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
@@ -48,7 +48,11 @@ def grab(self, filename, url, cont=True, verbose=False):
     if not cont and stat (filename):
         unlink (filename)
 
-    command = "curl -L -f -C - --limit-rate %sk -o %s %s" % (self.limit, filename, url)
+    silentStr= "-s"
+    if progress:
+        silentStr= ""
+
+    command = "curl -L -f -C - --limit-rate %sk %s -o %s %s" % (limit, silentStr, filename, url)
     if verbose:
         print command
 
@@ -60,7 +64,6 @@ def grab(self, filename, url, cont=True, verbose=False):
     while curlExitCode != 0 and curlExitCode != 2 and curlExitCode != 0x1600:
         curlExitCode = system(command)
         # print "cec= %x" % curlexitcode
-        print
 
     if curlExitCode==2:
         raise KeyboardInterrupt

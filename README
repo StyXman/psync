@@ -23,3 +23,5 @@ TODO:
 * Release's
 * [06:35] <cholo> StyXman: y los udebs para netinst???
 * checksum support?
+* ignore list.
+* better distro release handling.
