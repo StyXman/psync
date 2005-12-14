@@ -22,6 +22,7 @@ class Psync(object):
         self.updatedFiles= []
         self.dryRun= dryRun
         self.progress= progress
+        self.downloadedSize= 0
         self.__dict__.update(kwargs)
 
     def getPackage (self, baseUrl, localDir, fileName, size):
@@ -55,6 +56,7 @@ class Psync(object):
                 print "%s: not here" % _file
             if not self.dryRun:
                 ans= grab (_file, url, limit=self.limit, verbose=self.verbose, progress=self.progress)
+            self.downloadedSize+= size
             self.updatedFiles.append (basename(_file))
         else:
             if size is not None and s.st_size!=size:
@@ -62,6 +64,7 @@ class Psync(object):
                     print "%s: wrong size %d; should be %d" % (_file, s.st_size, size)
                 if not self.dryRun:
                     ans= grab (_file, url, limit=self.limit, cont=True, verbose=self.verbose, progress=self.progress)
+                self.downloadedSize+= size
                 self.updatedFiles.append (basename(_file))
             else:
                 if self.verbose:
@@ -134,7 +137,5 @@ class Psync(object):
             for _file in delete:
                 print "unlinking %s" % _file
                 unlink (_file)
-
-        return self.updatedFiles
 
 # end

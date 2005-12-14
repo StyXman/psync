@@ -65,11 +65,15 @@ if __name__=='__main__':
                 print "processing distro "+ str(distro)
             mail.append (distro['local']+':')
             driverName= distro['driver']
+            
             DriverClass= getattr(__import__('psyncpkg.drivers.'+driverName, {},
                                  {}, [driverName]), driverName)
             driver= DriverClass(cont=cont, consistent=consistent, limit=limit,
                 verbose=verbose, dryRun=dryRun, progress=progress, **distro)
-            mail+= driver.processDistro (distro)
+            driver.processDistro (distro)
+            
+            mail+= driver.updatedFiles
+            mail.append ('total downloaded: %7.2f MiB' % (driver.downloadedSize/1048576.0))
             mail.append ('')
 
         if not mailTo is None:
