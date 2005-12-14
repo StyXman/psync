@@ -57,13 +57,18 @@ def grab(filename, url, limit=20, cont=True, verbose=False, progress=False):
         print command
 
     # Curl has not an equivalent parameter for Wget's -t (number of tries)...
-    # Curl returns 0 on successful download, 2 when interrupted by the user
-    # with Ctrl-C and 22 when the file was not found.
-    # the code 22 is really returned as 22*256==5632 :(
+    # Curl returns:
+    # 0 on successful download,
+    # 2 when interrupted by the user with Ctrl-C,
+    # 22 when the file was not found (http error 404)
+    # 18: Partial file. Only a part of the file was transferred.
+    # the codes 22 and 18 are really returned as n*256 :(
+    finishCodes= (0, 2, 0x1600, 0x1200)
     curlExitCode = 1
-    while curlExitCode != 0 and curlExitCode != 2 and curlExitCode != 0x1600:
+    while not curlExitCode in finishCodes:
         curlExitCode = system(command)
-        # print "cec= %x" % curlexitcode
+        if verbose:
+            print "cec= 0x%x" % curlExitCode
 
     if curlExitCode==2:
         raise KeyboardInterrupt
