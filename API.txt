@@ -2,7 +2,6 @@ a driver needs to derive from psyncpkg.core.Psync and implement the following
 methods:
 
     def databases (self, distro_name, module, arch):
-
     def files (self, prefix, distro_name, module, arch):
     def checkold(self, filename):
     def finalDBs (self, distro, module, arch):
