@@ -9,21 +9,20 @@ import os
 from psyncpkg.utils import stat, makedirs, grab, rename
 
 class Psync(object):
-    def __init__ (self, cont=False, consistent=True, limit=20, verbose=False,
-            dryRun=False, progress=False, **kwargs):
+    def __init__ (self, verbose=False, **kwargs):
         """_attr means readonly
         """
-        self.cont= cont
-        self.saveSpace= not consistent
-        self.limit= limit
-        self.verbose= verbose
         self.delete= []
         self.failed= []
         self.updatedFiles= []
-        self.dryRun= dryRun
-        self.progress= progress
         self.downloadedSize= 0
+        self.verbose= verbose
+        
+        if self.verbose:
+            print self.__dict__
         self.__dict__.update(kwargs)
+        if self.verbose:
+            print self.__dict__
 
     def getPackage (self, baseUrl, localDir, fileName, size):
         """ Get one package, making sure it's the right size
@@ -38,7 +37,7 @@ class Psync(object):
 
         old= self.checkold (_file)
         if old:
-            if not self.saveSpace:
+            if not self.save_space:
                 for i in old:
                     if self.verbose:
                         print "%s: wrong version, deleted" % i
@@ -54,7 +53,7 @@ class Psync(object):
         except OSError:
             if self.verbose:
                 print "%s: not here" % _file
-            if not self.dryRun:
+            if not self.dry_run:
                 ans= grab (_file, url, limit=self.limit, verbose=self.verbose, progress=self.progress)
             self.downloadedSize+= size
             self.updatedFiles.append (basename(_file))
@@ -62,7 +61,7 @@ class Psync(object):
             if size is not None and s.st_size!=size:
                 if self.verbose:
                     print "%s: wrong size %d; should be %d" % (_file, s.st_size, size)
-                if not self.dryRun:
+                if not self.dry_run:
                     ans= grab (_file, url, limit=self.limit, cont=True, verbose=self.verbose, progress=self.progress)
                 self.downloadedSize+= size
                 self.updatedFiles.append (basename(_file))
@@ -76,11 +75,11 @@ class Psync(object):
     def processDistro(self, conf):
         local= conf['local']
         baseurl= conf['url']
-        distro= conf['distro']
+        version= conf['version']
         arch= conf['arch']
         modules= conf['modules']
 
-        if not self.cont:
+        if self.save_space:
             # create tmp dir
             _dir= ".tmp/"
             if self.verbose:
@@ -94,15 +93,15 @@ class Psync(object):
         files= []
         for module in modules:
             # download databases
-            for (database, critic) in self.databases (distro, module, arch):
-                # yes: per design, we don't follow the dryRun option here,
+            for (database, critic) in self.databases (version, module, arch):
+                # yes: per design, we don't follow the dry_run option here,
                 # but neither the databases will be swaped at the end.
                 found= grab (_dir+local+'/'+database,
                            baseurl+'/'+database, limit=self.limit,
                            verbose=self.verbose, progress=self.progress)
 
             # now files
-            for filename, size in self.files (_dir+local, local, distro, module, arch):
+            for filename, size in self.files (_dir+local, local, version, module, arch):
                 self.getPackage (baseurl, local, filename, size)
 
         # summary of failed pkgs
@@ -114,9 +113,9 @@ class Psync(object):
 
         # done
         # clean up/rollover
-        if not self.cont and not self.dryRun:
+        if self.save_space and not self.dry_run and self.failed!=[]:
             for module in modules:
-                for (database, critic) in self.finalDBs(distro, module, arch):
+                for (database, critic) in self.finalDBs(version, module, arch):
                     new= local+"/"+database
                     old= _dir+new
                     try:
@@ -132,7 +131,7 @@ class Psync(object):
                             raise e
                 # removedirs (dirname (old))
 
-        if not self.saveSpace and not self.dryRun:
+        if not self.save_space and not self.dry_run:
             # they're old anyways
             for _file in delete:
                 print "unlinking %s" % _file

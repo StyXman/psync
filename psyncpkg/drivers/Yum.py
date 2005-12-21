@@ -15,11 +15,11 @@ class Yum (Psync):
         super (Yum, self).__init__ (**kwargs)
         self.rpmList= None
 
-    def databases (self, distro_name, module, arch):
+    def databases (self, version, module, arch):
         baseDir= self.baseDir % locals ()
         ans= []
 
-        # actually, it should download comps.xml and take from there
+        # actually, it should download repomd.xml and take from there
         for i in ('repomd.xml', 'comps.xml',
                   'filelists.xml.gz', 'other.xml.gz', 'primary.xml.gz'):
             ans.append (('%s/repodata/%s' % (baseDir, i), True))
@@ -27,18 +27,20 @@ class Yum (Psync):
             print ans
         return ans
 
-    def files (self, prefix, localBase, distro_name, module, arch):
+    def files (self, prefix, localBase, version, module, arch):
         ans= []
         # build a parser and use it
         baseDir= self.baseDir % locals ()
         repodataDir= prefix+"/"+baseDir+"/repodata"
-        
+
         self.parser= RepodataParser (repodataDir)
         if self.verbose:
             self.parser.debug= True
 
         primary= repodataDir+'/primary.xml'
         primaryGz= primary+".gz"
+        if self.verbose:
+            print "processing database %s" % primaryGz
         # decompress the gz file
         gunzip (primaryGz, primary)
 
@@ -46,18 +48,18 @@ class Yum (Psync):
             self.rpmList= listdir("%s/%s/%s" % (localBase, baseDir, self.rpmDir))
         except OSError:
             self.rpmList= []
-        
+
         databank= self.parser.parseDataFromXml (primary)
         for i in databank.values():
             if self.verbose:
                 # i.dump ()
                 pass
             # (filename, size)
-            if i.nevra[4]!='src':
+            if i.nevra[4]!='src' and not i.location['href'].startswith ('debug'):
                 # nevra= (name, epoch, version, release, arch)
                 # ans.append (("%s/%s/%s-%s-%s.%s.rpm" % (baseDir, self.rpmDir, i.nevra[0], i.nevra[2], i.nevra[3], i.nevra[4]), i.size['package']))
                 ans.append (("%s/%s/%s" % (baseDir, self.rpmDir, i.location['href']), int(i.size['package'])))
-        
+
         ans.sort()
         return ans
 
@@ -89,7 +91,7 @@ class Yum (Psync):
 
         return ans
 
-    def finalDBs (self, distro, module, arch):
-        return []
+    def finalDBs (self, version_name, module, arch):
+        return self.databases (version_name, module, arch)
 
 # end

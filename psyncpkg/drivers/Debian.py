@@ -11,23 +11,23 @@ from psyncpkg.core import Psync
 from psyncpkg.utils import stat
 
 class Debian(Psync):
-    distroPath= "dists/%s/"
+    versionPath= "dists/%s/"
     def __init__ (self, **kwargs):
         super (Debian, self).__init__ (**kwargs)
         apt_pkg.init ()
         self.firstDatabase= True
 
-    def databases(self, distro_name, module, arch):
+    def databases(self, version_name, module, arch):
         ans= []
         # skipping Release
 
         # Contents
         if self.firstDatabase:
-            ans.append (("dists/%s/Contents-%s.gz" % (distro_name, arch), False))
+            ans.append (("dists/%s/Contents-%s.gz" % (version_name, arch), False))
             self.firstDatabase= False
         
         # download the .gz only and process from there
-        packages= "dists/%s/%s/binary-%s/Packages" % (distro_name, module, arch)
+        packages= "dists/%s/%s/binary-%s/Packages" % (version_name, module, arch)
         packagesGz= packages+".gz"
 
         if not self.cont or not stat (packagesGz):
@@ -37,8 +37,8 @@ class Debian(Psync):
             print ans
         return ans
 
-    def files(self, prefix, localBase, distro, module, arch):
-        packages= "%s/dists/%s/%s/binary-%s/Packages" % (prefix, distro, module,
+    def files(self, prefix, localBase, version, module, arch):
+        packages= "%s/dists/%s/%s/binary-%s/Packages" % (prefix, version, module,
                                                          arch)
         packagesGz= packages+".gz"
         
@@ -67,20 +67,20 @@ class Debian(Psync):
         f.close ()
         self.firstDatabase= True
 
-    def finalDBs (self, distro, module, arch):
+    def finalDBs (self, version, module, arch):
         ans= []
         # skipping Release
 
         # Packages
         for ext in ('', '.gz'):
-            ans.append (("dists/%s/%s/binary-%s/Packages%s" % (distro, module,
+            ans.append (("dists/%s/%s/binary-%s/Packages%s" % (version, module,
                                                               arch, ext), True))
 
         # Contents
         if self.firstDatabase:
             self.firstDatabase= False
         
-            ans.append (("dists/%s/Contents-%s.gz" % (distro, arch), False))
+            ans.append (("dists/%s/Contents-%s.gz" % (version, arch), False))
 
         if self.verbose:
             print ans
