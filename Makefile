@@ -1,5 +1,13 @@
 CHECKER=pychecker
 
+README=README.txt
+INDEX=$(HOME)/www/projects/psync/index.html
+
+all: $(README)
+
+$(README): $(INDEX)
+	lynx -dump $< > $@
+
 test:
 	$(CHECKER) -t -v -a --changetypes *.py 2>&1 | less -S
 
