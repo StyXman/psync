@@ -35,7 +35,40 @@ def makedirs(_dirname, verbose=False):
 	    if verbose:
 		print 'make dir %s' % i
 
-def grab(filename, url, limit=20, cont=True, verbose=False, progress=False):
+def getFile(url, destination):
+    file_name = fileFromUrl(url)
+    if not os.path.exists(destination):
+        try:
+            def reporter(block, block_size, total_size):
+                left = total_size - block * block_size
+                sys.stderr.write('\r')
+                sys.stderr.write('Downloading %s: ' % file_name)
+                if left > 0: # the estimate is a bit rough, so we fake it a bit
+                    sys.stderr.write('%sK left.' % (left/1024))
+                else:
+                    sys.stderr.write('done.')
+ 
+                # it's possible that this line is shorter than the earlier one,
+                # so we need to "erase" any leftovers
+                sys.stderr.write(' '*10)
+                sys.stderr.write('\b'*10)
+ 
+            urllib.urlretrieve(url, destination, reporter)
+            sys.stderr.write('\n')
+        except: # bare except is ok, exception re-raised below
+            if os.path.exists(destination):
+                os.unlink(destination)
+            raise
+ 
+    # check to make sure we *really* got an executable
+    if file_name.endswith('.exe'):
+        f = open(destination)
+        if f.read(2) != 'MZ': # Windows (and DOS) executables have this marker
+            raise RuntimeError('Download of "%s" resulted in something that '
+                'isn\'t an executable (perhaps a 404?).' % url)
+        f.close()
+
+def grab(filename, url, limit=0, cont=True, verbose=False, progress=False):
     """ Fetches a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
@@ -52,7 +85,11 @@ def grab(filename, url, limit=20, cont=True, verbose=False, progress=False):
     if progress:
         silentStr= ""
 
-    command = "curl -L -f -C - --limit-rate %sk %s -o %s %s" % (limit, silentStr, filename, url)
+    limitStr= ""
+    if limit>0:
+        limitStr= "--limit-rate %dk" % limit
+
+    command = "curl -L -f -C - %s %s -o %s %s" % (limitStr, silentStr, filename, url)
     if verbose:
         print command
 
@@ -96,7 +133,7 @@ def rename (old, new, verbose=False):
             # ufa. then copy it, you lazy bastard
             oldFile= open (old)
             newFile= open (new, 'w+')
-            
+
             data= oldFile.read (10240)
             while data!='':
                 newFile.write (data)
