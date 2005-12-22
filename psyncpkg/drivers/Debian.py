@@ -3,7 +3,7 @@
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
 from os import listdir
-from os.path import dirname
+from os.path import dirname, basename
 import apt_pkg
 import gzip
 
@@ -86,25 +86,32 @@ class Debian(Psync):
             print ans
         return ans
 
-    def checkold(self, filename):
+    def checkold(self, path):
         """ Checks for present files for an older version of this package.
             Also creates the directory just in case it doesn't exist.
         """
-        _dir= dirname (filename)
+        _dir= dirname (path)
+        filename= basename (path)
         (name, version) = filename.split('_')[:2]
-
         ans = []
 
+        if self.verbose:
+            # print 'processing dir %s for %s %s ' % (_dir, name, version)
+            pass
+        
         for f in listdir(_dir):
             try:
                 (fname, fversion) = f.split('_')[:2]
+                if self.verbose:
+                    # print fname, fversion
+                    pass
                 # if it's newer, delete the old one
                 if fname == name and apt_pkg.VersionCompare(version, fversion) == 1:
                     ans.append("%s/%s" % (_dir, f))
             except ValueError:
                 # unpack list of wrong size
                 # could be anything
-                # when ij doulbt, leave alne
+                # when in doubt, leave alne
                 if self.verbose:
                     print "ignoring %s" % f
 
