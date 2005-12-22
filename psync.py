@@ -13,6 +13,13 @@ import sys
 import smtplib
 import datetime
 
+import psyncpkg
+
+from psyncpkg import logLevel
+import logging
+logger = logging.getLogger('psync')
+logger.setLevel(logLevel)
+
 def sendmail (conf, mail):
     host= getfqdn ()
     body= '\r\n'.join (mail)
@@ -47,7 +54,8 @@ def handleOpts ():
     parser.add_option ('-c', '--continue', action='store_true', default=False)
     parser.add_option ('-d', '--distro', action='append', dest='distros')
     parser.add_option ('-f', '--config-file', default='psync.conf.py')
-    parser.add_option ('-g', '--debug', action='store_true', default=False)
+    parser.add_option ('-g', '--debug', action='store_const', dest='log_level',
+                        const=logging.DEBUG)
     parser.add_option ('-j', '--subject', default='Updates del día %(date)s')
     parser.add_option ('-l', '--limit', type='int', default=0)
     parser.add_option ('-m', '--mail-to')
@@ -58,11 +66,14 @@ def handleOpts ():
                         dest='save_space', default=False)
     parser.add_option ('-t', '--consistent', action='store_false',
                         dest='save_space')
-    parser.add_option ('-v', '--verbose', action='store_true')
+    parser.add_option ('-v', '--verbose', action='store_const', dest='log_level',
+                        const=logging.INFO)
     return parser.parse_args ()
 
 def main ():
     (conf, args)= handleOpts ()
+    conf.verbose= conf.log_level>0
+    psyncpkg.logLevel= conf.log_level
 
     # load config file
     configVars= {}
@@ -76,13 +87,12 @@ def main ():
         distros= config
 
     mail= []
-    if conf.dry_run and conf.verbose:
-        print "doing dry run!"
+    if conf.dry_run:
+        logger.info ("doing dry run!")
     try:
         for distro in distros:
             distro.update (confToDict (conf))
-            if conf.verbose:
-                print "processing distro "+ str(distro)
+            logger.debug ("processing distro "+ str(distro))
 
             # prepare teh mail body
             mail.append (distro['local']+':')

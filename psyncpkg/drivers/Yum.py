@@ -10,6 +10,11 @@ import re
 from psyncpkg.core import Psync
 from psyncpkg.utils import gunzip
 
+from psyncpkg import logLevel
+import logging
+logger = logging.getLogger('psync.drivers.Yum')
+logger.setLevel(logLevel)
+
 class Yum (Psync):
     def __init__ (self, **kwargs):
         super (Yum, self).__init__ (**kwargs)
@@ -23,8 +28,7 @@ class Yum (Psync):
         for i in ('repomd.xml', 'comps.xml',
                   'filelists.xml.gz', 'other.xml.gz', 'primary.xml.gz'):
             ans.append (('%s/repodata/%s' % (baseDir, i), True))
-        if self.verbose:
-            print ans
+        logger.debug (ans)
         return ans
 
     def files (self, prefix, localBase, version, module, arch):
@@ -39,8 +43,7 @@ class Yum (Psync):
 
         primary= repodataDir+'/primary.xml'
         primaryGz= primary+".gz"
-        if self.verbose:
-            print "processing database %s" % primaryGz
+        logger.info ("processing database %s" % primaryGz)
         # decompress the gz file
         gunzip (primaryGz, primary)
 
@@ -85,9 +88,8 @@ class Yum (Psync):
             except ValueError:
                 # unpack list of wrong size
                 # could be anything
-                # when in doulbt, leave alone
-                if self.verbose:
-                    print "ignoring %s" % f
+                # when in doubt, leave alone
+                logger.debug ("ignoring %s" % f)
 
         return ans
 

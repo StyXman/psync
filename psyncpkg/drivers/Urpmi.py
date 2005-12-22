@@ -9,6 +9,11 @@ import re
 
 from psyncpkg.core import Psync
 
+from psyncpkg import logLevel
+import logging
+logger = logging.getLogger('psync.drivers.Urpmi')
+logger.setLevel(logLevel)
+
 class Urpmi (Psync):
     
     def databases (self, distro, module, arch):
@@ -30,8 +35,7 @@ class Urpmi (Psync):
     def files(self, prefix, localBase, distro, module, arch):
         synthesis= "%s/%s" % (prefix, self.synthesis)
         
-        if self.verbose:
-            print "opening %s" % synthesis
+        logger.debug ("opening %s" % synthesis)
         f= gzip.open (synthesis)
 
         line= f.readline ()

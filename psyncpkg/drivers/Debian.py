@@ -10,6 +10,11 @@ import gzip
 from psyncpkg.core import Psync
 from psyncpkg.utils import stat
 
+from psyncpkg import logLevel
+import logging
+logger = logging.getLogger('psync.drivers.Debian')
+logger.setLevel(logLevel)
+
 class Debian(Psync):
     versionPath= "dists/%s/"
     def __init__ (self, **kwargs):
@@ -33,8 +38,7 @@ class Debian(Psync):
         if self.save_space or not stat (packagesGz):
             ans.append ((packagesGz, True))
         
-        if self.verbose:
-            print ans
+        logger.debug (ans)
         return ans
 
     def files(self, prefix, localBase, version, module, arch):
@@ -42,8 +46,7 @@ class Debian(Psync):
                                                          arch)
         packagesGz= packages+".gz"
         
-        if self.verbose:
-            print "opening %s" % packagesGz
+        logger.debug ("opening %s" % packagesGz)
         f= gzip.open (packagesGz)
         o= open (packages, "w+")
 
@@ -82,8 +85,7 @@ class Debian(Psync):
         
             ans.append (("dists/%s/Contents-%s.gz" % (version, arch), False))
 
-        if self.verbose:
-            print ans
+        logger.debug (ans)
         return ans
 
     def checkold(self, path):
@@ -112,8 +114,7 @@ class Debian(Psync):
                 # unpack list of wrong size
                 # could be anything
                 # when in doubt, leave alne
-                if self.verbose:
-                    print "ignoring %s" % f
+                logger.debug ("ignoring %s" % f)
 
         return ans
 

@@ -7,6 +7,11 @@ from os import mkdir, unlink, system, utime
 from os.path import dirname
 from gzip import GzipFile
 
+from psyncpkg import logLevel
+import logging
+logger = logging.getLogger('psync.utils')
+logger.setLevel(logLevel)
+
 def stat(f):
     """ Safe replacement for os.stat() """
     ans = True
@@ -16,7 +21,7 @@ def stat(f):
         ans = False
     return ans
 
-def makedirs(_dirname, verbose=False):
+def makedirs(_dirname):
     """ Better replacement for os.makedirs():
         doesn't fails if some intermediate dir already exists.
     """
@@ -32,8 +37,7 @@ def makedirs(_dirname, verbose=False):
             # print "%s failed: %s" % (i, e)
             pass
 	else:
-	    if verbose:
-		print 'make dir %s' % i
+            logger.debug ('make dir %s' % i)
 
 def getFile(url, destination):
     file_name = fileFromUrl(url)
@@ -68,10 +72,11 @@ def getFile(url, destination):
                 'isn\'t an executable (perhaps a 404?).' % url)
         f.close()
 
-def grab(filename, url, limit=0, cont=True, verbose=False, progress=False):
+def grab(filename, url, limit=0, cont=True, progress=False):
     """ Fetches a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
+    # logger.info ("%s -> %s" % (url, filename))
     print "%s -> %s" % (url, filename)
     _dir = dirname(filename)
     makedirs(_dir)
@@ -90,8 +95,7 @@ def grab(filename, url, limit=0, cont=True, verbose=False, progress=False):
         limitStr= "--limit-rate %dk" % limit
 
     command = "curl -L -f -C - %s %s -o %s %s" % (limitStr, silentStr, filename, url)
-    if verbose:
-        print command
+    logger.debug (command)
 
     # Curl has not an equivalent parameter for Wget's -t (number of tries)...
     # Curl returns:
@@ -104,8 +108,7 @@ def grab(filename, url, limit=0, cont=True, verbose=False, progress=False):
     curlExitCode = 1
     while not curlExitCode in finishCodes:
         curlExitCode = system(command)
-        if verbose:
-            print "cec= 0x%x" % curlExitCode
+        logger.debug ("cec= 0x%x" % curlExitCode)
 
     if curlExitCode==2:
         raise KeyboardInterrupt
@@ -122,9 +125,8 @@ def touch (path):
         f= open (path, 'w+')
         f.close()
 
-def rename (old, new, verbose=False):
-    if verbose:
-        print old, '->', new
+def rename (old, new):
+    logger.info (old, '->', new)
     try:
         os.rename (old, new)
     except OSError, e:

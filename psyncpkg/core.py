@@ -8,6 +8,11 @@ import os
 
 from psyncpkg.utils import stat, makedirs, grab, rename
 
+from psyncpkg import logLevel
+import logging
+logger = logging.getLogger('psync.core')
+logger.setLevel(logLevel)
+
 class Psync(object):
     def __init__ (self, verbose=False, **kwargs):
         """_attr means readonly
@@ -18,11 +23,9 @@ class Psync(object):
         self.downloadedSize= 0
         self.verbose= verbose
         
-        if self.verbose:
-            print self.__dict__
+        logger.debug (self.__dict__)
         self.__dict__.update(kwargs)
-        if self.verbose:
-            print self.__dict__
+        logger.debug (self.__dict__)
 
     def getPackage (self, baseUrl, localDir, fileName, size):
         """ Get one package, making sure it's the right size
@@ -39,35 +42,30 @@ class Psync(object):
         if old:
             if self.save_space:
                 for i in old:
-                    if self.verbose:
-                        print "%s: wrong version, deleted" % i
+                    logger.info ("%s: wrong version, deleted" % i)
                     unlink (i)
             else:
-                if self.verbose:
-                    print "%s: wrong version, marked for deletion" % old
+                logger.info ("%s: wrong versions, marked for deletion" % old)
                 self.delete+= (old)
 
         try:
             s= os.stat (_file)
             # print "%d<>%d" % (s.st_size, size)
         except OSError:
-            if self.verbose:
-                print "%s: not here" % _file
+            logger.info ("%s: not here" % _file)
             if not self.dry_run:
-                ans= grab (_file, url, limit=self.limit, verbose=self.verbose, progress=self.progress)
+                ans= grab (_file, url, limit=self.limit, progress=self.progress)
             self.downloadedSize+= size
             self.updatedFiles.append (basename(_file))
         else:
             if size is not None and s.st_size!=size:
-                if self.verbose:
-                    print "%s: wrong size %d; should be %d" % (_file, s.st_size, size)
+                logger.info ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
                 if not self.dry_run:
-                    ans= grab (_file, url, limit=self.limit, cont=True, verbose=self.verbose, progress=self.progress)
+                    ans= grab (_file, url, limit=self.limit, cont=True, progress=self.progress)
                 self.downloadedSize+= size
                 self.updatedFiles.append (basename(_file))
             else:
-                if self.verbose:
-                    print "%s: already here, skipping" % _file
+                logger.info ("%s: already here, skipping" % _file)
 
         if ans==0x1600:
             self.failed.append ("%s/%s" % (localDir, fileName))
@@ -82,8 +80,7 @@ class Psync(object):
         if not self.save_space:
             # create tmp dir
             _dir= ".tmp/"
-            if self.verbose:
-                print "not cont: working on %s" % _dir
+            logger.info ("not cont: working on %s" % _dir)
         else:
             _dir= './'
 
@@ -98,7 +95,7 @@ class Psync(object):
                 # but neither the databases will be swaped at the end.
                 found= grab (_dir+local+'/'+database,
                            baseurl+'/'+database, limit=self.limit,
-                           verbose=self.verbose, progress=self.progress)
+                           progress=self.progress)
 
             # now files
             for filename, size in self.files (_dir+local, local, version, module, arch):
@@ -119,10 +116,10 @@ class Psync(object):
                     new= local+"/"+database
                     old= _dir+new
                     try:
-                        makedirs (dirname (new), self.verbose)
+                        makedirs (dirname (new))
                         if stat (new):
                             unlink (new)
-                        rename (old, new, self.verbose)
+                        rename (old, new)
                     except OSError, e:
                         # better error report!
                         if not critic:
