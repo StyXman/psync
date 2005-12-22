@@ -101,10 +101,11 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     # Curl returns:
     # 0 on successful download,
     # 2 when interrupted by the user with Ctrl-C,
+    # 18 Partial file. Only a part of the file was transferred.
     # 22 when the file was not found (http error 404)
-    # 18: Partial file. Only a part of the file was transferred.
+    # 23 disk full
     # the codes 22 and 18 are really returned as n*256 :(
-    finishCodes= (0, 2, 0x1600, 0x1200)
+    finishCodes= (0, 2, 0x1600, 0x1200, 0x1700)
     curlExitCode = 1
     while not curlExitCode in finishCodes:
         curlExitCode = system(command)
@@ -112,6 +113,8 @@ def grab(filename, url, limit=0, cont=True, progress=False):
 
     if curlExitCode==2:
         raise KeyboardInterrupt
+    elif curlExitCode==0x1700:
+        raise IOError
 
     return curlExitCode
 
@@ -126,7 +129,7 @@ def touch (path):
         f.close()
 
 def rename (old, new):
-    logger.info (old, '->', new)
+    logger.info (old+' -> ' + new)
     try:
         os.rename (old, new)
     except OSError, e:

@@ -109,8 +109,9 @@ class Psync(object):
             print "----- %d package(s) failed"
 
         # done
-        # clean up/rollover
-        if not self.save_space and not self.dry_run and self.failed!=[]:
+        # update databases
+        if not self.save_space and not self.dry_run and self.failed==[]:
+            logger.info ('database rook')
             for module in modules:
                 for (database, critic) in self.finalDBs(version, module, arch):
                     new= local+"/"+database
@@ -128,6 +129,7 @@ class Psync(object):
                             raise e
                 # removedirs (dirname (old))
 
+        # clean up
         if not self.save_space and not self.dry_run:
             # they're old anyways
             for _file in delete:

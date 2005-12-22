@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='psync',
-      version='0.2.2',
+      version='0.2.3',
       description="psync is a distribution mirroring utility with consistency in mind.",
       long_description="""
 psync is a mirroring utility. its main goal is to be able to update a  
@@ -22,7 +22,7 @@ to fix this. it also aims to support as many distributions as possible.
                 ],
       scripts= ['psync.py'],
       # data_files= [('examples', ['psync.conf.py'])],
-      classifiers=['Development Status :: 3 - Alpha',
+      classifiers=['Development Status :: 3 - Beta',
                    'Environment :: Console',
                    'Intended Audience :: System Administrators',
                    'License :: OSI Approved :: GNU General Public License (GPL)',
