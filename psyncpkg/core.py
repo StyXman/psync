@@ -79,7 +79,7 @@ class Psync(object):
         arch= conf['arch']
         modules= conf['modules']
 
-        if self.save_space:
+        if not self.save_space:
             # create tmp dir
             _dir= ".tmp/"
             if self.verbose:
@@ -113,7 +113,7 @@ class Psync(object):
 
         # done
         # clean up/rollover
-        if self.save_space and not self.dry_run and self.failed!=[]:
+        if not self.save_space and not self.dry_run and self.failed!=[]:
             for module in modules:
                 for (database, critic) in self.finalDBs(version, module, arch):
                     new= local+"/"+database

@@ -45,18 +45,19 @@ def confToDict (conf):
 def handleOpts ():
     parser= OptionParser ()
     parser.add_option ('-c', '--continue', action='store_true', default=False)
-    parser.add_option ('-d', '--distro', action='append')
+    parser.add_option ('-d', '--distro', action='append', dest='distros')
     parser.add_option ('-f', '--config-file', default='psync.conf.py')
     parser.add_option ('-g', '--debug', action='store_true', default=False)
     parser.add_option ('-j', '--subject', default='Updates del día %(date)s')
-    parser.add_option ('-l', '--limit', type='int', default=20)
+    parser.add_option ('-l', '--limit', type='int', default=0)
     parser.add_option ('-m', '--mail-to')
     parser.add_option ('-n', '--dry-run', action='store_true', default=False)
     parser.add_option ('-p', '--progress', action='store_true', default=False)
     parser.add_option ('-q', '--quiet', action='store_false', default=False)
-    parser.add_option ('-s', '--save-space', action='store_true', default=False)
-    parser.add_option ('-t', '--consistent', dest='save_space',
-                       action='store_false', default=True)
+    parser.add_option ('-s', '--save-space', action='store_true',
+                        dest='save_space', default=False)
+    parser.add_option ('-t', '--consistent', action='store_false',
+                        dest='save_space')
     parser.add_option ('-v', '--verbose', action='store_true')
     return parser.parse_args ()
 
@@ -69,8 +70,8 @@ def main ():
     config= configVars['config']
     del configVars
 
-    if conf.distro is not None:
-        distros= [ x for x in config if x['local'] in conf.distro ]
+    if conf.distros is not None:
+        distros= [ x for x in config if x['local'] in conf.distros ]
     else:
         distros= config
 
