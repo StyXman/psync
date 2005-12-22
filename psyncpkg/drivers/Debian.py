@@ -30,7 +30,7 @@ class Debian(Psync):
         packages= "dists/%s/%s/binary-%s/Packages" % (version_name, module, arch)
         packagesGz= packages+".gz"
 
-        if not self.cont or not stat (packagesGz):
+        if self.save_space or not stat (packagesGz):
             ans.append ((packagesGz, True))
         
         if self.verbose:
