@@ -37,7 +37,7 @@ class Psync(object):
 
         old= self.checkold (_file)
         if old:
-            if not self.save_space:
+            if self.save_space:
                 for i in old:
                     if self.verbose:
                         print "%s: wrong version, deleted" % i
