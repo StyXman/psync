@@ -28,7 +28,7 @@ config+= [{
     'url': 'http://http.us.debian.org/debian',
     'version': 'sarge',
     'arch': 'i386',
-    'modules': [ 'main', 'non-free', 'contrib' ],
+    'modules': [ 'main', 'non-free', 'contrib', 'main/debian-installer' ],
 }]
 config+= [{
     'local': 'debian/updates/sarge',
