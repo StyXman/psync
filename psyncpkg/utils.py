@@ -73,15 +73,17 @@ def getFile(url, destination):
         f.close()
 
 def grab(filename, url, limit=0, cont=True, progress=False):
-    """ Fetches a file if it does not exist or continues downloading
+    """ Fetchs a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
-    # logger.info ("%s -> %s" % (url, filename))
-    print "%s -> %s" % (url, filename)
+    logger.info ("%s -> %s" % (url, filename))
     _dir = dirname(filename)
     makedirs(_dir)
 
-    # fix cont smantics
+    # fix cont semantics
+    contStr= ""
+    if cont:
+        contStr= "-C -"
     # if file exists and not cont, delete
     if not cont and stat (filename):
         unlink (filename)
@@ -94,21 +96,27 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     if limit>0:
         limitStr= "--limit-rate %dk" % limit
 
-    command = "curl -L -f -C - %s %s -o %s %s" % (limitStr, silentStr, filename, url)
+    command = "curl -L -f %s %s %s -o %s %s" % (contStr, limitStr, silentStr, filename, url)
     logger.debug (command)
 
     # Curl has not an equivalent parameter for Wget's -t (number of tries)...
     # Curl returns:
+    
     # 0 on successful download,
     # 2 when interrupted by the user with Ctrl-C,
+
+    # these codes are really returned as n*256 :(
     # 18 Partial file. Only a part of the file was transferred.
     # 22 when the file was not found (http error 404)
     # 23 disk full
-    # the codes 22 and 18 are really returned as n*256 :(
+    # 33 The range "command" didn't work.
     finishCodes= (0, 2, 0x1600, 0x1200, 0x1700)
     curlExitCode = 1
     while not curlExitCode in finishCodes:
         curlExitCode = system(command)
+        if curlExitCode==0x2100:
+            command = "curl -L -f %s %s -o %s %s" % (limitStr, silentStr, filename, url)
+
         logger.debug ("cec= 0x%x" % curlExitCode)
 
     if curlExitCode==2:
