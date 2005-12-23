@@ -52,9 +52,9 @@ def confToDict (conf):
 def handleOpts ():
     parser= OptionParser ()
     parser.add_option ('-c', '--continue', action='store_true', default=False)
-    parser.add_option ('-d', '--distro', action='append', dest='distros')
+    parser.add_option ('-r', '--repo', action='append', dest='repos')
     parser.add_option ('-f', '--config-file', default='psync.conf.py')
-    parser.add_option ('-g', '--debug', action='store_const', dest='log_level',
+    parser.add_option ('-d', '--debug', action='store_const', dest='log_level',
                         const=logging.DEBUG)
     parser.add_option ('-j', '--subject', default='Updates del día %(date)s')
     parser.add_option ('-l', '--limit', type='int', default=0)
@@ -81,29 +81,29 @@ def main ():
     config= configVars['config']
     del configVars
 
-    if conf.distros is not None:
-        distros= [ x for x in config if x['local'] in conf.distros ]
+    if conf.repos is not None:
+        repos= [ x for x in config if x['repo'] in conf.repos ]
     else:
-        distros= config
+        repos= config
 
     mail= []
     if conf.dry_run:
         logger.info ("doing dry run!")
     try:
-        for distro in distros:
-            distro.update (confToDict (conf))
-            logger.debug ("processing distro "+ str(distro))
+        for repo in repos:
+            repo.update (confToDict (conf))
+            logger.debug ("processing repo "+ str(repo))
 
             # prepare teh mail body
-            mail.append (distro['local']+':')
-            mail.append ('~' * (len (distro['local'])+1))
-            driverName= distro['driver']
+            mail.append (repo['repo']+':')
+            mail.append ('~' * (len (repo['repo'])+1))
+            driverName= repo['driver']
             
             # instantiate a driver and process it
             DriverClass= getattr(__import__('psyncpkg.drivers.'+driverName, {},
                                  {}, [driverName]), driverName)
-            driver= DriverClass(**distro)
-            driver.processDistro (distro)
+            driver= DriverClass(**repo)
+            driver.processRepo ()
 
             # add to the mail the updated files.
             mail+= driver.updatedFiles
