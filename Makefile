@@ -1,6 +1,6 @@
 CHECKER=pychecker
 
-README=README.txt
+README=README
 INDEX=$(HOME)/www/projects/psync/index.html
 
 all: $(README)
