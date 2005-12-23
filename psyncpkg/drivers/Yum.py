@@ -6,9 +6,10 @@ from rpmUtils.miscutils import compareEVR
 from os import listdir
 from os.path import basename
 import re
+import libxml2
 
 from psyncpkg.core import Psync
-from psyncpkg.utils import gunzip
+from psyncpkg.utils import gunzip, grab
 
 from psyncpkg import logLevel
 import logging
@@ -20,22 +21,34 @@ class Yum (Psync):
         super (Yum, self).__init__ (**kwargs)
         self.rpmList= None
 
-    def databases (self, version, module, arch):
-        baseDir= self.baseDir % locals ()
+    def databases (self):
         ans= []
 
-        # actually, it should download repomd.xml and take from there
-        for i in ('repomd.xml', 'comps.xml',
-                  'filelists.xml.gz', 'other.xml.gz', 'primary.xml.gz'):
-            ans.append (('%s/repodata/%s' % (baseDir, i), True))
+        # download repomd.xml and take from there
+        filename= '%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata/repomd.xml' % self
+        grab (filename, '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self)
+        
+        repomd= libxml2.parseFile(filename).getRootElement()
+        repomdChild= repomd.children
+        while repomdChild:
+            if repomdChild.name=='data':
+                dataChild= repomdChild.children
+                while dataChild:
+                    if dataChild.name=='location':
+                        ans.append ((dataChild.prop ('href'), True))
+    
+                    dataChild= dataChild.next
+            
+            repomdChild= repomdChild.next
+        
         logger.debug (ans)
         return ans
 
-    def files (self, prefix, localBase, version, module, arch):
-        ans= []
+    def files (self):
         # build a parser and use it
-        baseDir= self.baseDir % locals ()
-        repodataDir= prefix+"/"+baseDir+"/repodata"
+        # hack
+        repodataDir= "%(repoDir)s/%(baseDir)s/repodata" % self
+        ans= []
 
         self.parser= RepodataParser (repodataDir)
         if self.verbose:
@@ -48,7 +61,7 @@ class Yum (Psync):
         gunzip (primaryGz, primary)
 
         try:
-            self.rpmList= listdir("%s/%s/%s" % (localBase, baseDir, self.rpmDir))
+            self.rpmList= listdir ("%(repoDir)s/%(baseDir)s/%(rpmDir)s" % self)
         except OSError:
             self.rpmList= []
 
@@ -57,11 +70,13 @@ class Yum (Psync):
             if self.verbose:
                 # i.dump ()
                 pass
-            # (filename, size)
-            if i.nevra[4]!='src' and not i.location['href'].startswith ('debug'):
-                # nevra= (name, epoch, version, release, arch)
-                # ans.append (("%s/%s/%s-%s-%s.%s.rpm" % (baseDir, self.rpmDir, i.nevra[0], i.nevra[2], i.nevra[3], i.nevra[4]), i.size['package']))
-                ans.append (("%s/%s/%s" % (baseDir, self.rpmDir, i.location['href']), int(i.size['package'])))
+            # nevra= (name, epoch, version, release, arch)
+            if ( (self.source and i.nevra[4]=='src') or
+                 (self.debug and i.location['href'].startswith ('debug')) or
+                 (not i.nevra[4]=='src') and not i.location['href'].startswith ('debug') ):
+                # (filename, size)
+                ans.append (( ("%(rpmDir)s/" % self)+i.location['href'],
+                             int(i.size['package']) ))
 
         ans.sort()
         return ans
@@ -93,7 +108,9 @@ class Yum (Psync):
 
         return ans
 
-    def finalDBs (self, version_name, module, arch):
-        return self.databases (version_name, module, arch)
+    def finalDBs (self):
+        finals= self.databases ()
+        finals.append (('repodata/repomd.xml', True))
+        return finals
 
 # end

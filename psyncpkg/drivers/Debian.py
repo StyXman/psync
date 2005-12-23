@@ -16,23 +16,22 @@ logger = logging.getLogger('psync.drivers.Debian')
 logger.setLevel(logLevel)
 
 class Debian(Psync):
-    versionPath= "dists/%s/"
     def __init__ (self, **kwargs):
         super (Debian, self).__init__ (**kwargs)
         apt_pkg.init ()
         self.firstDatabase= True
 
-    def databases(self, version_name, module, arch):
+    def databases(self):
         ans= []
         # skipping Release
 
         # Contents
         if self.firstDatabase:
-            ans.append (("dists/%s/Contents-%s.gz" % (version_name, arch), False))
+            ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
             self.firstDatabase= False
         
         # download the .gz only and process from there
-        packages= "dists/%s/%s/binary-%s/Packages" % (version_name, module, arch)
+        packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
         packagesGz= packages+".gz"
 
         if self.save_space or not stat (packagesGz):
@@ -41,9 +40,8 @@ class Debian(Psync):
         logger.debug (ans)
         return ans
 
-    def files(self, prefix, localBase, version, module, arch):
-        packages= "%s/dists/%s/%s/binary-%s/Packages" % (prefix, version, module,
-                                                         arch)
+    def files(self):
+        packages= "%(tempDir)s/%(repoDir)s/dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % self
         packagesGz= packages+".gz"
         
         logger.debug ("opening %s" % packagesGz)
@@ -70,20 +68,19 @@ class Debian(Psync):
         f.close ()
         self.firstDatabase= True
 
-    def finalDBs (self, version, module, arch):
+    def finalDBs (self):
         ans= []
         # skipping Release
 
         # Packages
         for ext in ('', '.gz'):
-            ans.append (("dists/%s/%s/binary-%s/Packages%s" % (version, module,
-                                                              arch, ext), True))
+            ans.append (( ("dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % self)+ext, True ))
 
         # Contents
         if self.firstDatabase:
             self.firstDatabase= False
         
-            ans.append (("dists/%s/Contents-%s.gz" % (version, arch), False))
+            ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
 
         logger.debug (ans)
         return ans
