@@ -5,14 +5,34 @@
 # example config file
 
 config= []
-#config+= [{
-    #'local': 'debian/updates/sarge',
-    #'driver': 'Debian',
-    #'url': 'http://security.debian.org/debian-security',
-    #'release': 'sarge/updates',
-    #'arch': 'i386',
-    #'modules': [ 'main', 'non-free', 'contrib' ],
-#}]
+
+#########
+# debian
+#########
+# deb http://http.us.debian.org/debian sarge             main non-free contrib
+#     |<-- repoUrl                -->| |<-- release -->| |<-- modules     -->|
+config.append (dict (
+    repo= 'debian',
+    repoUrl= 'http://http.us.debian.org/debian',
+    repoDir= 'debian/debian',
+    driver= 'Debian',
+    releases= [ 'sarge' ],
+    archs= [ 'i386' ],
+    modules= [ 'main', 'non-free', 'contrib', 'main/debian-installer' ],
+    baseDirTemplate= '',
+))
+
+config.append (dict (
+    repo= 'debian-security',
+    repoUrl= 'http://security.debian.org/debian-security',
+    repoDir= 'debian/debian-security',
+    driver= 'Debian',
+    releases= [ 'sarge/updates' ],
+    archs= [ 'i386' ],
+    modules= [ 'main', 'non-free', 'contrib' ],
+    baseDirTemplate= '',
+))
+
 #config+=[{
     #'local': 'debian-non-US',
     #'driver': 'Debian',
@@ -32,18 +52,9 @@ config= []
     #'modules': [ 'main' ],
 #}]
 
-#config+= [{
-    #'local': 'plf-free',
-    #'driver': 'Urpmi',
-    #'url': 'http://ftp.club-internet.fr/pub/linux/plf/mandrake/free',
-    #'release': '10.2',
-    #'distroSpec': '%(release)s',
-    #'rpmSpec': '%(arch)s',
-    #'arch': 'i586',
-    #'modules': [''],
-    #'hdlist': '../synthesis.hdlist.cz',
-#}]
-
+###########
+# mandrake
+###########
 #config+= [{
     #'local': 'mandrake',
     #'driver': 'Urpmi',
@@ -56,19 +67,37 @@ config= []
     #'hdlist': '../media_info/synthesis.hdlist_%(module)s.cz',
 #}]
 
-#config+= [{
-    #'local': 'mandrake/updates',
-    #'driver': 'Urpmi',
-    #'url': 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
-    #'release': 'LE2005',
-    #'arch': 'i586',
-    #'distroSpec': '%(release)s',
-    #'rpmSpec': 'main_updates',
-    #'modules': [ '' ],
-    #'hdlist': 'media_info/synthesis.hdlist.cz',
-#}]
+config.append (dict (
+    repo= 'mandrake-updates',
+    repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
+    repoDir= 'mandrake/updates',
+    driver= 'Urpmi',
+    releases= [ 'LE2005' ],
+    archs= [ 'i586' ],
+    modules= [ 'main_updates' ],
+    baseDirTemplate= '%(release)s/%(module)s',
+    rpmDir= '.',
+    hdlist= 'media_info/hdlist.cz',
+))
 
-## ubuntu
+# urpmi.addmedia plf-free http://plf.acnova.com/mandrake/free/10.2 with hdlist.cz
+# urpmi.addmedia plf-nonfree http://plf.acnova.com/mandrake/non-free/10.2 with hdlist.cz
+config.append (dict (
+    repo= 'plf',
+    repoUrl= 'http://ftp.club-internet.fr/pub/linux/plf/',
+    repoDir= 'mandrake/plf',
+    driver= 'Urpmi',
+    distros= [ 'mandrake' ],
+    releases= [ '10.2' ],
+    archs= [ 'i586' ],
+    baseDirTemplate= '%(distro)s/free/%(release)s/%(arch)s',
+    rpmDir= '.',
+    hdlist= '../hdlist.cz',
+))
+
+#########
+# ubuntu
+#########
 config.append (dict (
     repo= 'ubuntu',
     repoUrl= 'http://archive.ubuntu.com/ubuntu',
@@ -79,15 +108,6 @@ config.append (dict (
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
-
-#config+= [{
-    #'local': 'ubuntu/updates/hoary',
-    #'driver': 'Debian',
-    #'url': 'http://security.ubuntu.com/ubuntu',
-    #'release': 'hoary-security',
-    #'arch': 'i386',
-    #'modules': [ 'main' ],
-#}]
 config.append (dict (
     repo= 'ubuntu-updates',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
@@ -99,25 +119,9 @@ config.append (dict (
     baseDirTemplate= '',
 ))
 
-
-#config+= [{
-    #'local': 'ubuntu-warty',
-    #'driver': 'Debian',
-    #'url': 'http://archive.ubuntu.com/ubuntu',
-    #'release': 'warty',
-    #'arch': 'i386',
-    #'modules': [ 'main', 'restricted', 'universe' ],
-#}]
-
-#config+= [{
-    #'local': 'ubuntu/updates/breezy',
-    #'driver': 'Debian',
-    #'url': 'http://security.ubuntu.com/ubuntu',
-    #'release': 'breezy-security',
-    #'arch': 'i386',
-    #'modules': [ 'main' ],
-#}]
-
+#########
+# fedora
+#########
 #config+= [{
     #'local': 'fedora',
     #'driver': 'Yum',
@@ -127,17 +131,6 @@ config.append (dict (
     #'modules': [ '' ],
     #'baseDir': "%(release)s/%(arch)s/os",
     #'rpmDir': 'Fedora/RPMS',
-#}]
-
-#config+= [{
-    #'local': 'fedora/updates',
-    #'driver': 'Yum',
-    #'url': 'http://www.las.ic.unicamp.br/pub/fedora/linux/core/updates',
-    #'release': '3',
-    #'arch': 'i386',
-    #'modules': [ '' ],
-    #'baseDir': "%(release)s/%(arch)s",
-    #'rpmDir': '.',
 #}]
 
 config.append (dict (
@@ -167,15 +160,4 @@ config.append (dict (
     rpmDir= '.',
     debug= False,
     source= False,
-))
-
-config.append (dict (
-    repo= 'debian',
-    repoUrl= 'http://http.us.debian.org/debian',
-    repoDir= 'debian/debian',
-    driver= 'Debian',
-    releases= [ 'sarge' ],
-    archs= [ 'i386' ],
-    modules= [ 'main', 'non-free', 'contrib', 'main/debian-installer' ],
-    baseDirTemplate= '',
 ))

@@ -1,8 +1,4 @@
-psync is a tool for maintaining mirrors for several types of repos.
-right now the status is beta, which means that it works, it  has important
-things like, configurability and CL options, but is not considered final.
-
-it depends in the following packages (debian only):
+psync depends in the following packages:
 * curl.
 for Debian repos:
     * python-apt (python2.3 only)
@@ -11,16 +7,15 @@ for Yum repos:
     * rpm-python
     * python-celementtree
 
+if you plan to use psync under ubuntu, where the default python is 2.4, you
+must run the setup.py script with python2.3.
+
 if you want to use if you:
-0) install it in the root of the mirrors.
-1) modify the `psync.config.py' file.
-2) ./psync/py --help.
+0) install it running the setup.py script. it's a standar distutils script, so
+   you know the drill.
+1) copy the `psync.config.py' file to the root of the mirror and modify it at
+   will.
+2) psync.py --help.
 3) fire at will.
 
 I guess that's all. enjoy.
-
-TODO:
-* Release's
-* checksum support?
-* ignore list.
-* better distro release handling.
