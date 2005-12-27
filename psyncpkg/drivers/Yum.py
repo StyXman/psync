@@ -41,14 +41,12 @@ class Yum (Psync):
             
             repomdChild= repomdChild.next
         
-        logger.debug (ans)
         return ans
 
     def files (self):
         # build a parser and use it
         # hack
         repodataDir= "%(repoDir)s/%(baseDir)s/repodata" % self
-        ans= []
 
         self.parser= RepodataParser (repodataDir)
         if self.verbose:
@@ -75,11 +73,8 @@ class Yum (Psync):
                  (self.debug and i.location['href'].startswith ('debug')) or
                  (not i.nevra[4]=='src') and not i.location['href'].startswith ('debug') ):
                 # (filename, size)
-                ans.append (( ("%(rpmDir)s/" % self)+i.location['href'],
-                             int(i.size['package']) ))
-
-        ans.sort()
-        return ans
+                yield ( ("%(rpmDir)s/" % self)+i.location['href'],
+                             int(i.size['package']) )
 
     def checkold(self, filename):
         """ Checks for present files for an older version of this package.
