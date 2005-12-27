@@ -10,4 +10,4 @@ handler.setFormatter(formatter)
 logger = logging.getLogger('psync')
 logger.addHandler(handler)
 
-logLevel= logging.NOTSET
+logLevel= logging.INFO
