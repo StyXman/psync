@@ -120,7 +120,12 @@ class Psync(object):
     def process (self):
         # download databases
         self.baseDir= self.baseDirTemplate % self
-        for (database, critic) in self.databases ():
+        logger.debug (self.baseDirTemplate)
+        logger.debug (self.baseDir)
+        
+        databases= self.databases ()
+        logger.debug (databases)
+        for (database, critic) in databases:
             # yes: per design, we don't follow the dry_run option here,
             # but neither the databases will be swaped at the end.
             dababaseFilename= ("%(tempDir)s/%(repoDir)s/%(baseDir)s/" % self)+database
