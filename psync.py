@@ -72,7 +72,8 @@ def handleOpts ():
 
 def main ():
     (conf, args)= handleOpts ()
-    conf.verbose= conf.log_level>0
+    conf.verbose= conf.log_level>=logging.INFO
+    conf.debug= conf.log_level>=logging.DEBUG
     psyncpkg.logLevel= conf.log_level
 
     # load config file
@@ -92,7 +93,7 @@ def main ():
     try:
         for repo in repos:
             repo.update (confToDict (conf))
-            logger.debug ("processing repo "+ str(repo))
+            logger.info ("processing repo "+repo.repo))
 
             # prepare teh mail body
             mail.append (repo['repo']+':')
