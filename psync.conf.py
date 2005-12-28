@@ -28,7 +28,7 @@ config.append (dict (
     repoDir= 'debian/debian-security',
     driver= 'Debian',
     releases= [ 'sarge/updates' ],
-    archs= [ 'i386' ],
+    archs= [ 'i386', 'sparc' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDirTemplate= '',
 ))
@@ -67,12 +67,14 @@ config.append (dict (
     #'hdlist': '../media_info/synthesis.hdlist_%(module)s.cz',
 #}]
 
+# urpmi.addmedia contrib-ttu    ftp://ftp.phys.ttu.edu/pub/mandrake/ 9.2/contrib/i586          with hdlist.cz
+#                \<-- repo -->| |<-- repoUrl                    -->| |<-- baseDirTemplate -->|      |<-- hdlist -->|
 config.append (dict (
     repo= 'mandrake-updates',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
-    releases= [ 'LE2005' ],
+    releases= [ 'LE2005', '2006.0' ],
     archs= [ 'i586' ],
     modules= [ 'main_updates' ],
     baseDirTemplate= '%(release)s/%(module)s',
