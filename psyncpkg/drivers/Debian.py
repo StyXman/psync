@@ -37,7 +37,6 @@ class Debian(Psync):
         if self.save_space or not stat (packagesGz):
             ans.append ((packagesGz, True))
         
-        logger.debug (ans)
         return ans
 
     def files(self):
@@ -91,7 +90,8 @@ class Debian(Psync):
         """
         _dir= dirname (path)
         filename= basename (path)
-        (name, version) = filename.split('_')[:2]
+        (name, version, arch) = filename.split('_')
+        arch= arch.split ('.')[0]
         ans = []
 
         if self.verbose:
@@ -100,12 +100,13 @@ class Debian(Psync):
         
         for f in listdir(_dir):
             try:
-                (fname, fversion) = f.split('_')[:2]
+                (fname, fversion, farch) = f.split('_')
+                farch= farch.split ('.')[0]
                 if self.verbose:
                     # print fname, fversion
                     pass
                 # if it's newer, delete the old one
-                if fname == name and apt_pkg.VersionCompare(version, fversion) == 1:
+                if farch==arch and fname == name and apt_pkg.VersionCompare(version, fversion) == 1:
                     ans.append("%s/%s" % (_dir, f))
             except ValueError:
                 # unpack list of wrong size
