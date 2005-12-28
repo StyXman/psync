@@ -44,17 +44,19 @@ class Psync(object):
         if old:
             if self.save_space:
                 for i in old:
-                    logger.info ("%s: wrong version, deleted" % i)
+                    if self.verbose:
+                        logger.info ("%s: wrong version, deleted" % i)
                     unlink (i)
             else:
-                logger.info ("%s: wrong versions, marked for deletion" % old)
+                if self.verbose:
+                    logger.info ("%s: wrong versions, marked for deletion" % old)
                 self.delete+= (old)
 
         try:
             s= os.stat (_file)
             # print "%d<>%d" % (s.st_size, size)
         except OSError:
-            logger.info ("%s: not here" % _file)
+            logger.info ("%s" % _file)
             if not self.dry_run:
                 ans= grab (_file, url, limit=self.limit, progress=self.progress)
             self.downloadedSize+= size
@@ -67,7 +69,8 @@ class Psync(object):
                 self.downloadedSize+= size
                 self.updatedFiles.append (basename(_file))
             else:
-                logger.info ("%s: already here, skipping" % _file)
+                if self.verbose:
+                    logger.info ("%s: already here, skipping" % _file)
 
         if ans==0x1600:
             self.failed.append ("%s/%s" % (localDir, fileName))
@@ -103,7 +106,8 @@ class Psync(object):
         if not self.save_space and not self.dry_run:
             # they're old anyways
             for _file in self.delete:
-                print "unlinking %s" % _file
+                if self.verbose:
+                    logger.info ("unlinking %s" % _file)
                 unlink (_file)
 
     def processRelease (self):
@@ -118,42 +122,51 @@ class Psync(object):
                 self.process ()
 
     def process (self):
-        # download databases
-        self.baseDir= self.baseDirTemplate % self
-        logger.debug (self.baseDirTemplate)
-        logger.debug (self.baseDir)
-        
-        databases= self.databases ()
-        logger.debug (databases)
-        for (database, critic) in databases:
-            # yes: per design, we don't follow the dry_run option here,
-            # but neither the databases will be swaped at the end.
-            dababaseFilename= ("%(tempDir)s/%(repoDir)s/%(baseDir)s/" % self)+database
-            databaseUrl= ("%(repoUrl)s/%(baseDir)s/" % self)+database
+        try:
+            # download databases
+            self.baseDir= self.baseDirTemplate % self
+            logger.debug (self.baseDirTemplate)
+            logger.debug (self.baseDir)
+            
+            databases= self.databases ()
+            logger.debug (databases)
+            for (database, critic) in databases:
+                # yes: per design, we don't follow the dry_run option here,
+                # but neither the databases will be swaped at the end.
+                dababaseFilename= ("%(tempDir)s/%(repoDir)s/%(baseDir)s/" % self)+database
+                databaseUrl= ("%(repoUrl)s/%(baseDir)s/" % self)+database
+    
+                found= grab (dababaseFilename, databaseUrl,
+                             limit=self.limit, progress=self.progress, cont=False)
+    
+            # now files
+            for filename, size in self.files ():
+                self.getPackage (filename, size)
+            
+            if not self.save_space and not self.dry_run and self.failed==[]:
+                self.updateDatabases ()
+        except Exception, e:
+            logger.info ('processing %s failed due to %s' % (self.repo, e))
+            if self.debug: # or out of disk space
+                raise
 
-            found= grab (dababaseFilename, databaseUrl,
-                            limit=self.limit, progress=self.progress, cont=False)
-
-        # now files
-        for filename, size in self.files ():
-            self.getPackage (filename, size)
-        
-        logger.info ('database rook')
-        if not self.save_space and not self.dry_run and self.failed==[]:
-            for (database, critic) in self.finalDBs():
-                # logger.debug (self.__dict__)
-                new= ("%(repoDir)s/%(baseDir)s/" % self)+database
-                old= self.tempDir+'/'+new
-                try:
-                    makedirs (dirname (new))
-                    if stat (new):
-                        unlink (new)
-                    rename (old, new)
-                except OSError, e:
-                    # better error report!
-                    if not critic:
-                        logger.info ('[Ign] %s (%s)' % (old, str (e)))
-                    else:
-                        raise e
-            # removedirs (dirname (old))
+    def updateDatabases (self):
+        if self.verbose:
+            logger.info ('updating databases')
+        for (database, critic) in self.finalDBs():
+            # logger.debug (self.__dict__)
+            new= ("%(repoDir)s/%(baseDir)s/" % self)+database
+            old= self.tempDir+'/'+new
+            try:
+                makedirs (dirname (new))
+                if stat (new):
+                    unlink (new)
+                rename (old, new)
+            except OSError, e:
+                # better error report!
+                if not critic:
+                    logger.info ('[Ign] %s (%s)' % (old, str (e)))
+                else:
+                    raise e
+        # removedirs (dirname (old))
 # end
