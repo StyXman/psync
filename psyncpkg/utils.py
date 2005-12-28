@@ -76,7 +76,7 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     """ Fetchs a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
-    logger.info ("%s -> %s" % (url, filename))
+    logger.info ("downloading %s" % filename)
     _dir = dirname(filename)
     makedirs(_dir)
 
@@ -137,7 +137,7 @@ def touch (path):
         f.close()
 
 def rename (old, new):
-    logger.info (old+' -> ' + new)
+    logger.info ("move: %s -> %s" % (old, new))
     try:
         os.rename (old, new)
     except OSError, e:
