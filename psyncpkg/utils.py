@@ -3,9 +3,10 @@
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
 import os
-from os import mkdir, unlink, system, utime
+from os import mkdir, unlink, system, utime, strerror
 from os.path import dirname
 from gzip import GzipFile
+import errno
 
 from psyncpkg import logLevel
 import logging
@@ -122,7 +123,10 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     if curlExitCode==2:
         raise KeyboardInterrupt
     elif curlExitCode==0x1700:
-        raise IOError
+        e= IOError ()
+        e.errno= errno.ENOSPC
+        e.strerror= strerror (errno.ENOSPC)
+        raise e
 
     return curlExitCode
 

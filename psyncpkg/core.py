@@ -5,6 +5,7 @@
 from os import unlink, removedirs
 from os.path import dirname, basename
 import os
+import errno
 
 from psyncpkg.utils import stat, makedirs, grab, rename
 
@@ -147,8 +148,11 @@ class Psync(object):
                 self.updateDatabases ()
         except Exception, e:
             logger.info ('processing %s failed due to %s' % (self.repo, e))
-            if self.debug: # or out of disk space
-                raise
+            if ( self.debug or
+                 (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
+                 isinstance (e, KeyboardInterrupt) ):
+                # debugging or out of disk space
+                raise e
 
     def updateDatabases (self):
         if self.verbose:
