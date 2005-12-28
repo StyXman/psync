@@ -93,7 +93,7 @@ def main ():
     try:
         for repo in repos:
             repo.update (confToDict (conf))
-            logger.info ("processing repo "+repo.repo))
+            logger.info ("processing repo "+repo['repo'])
 
             # prepare teh mail body
             mail.append (repo['repo']+':')

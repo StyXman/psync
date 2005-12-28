@@ -1,1 +1,1 @@
-include psync.conf.py
+include psync.conf.py INSTALL COPYING RUNNING.txt
