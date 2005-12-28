@@ -2,65 +2,45 @@
 # Marcos Dione <mdione@grulic.org.ar>
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
-from os import listdir
+from os import listdir, popen
 from os.path import basename, dirname, join
 import gzip
 import re
+import rpm
 
-from psyncpkg.core import Psync
+from psyncpkg.drivers.Rpm import Rpm
 
 from psyncpkg import logLevel
 import logging
 logger = logging.getLogger('psync.drivers.Urpmi')
 logger.setLevel(logLevel)
 
-class Urpmi (Psync):
+class Urpmi (Rpm):
     
-    def databases (self, distro, module, arch):
-        varDict= self.__dict__
-        self.module= module
-        self.arch= arch
-        self.distroPath= self.distroSpec % varDict
-        self.rpmPath= self.distroPath+'/'+(self.rpmSpec % varDict)
-        self.synthesis= self.rpmPath+'/'+(self.hdlist % varDict)
-        # if self.verbose:
-            # print self.__dict__
+    def databases (self):
+        hdsplit= (dirname (self.hdlist), basename (self.hdlist))
+        synthesis= hdsplit[0]+'/synthesis.'+hdsplit[1]
+        return [ (synthesis, True), (self.hdlist, True) ]
+
+    def files(self):
+        hdlist= "%(tempDir)s/%(repoDir)s/%(baseDir)s/%(hdlist)s" % self
+        logger.debug ("opening %s" % hdlist)
+        pipe= popen ('zcat %s' % hdlist)
+
+        try:
+            self.rpmList= listdir ("%(repoDir)s/%(baseDir)s/%(rpmDir)s" % self)
+        except OSError:
+            self.rpmList= []
+
+        headerList= rpm.readHeaderListFromFD (pipe.fileno())
+        for header in headerList:
+            rpmArch= header[rpm.RPMTAG_ARCH]
+            if rpmArch==self.arch or rpmArch=='all':
+                # 1000000-> rpm file name, 1000001-> rpm file size
+                yield (self.rpmDir+'/'+header[1000000], header[1000001])
         
-        # luckly curl manages relative paths correctly
-        # synthesis= distro+'/'+module+'/'+self.hdlist
-        hdlist= self.synthesis.replace ('synthesis.', '')
-        # return [synthesis, hdlist]
-        return [ (self.synthesis, True) ]
+        pipe.close ()
 
-    def files(self, prefix, localBase, distro, module, arch):
-        synthesis= "%s/%s" % (prefix, self.synthesis)
-        
-        logger.debug ("opening %s" % synthesis)
-        f= gzip.open (synthesis)
-
-        line= f.readline ()
-        while line:
-            # @info@gstreamer-xvid-0.8.8-1plf.i586@0@24240@Video
-            data= line.split('@')
-            if data[1]=='info':
-                rpm= data[2]
-                print rpm
-                rpmArch= rpm.split ('.')[-1]
-                print rpm
-                if rpmArch==arch or rpmArch=='all':
-                    yield (self.rpmPath+'/'+rpm+'.rpm', None)
-            
-            line= f.readline ()
-        
-        f.close ()
-
-    def checkold(self, _file):
-        """ Checks for present files for an older version of this package.
-            Also creates the directory just in case it doesn't exist.
-        """
-        return []
-
-    def finalDBs (self, distro, module, arch):
-        return []
+    finalDBs= databases
 
 # end
