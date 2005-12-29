@@ -126,8 +126,8 @@ class Psync(object):
         try:
             # download databases
             self.baseDir= self.baseDirTemplate % self
-            logger.debug (self.baseDirTemplate)
-            logger.debug (self.baseDir)
+            logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
+            logger.debug ("resulting baseDir: %s" % self.baseDir)
             
             databases= self.databases ()
             logger.debug (databases)
@@ -151,7 +151,7 @@ class Psync(object):
             if ( self.debug or
                  (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                  isinstance (e, KeyboardInterrupt) ):
-                # debugging or out of disk space
+                # debugging, out of disk space or keyb int
                 raise e
 
     def updateDatabases (self):
