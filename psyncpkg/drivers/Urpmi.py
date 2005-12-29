@@ -35,7 +35,7 @@ class Urpmi (Rpm):
         headerList= rpm.readHeaderListFromFD (pipe.fileno())
         for header in headerList:
             rpmArch= header[rpm.RPMTAG_ARCH]
-            if rpmArch==self.arch or rpmArch=='all':
+            if rpmArch==self.arch:
                 # 1000000-> rpm file name, 1000001-> rpm file size
                 yield (self.rpmDir+'/'+header[1000000], header[1000001])
         
