@@ -21,14 +21,15 @@ config.append (dict (
     modules= [ 'main', 'non-free', 'contrib', 'main/debian-installer' ],
     baseDirTemplate= '',
 ))
-
 config.append (dict (
     repo= 'debian-security',
     repoUrl= 'http://security.debian.org/debian-security',
     repoDir= 'debian/debian-security',
     driver= 'Debian',
-    releases= [ 'sarge/updates' ],
+    # releases= [ 'woody/updates', 'sarge/updates' ],
     archs= [ 'i386', 'sparc' ],
+    releases= [ 'sarge/updates' ],
+    # archs= [ 'i386' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDirTemplate= '',
 ))
@@ -74,7 +75,7 @@ config.append (dict (
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
-    releases= [ 'LE2005', '2006.0' ],
+    releases= [ 'LE2005' ],
     archs= [ 'i586' ],
     modules= [ 'main_updates' ],
     baseDirTemplate= '%(release)s/%(module)s',
@@ -110,14 +111,26 @@ config.append (dict (
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
+# ubuntu has updates and security!
+# also, uni and multiverse are supported!
 config.append (dict (
     repo= 'ubuntu-updates',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/updates',
     driver= 'Debian',
+    releases= [ 'breezy-updates' ],
+    archs= [ 'i386' ],
+    modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
+    baseDirTemplate= '',
+))
+config.append (dict (
+    repo= 'ubuntu-security',
+    repoUrl= 'http://security.ubuntu.com/ubuntu',
+    repoDir= 'ubuntu/security',
+    driver= 'Debian',
     releases= [ 'breezy-security' ],
     archs= [ 'i386' ],
-    modules= [ 'main', 'restricted' ],
+    modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
 
