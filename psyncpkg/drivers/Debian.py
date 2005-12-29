@@ -25,17 +25,21 @@ class Debian(Psync):
         ans= []
         # skipping Release
 
-        # Contents
+        # Contents and Release
         if self.firstDatabase:
             ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
+            ans.append (("dists/%(release)s/Release" % self, False))
+            ans.append (("dists/%(release)s/Release.gpg" % self, False))
             self.firstDatabase= False
         
         # download the .gz only and process from there
         packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
         packagesGz= packages+".gz"
+        release= "dists/%(release)s/%(module)s/binary-%(arch)s/Release" % (self)
 
         if self.save_space or not stat (packagesGz):
             ans.append ((packagesGz, True))
+            ans.append ((release, False))
         
         return ans
 
