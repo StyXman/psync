@@ -105,25 +105,15 @@ def main ():
             logger.info ("processing repo "+repo['repo'])
 
             # prepare teh mail body
-            mail.append (repo['repo']+':')
-            mail.append ('~' * (len (repo['repo'])+1))
+            mail.append (repo['repo'].center (75))
+            mail.append (('~' * len (repo['repo'])).center (75))
             driverName= repo['driver']
             
             # instantiate a driver and process it
             DriverClass= getattr(__import__('psyncpkg.drivers.'+driverName, {},
                                  {}, [driverName]), driverName)
             driver= DriverClass(**repo)
-            driver.processRepo ()
-
-            # add to the mail the updated files.
-            mail+= driver.updatedFiles
-            mail.append ('total update: %7.2f MiB' % (driver.downloadedSize/1048576.0))
-            if driver.failed!=[]:
-                mail.append ('')
-                mail.append ('failed')
-                mail+= driver.failed
-            mail.append ('')
-            mail.append ('')
+            mail+= driver.processRepo ()
 
         if not conf.mail_to is None:
             # send mail

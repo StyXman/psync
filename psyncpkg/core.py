@@ -33,7 +33,9 @@ class Psync(object):
     def getPackage (self, filename, size):
         """ Get one package, making sure it's the right size
             and that old versions will end deleted.
+            Returns a list of really downloaded files. Could be empty.
         """
+        summary= []
         ans= 0
         url= ("%(repoUrl)s/%(baseDir)s/" % self)+filename
         _file= ("%(repoDir)s/%(baseDir)s/" % self)+filename
@@ -61,14 +63,14 @@ class Psync(object):
             if not self.dry_run:
                 ans= grab (_file, url, limit=self.limit, progress=self.progress)
             self.downloadedSize+= size
-            self.updatedFiles.append (basename(_file))
+            summary.append (basename(_file))
         else:
             if size is not None and s.st_size!=size:
                 logger.info ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
                 if not self.dry_run:
                     ans= grab (_file, url, limit=self.limit, cont=True, progress=self.progress)
                 self.downloadedSize+= size
-                self.updatedFiles.append (basename(_file))
+                summary.append (basename(_file))
             else:
                 if self.verbose:
                     logger.info ("%s: already here, skipping" % _file)
@@ -76,7 +78,15 @@ class Psync(object):
         if ans==0x1600:
             self.failed.append ("%s/%s" % (localDir, fileName))
 
+        return summary
+
     def processRepo (self):
+        """
+        Process the whole repo.
+        Returns a list of strings with a summary of what was done.
+        It is for human consumption.
+        """
+        summary= []
         if not self.save_space:
             # create tmp dir
             self.tempDir= ".tmp"
@@ -87,21 +97,24 @@ class Psync(object):
         distros= getattr (self, 'distros', None)
         if distros is not None:
             for distro in distros:
+                ans.append ("distro: %s" % distro)
                 self.distro= distro
                 for release in self.releases:
                     self.release= release
-                    self.processRelease ()
+                    releaseSummary= self.processRelease ()
         else:
             for release in self.releases:
                 self.release= release
-                self.processRelease ()
+                releaseSummary= self.processRelease ()
             
         # summary of failed pkgs
         if self.failed:
-            print "====="
+            logger.info ("failed packages:")
             for i in self.failed:
-                print i
-            print "----- %d package(s) failed" % len (self.failed)
+                logger.info (i)
+            logger.info ("----- %d package(s) failed" % len (self.failed))
+        else:
+            summary+= releaseSummary
 
         # clean up
         if not self.save_space and not self.dry_run:
@@ -111,18 +124,44 @@ class Psync(object):
                     logger.info ("unlinking %s" % _file)
                 unlink (_file)
 
+        return summary
+
     def processRelease (self):
+        """
+        Process one release.
+        Returns a list of strings with a summary of what was done.
+        It is for human consumption.
+        """
+        summary= []
         for arch in self.archs:
             self.arch= arch
+            msg= "architecture %s:" % arch
+            summary.append (msg)
+            summary.append ("~" * len (msg))
             modules= getattr (self, 'modules', None)
             if modules is not None:
                 for module in self.modules:
+                    # won't log what module we are processing
                     self.module= module
-                    self.process ()
+                    summary+= self.process ()
             else:
-                self.process ()
+                summary+= self.process ()
+            summary.append ("                                total update: %7.2f MiB" %
+                (self.downloadedSize/1048576.0))
+            summary.append ('')
+            summary.append ('')
+            # reset count
+            self.downloadedSize= 0
+
+        return summary
 
     def process (self):
+        """
+        Process one module.
+        Returns a list of strings with a summary of what was done.
+        It is for human consumption.
+        """
+        summary= []
         try:
             # download databases
             self.baseDir= self.baseDirTemplate % self
@@ -142,7 +181,7 @@ class Psync(object):
     
             # now files
             for filename, size in self.files ():
-                self.getPackage (filename, size)
+                summary+= self.getPackage (filename, size)
             
             if not self.save_space and not self.dry_run and self.failed==[]:
                 self.updateDatabases ()
@@ -153,6 +192,8 @@ class Psync(object):
                  isinstance (e, KeyboardInterrupt) ):
                 # debugging, out of disk space or keyb int
                 raise e
+
+        return summary
 
     def updateDatabases (self):
         if self.verbose:
