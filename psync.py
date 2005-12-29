@@ -51,29 +51,38 @@ def confToDict (conf):
 
 def handleOpts ():
     parser= OptionParser ()
-    parser.add_option ('-c', '--continue', action='store_true', default=False)
-    parser.add_option ('-r', '--repo', action='append', dest='repos')
-    parser.add_option ('-f', '--config-file', default='psync.conf.py')
+    parser.add_option ('-c', '--continue', action='store_true', default=False,
+        help="Continue processing the databases instead of donwloading new ones.")
+    parser.add_option ('-r', '--repo', action='append', dest='repos',
+        help="a repo name to be processed. you can specify any number of them. if none specified, all repos defined in the config file will be processed.")
+    parser.add_option ('-f', '--config-file', default='psync.conf.py',
+        help="Process this config file instead of psync.conf.py in the current dir.")
     parser.add_option ('-d', '--debug', action='store_const', dest='log_level',
-                        const=logging.DEBUG)
-    parser.add_option ('-j', '--subject', default='Updates del día %(date)s')
-    parser.add_option ('-l', '--limit', type='int', default=0)
-    parser.add_option ('-m', '--mail-to')
-    parser.add_option ('-n', '--dry-run', action='store_true', default=False)
-    parser.add_option ('-p', '--progress', action='store_true', default=False)
-    parser.add_option ('-q', '--quiet', action='store_false', default=False)
+        const=logging.DEBUG, help="Be *very* verbose on what's being done.")
+    parser.add_option ('-j', '--subject', default='Updates del día %(date)s',
+        help="The subject of the mail sent.")
+    parser.add_option ('-l', '--limit', type='int', default=0,
+        help="Limit the bandwidth used to n KiB/s.")
+    parser.add_option ('-m', '--mail-to',
+        help="Send a summary mail to this email account. If not specified, the summary is printed on stdout.")
+    parser.add_option ('-n', '--dry-run', action='store_true', default=False,
+        help="Do a dry run: download databases, process them, but don't download any package. It does the summary. Usefull for foreseeing how much it will download.")
+    parser.add_option ('-p', '--progress', action='store_true', default=False,
+        help="show a progress when downloading anything. Not suitable for non interactive running (e.g., from a cron job).")
+    parser.add_option ('-q', '--quiet', action='store_false', default=False,
+        help="Shh! Don't say anything!")
     parser.add_option ('-s', '--save-space', action='store_true',
-                        dest='save_space', default=False)
+        dest='save_space', default=False, help="Do not maintain consistency, saving space.")
     parser.add_option ('-t', '--consistent', action='store_false',
-                        dest='save_space')
+        dest='save_space', help="Maintain consistency, wasting temporarily space.")
     parser.add_option ('-v', '--verbose', action='store_const', dest='log_level',
-                        const=logging.INFO)
+        const=logging.INFO, help="Be verbose on what's being done.")
     return parser.parse_args ()
 
 def main ():
     (conf, args)= handleOpts ()
-    conf.verbose= conf.log_level>=logging.INFO
-    conf.debug= conf.log_level>=logging.DEBUG
+    conf.debug= conf.log_level==logging.DEBUG
+    conf.verbose= conf.log_level==logging.INFO or conf.debug
     psyncpkg.logLevel= conf.log_level
 
     # load config file
