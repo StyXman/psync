@@ -150,7 +150,7 @@ config.append (dict (
 
 config.append (dict (
     repo= 'fedora-updates',
-    repoUrl= 'http://apt.kde-redhat.org/apt/kde-redhat',
+    repoUrl= 'http://www.las.ic.unicamp.br/pub/fedora/linux/core/updates',
     repoDir= 'fedora/updates',
     driver= 'Yum',
     releases= [ '3' ],
