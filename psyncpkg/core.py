@@ -57,7 +57,6 @@ class Psync(object):
 
         try:
             s= os.stat (_file)
-            # print "%d<>%d" % (s.st_size, size)
         except OSError:
             logger.info ("%s" % _file)
             if not self.dry_run:
@@ -90,7 +89,7 @@ class Psync(object):
         if not self.save_space:
             # create tmp dir
             self.tempDir= ".tmp"
-            logger.info ("not cont: working on %s" % self.tempDir)
+            logger.debug ("not cont: working on %s" % self.tempDir)
         else:
             self.tempDir= '.'
 
@@ -146,13 +145,17 @@ class Psync(object):
                     summary+= self.process ()
             else:
                 summary+= self.process ()
-            summary.append ("                                total update: %7.2f MiB" %
-                (self.downloadedSize/1048576.0))
+            
+            summary.append (("total update: %7.2f MiB" %
+                (self.downloadedSize/1048576.0)).rjust (75))
             summary.append ('')
             summary.append ('')
             # reset count
             self.downloadedSize= 0
 
+        # if not self.save_space and not self.dry_run and self.failed==[]:
+            # self.updateDatabases ()
+            
         return summary
 
     def process (self):
@@ -167,22 +170,14 @@ class Psync(object):
             self.baseDir= self.baseDirTemplate % self
             logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
             logger.debug ("resulting baseDir: %s" % self.baseDir)
+            self.getDatabases ()
             
-            databases= self.databases ()
-            logger.debug (databases)
-            for (database, critic) in databases:
-                # yes: per design, we don't follow the dry_run option here,
-                # but neither the databases will be swaped at the end.
-                dababaseFilename= ("%(tempDir)s/%(repoDir)s/%(baseDir)s/" % self)+database
-                databaseUrl= ("%(repoUrl)s/%(baseDir)s/" % self)+database
-    
-                found= grab (dababaseFilename, databaseUrl,
-                             limit=self.limit, progress=self.progress, cont=False)
-    
             # now files
             for filename, size in self.files ():
                 summary+= self.getPackage (filename, size)
             
+            # yes, there is a BUG here, but it's not that grave.
+            # planned to be fixed in 0.2.5 or never
             if not self.save_space and not self.dry_run and self.failed==[]:
                 self.updateDatabases ()
         except Exception, e:
@@ -195,22 +190,33 @@ class Psync(object):
 
         return summary
 
+    def getDatabases (self):
+        databases= self.databases ()
+        logger.debug (databases)
+        for (database, critic) in databases:
+            # yes: per design, we don't follow the dry_run option here,
+            # but neither the databases will be swaped at the end.
+            dababaseFilename= ("%(tempDir)s/%(repoDir)s/%(baseDir)s/" % self)+database
+            databaseUrl= ("%(repoUrl)s/%(baseDir)s/" % self)+database
+    
+            found= grab (dababaseFilename, databaseUrl,
+                            limit=self.limit, progress=self.progress, cont=False)
+
     def updateDatabases (self):
-        if self.verbose:
-            logger.info ('updating databases')
-        for (database, critic) in self.finalDBs():
+        logger.info ('updating databases')
+        databases= self.finalDBs()
+        logger.debug (databases)
+        for (database, critic) in databases:
             # logger.debug (self.__dict__)
-            new= ("%(repoDir)s/%(baseDir)s/" % self)+database
-            old= self.tempDir+'/'+new
+            dst= ("%(repoDir)s/%(baseDir)s/" % self)+database
+            src= self.tempDir+'/'+new
             try:
                 makedirs (dirname (new))
-                if stat (new):
-                    unlink (new)
-                rename (old, new)
+                rename (src, dst, overwrite=True)
             except OSError, e:
                 # better error report!
                 if not critic:
-                    logger.info ('[Ign] %s (%s)' % (old, str (e)))
+                    logger.info ('[Ign] %s (%s)' % (src, str (e)))
                 else:
                     raise e
         # removedirs (dirname (old))
