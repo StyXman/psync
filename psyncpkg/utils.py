@@ -40,6 +40,59 @@ def makedirs(_dirname):
 	else:
             logger.debug ('make dir %s' % i)
 
+def touch (path):
+    """
+    Does the same than touch(1).
+    """
+    if stat (path):
+        utime (startStamp, None)
+    else:
+        f= open (path, 'w+')
+        f.close()
+
+def rename (src, dst, overwrite=False):
+    logger.info ("move: %s -> %s" % (src, dst))
+    # os.rename does not bark when overwriting
+    if stat (dst) and not overwrite:
+        e= IOError ()
+        e.errno= errno.EEXIST
+        e.strerror= strerror (errno.EEXIST)
+        raise e
+        
+    try:
+        os.rename (src, dst)
+    except OSError, e:
+        if e.errno==18:
+            # [Errno 18] Invalid cross-device link
+            # ufa. then copy it, you lazy bastard
+            srcFile= open (src)
+            dstFile= open (dst, 'w+')
+
+            data= srcFile.read (10240)
+            while data!='':
+                dstFile.write (data)
+                data= srcFile.read (10240)
+
+            srcFile.close ()
+            dstFile.close ()
+            # bye bye you src man
+            unlink (src)
+        else:
+            raise e
+
+def gunzip (gzFileName, fileName):
+    inFile= GzipFile (gzFileName)
+    outFile= open (fileName, "w+")
+
+    line= inFile.readline ()
+    while line:
+        # print line
+        outFile.write (line)
+        line= inFile.readline ()
+
+    inFile.close ()
+    outFile.close ()
+
 def getFile(url, destination):
     file_name = fileFromUrl(url)
     if not os.path.exists(destination):
@@ -129,51 +182,5 @@ def grab(filename, url, limit=0, cont=True, progress=False):
         raise e
 
     return curlExitCode
-
-def touch (path):
-    """
-    Does the same than touch(1).
-    """
-    if stat (path):
-        utime (startStamp, None)
-    else:
-        f= open (path, 'w+')
-        f.close()
-
-def rename (old, new):
-    logger.info ("move: %s -> %s" % (old, new))
-    try:
-        os.rename (old, new)
-    except OSError, e:
-        if e.errno==18:
-            # [Errno 18] Invalid cross-device link
-            # ufa. then copy it, you lazy bastard
-            oldFile= open (old)
-            newFile= open (new, 'w+')
-
-            data= oldFile.read (10240)
-            while data!='':
-                newFile.write (data)
-                data= oldFile.read (10240)
-
-            oldFile.close ()
-            newFile.close ()
-            # bye bye you old man
-	    unlink (old)
-        else:
-            raise e
-
-def gunzip (gzFileName, fileName):
-    inFile= GzipFile (gzFileName)
-    outFile= open (fileName, "w+")
-
-    line= inFile.readline ()
-    while line:
-        # print line
-        outFile.write (line)
-        line= inFile.readline ()
-
-    inFile.close ()
-    outFile.close ()
 
 #end
