@@ -118,14 +118,6 @@ def getFile(url, destination):
                 os.unlink(destination)
             raise
  
-    # check to make sure we *really* got an executable
-    if file_name.endswith('.exe'):
-        f = open(destination)
-        if f.read(2) != 'MZ': # Windows (and DOS) executables have this marker
-            raise RuntimeError('Download of "%s" resulted in something that '
-                'isn\'t an executable (perhaps a 404?).' % url)
-        f.close()
-
 def grab(filename, url, limit=0, cont=True, progress=False):
     """ Fetchs a file if it does not exist or continues downloading
         a previously partially downloaded file.
