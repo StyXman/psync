@@ -58,7 +58,8 @@ class Psync(object):
         try:
             s= os.stat (_file)
         except OSError:
-            logger.info ("%s" % _file)
+            # the file does not exist; download it
+            # logger.info ("%s" % _file)
             if not self.dry_run:
                 ans= grab (_file, url, limit=self.limit, progress=self.progress)
             self.downloadedSize+= size
@@ -180,9 +181,12 @@ class Psync(object):
             # planned to be fixed in 0.2.5 or never
             if not self.save_space and not self.dry_run and self.failed==[]:
                 self.updateDatabases ()
+            else:
+                logger.debug ("save: %s, dry: %s, failed: %s" %
+                    (self.save_space, self.dry_run, self.failed))
         except Exception, e:
             logger.info ('processing %s failed due to %s' % (self.repo, e))
-            if ( self.debug or
+            if ( self.debugging or
                  (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                  isinstance (e, KeyboardInterrupt) ):
                 # debugging, out of disk space or keyb int
