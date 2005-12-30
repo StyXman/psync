@@ -81,8 +81,8 @@ def handleOpts ():
 
 def main ():
     (conf, args)= handleOpts ()
-    conf.debug= conf.log_level==logging.DEBUG
-    conf.verbose= conf.log_level==logging.INFO or conf.debug
+    conf.debugging= conf.log_level==logging.DEBUG
+    conf.verbose= conf.log_level==logging.INFO or conf.debugging
     psyncpkg.logLevel= conf.log_level
 
     # load config file
