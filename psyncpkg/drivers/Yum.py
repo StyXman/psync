@@ -41,7 +41,7 @@ class Yum (Rpm):
     def files (self):
         # build a parser and use it
         # hack
-        repodataDir= "%(repoDir)s/%(baseDir)s/repodata" % self
+        repodataDir= "%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata" % self
 
         self.parser= RepodataParser (repodataDir)
         if self.verbose:
@@ -64,9 +64,12 @@ class Yum (Rpm):
                 # i.dump ()
                 pass
             # nevra= (name, epoch, version, release, arch)
-            if ( (self.source and i.nevra[4]=='src') or
-                 (self.debug and i.location['href'].startswith ('debug')) or
-                 (not i.nevra[4]=='src') and not i.location['href'].startswith ('debug') ):
+            isDebug= 'debuginfo' in i.location['href']
+            isSource= i.nevra[4]=='src'
+            if ( (self.source and not isDebug) or
+                 (self.debug and not isSource) or
+                 (self.source and self.debug) or
+                 (not isSource and not isDebug) ):
                 # (filename, size)
                 yield ( ("%(rpmDir)s/" % self)+i.location['href'],
                              int(i.size['package']) )
