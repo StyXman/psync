@@ -88,7 +88,7 @@ class Psync(object):
         It is for human consumption.
         """
         summary= []
-        if not self.save_space:
+        if not self.save_space and not self.process_old:
             # create tmp dir
             self.tempDir= ".tmp"
             logger.debug ("not cont: working on %s" % self.tempDir)
@@ -172,7 +172,8 @@ class Psync(object):
             self.baseDir= self.baseDirTemplate % self
             logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
             logger.debug ("resulting baseDir: %s" % self.baseDir)
-            self.getDatabases ()
+            if not self.process_old:
+                self.getDatabases ()
             
             # now files
             for filename, size in self.files ():
@@ -180,7 +181,7 @@ class Psync(object):
             
             # yes, there is a BUG here, but it's not that grave.
             # planned to be fixed in 0.2.5 or never
-            if not self.save_space and not self.dry_run and self.failed==[]:
+            if not self.save_space and not self.dry_run and self.failed==[] and not self.process_old:
                 self.updateDatabases ()
             else:
                 logger.debug ("save: %s, dry: %s, failed: %s" %

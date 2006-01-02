@@ -67,6 +67,8 @@ def handleOpts ():
         help="Send a summary mail to this email account. If not specified, the summary is printed on stdout.")
     parser.add_option ('-n', '--dry-run', action='store_true', default=False,
         help="Do a dry run: download databases, process them, but don't download any package. It does the summary. Usefull for foreseeing how much it will download.")
+    parser.add_option ('-o', '--process-old', action='store_true', default=False,
+        help="Process databases already downloaded. Mostly for debug purposses.")
     parser.add_option ('-p', '--progress', action='store_true', default=False,
         help="show a progress when downloading anything. Not suitable for non interactive running (e.g., from a cron job).")
     parser.add_option ('-q', '--quiet', action='store_false', default=False,
