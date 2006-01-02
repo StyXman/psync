@@ -4,6 +4,7 @@
 
 from os import unlink, removedirs
 from os.path import dirname, basename
+from traceback import print_exc
 import os
 import errno
 
@@ -190,6 +191,7 @@ class Psync(object):
                  (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                  isinstance (e, KeyboardInterrupt) ):
                 # debugging, out of disk space or keyb int
+                print_exc ()
                 raise e
 
         return summary
@@ -213,9 +215,9 @@ class Psync(object):
         for (database, critic) in databases:
             # logger.debug (self.__dict__)
             dst= ("%(repoDir)s/%(baseDir)s/" % self)+database
-            src= self.tempDir+'/'+new
+            src= self.tempDir+'/'+dst
             try:
-                makedirs (dirname (new))
+                makedirs (dirname (dst))
                 rename (src, dst, overwrite=True)
             except OSError, e:
                 # better error report!
