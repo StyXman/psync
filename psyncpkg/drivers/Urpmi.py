@@ -19,22 +19,27 @@ class Urpmi (Rpm):
     def __init__ (self, **kwargs):
         super (Urpmi, self).__init__ (**kwargs)
         # this flag is for downloading the databases just once
-        self.first= None
+        # self.first= None
     
     def databases (self):
-        logger.debug ("%s, %s" % (self.first, self.release))
-        if self.first==self.release:
+        # logger.debug ("%s, %s" % (self.first, self.release))
+        # if self.first==self.release:
             # databases already dowloaded and updated
-            self.tempDir= '.'
-            ans= []
-        else:
-            self.first= self.release
+            # self.tempDir= '.'
+            # ans= []
+        # else:
+        if True:
+            # self.first= self.release
+            if hasattr (self, 'hdlistTemplate'):
+                self.hdlist= self.hdlistTemplate % self
             hdsplit= (dirname (self.hdlist), basename (self.hdlist))
             synthesis= hdsplit[0]+'/synthesis.'+hdsplit[1]
             ans= [ (synthesis, True), (self.hdlist, True) ]
         return ans
 
     def files(self):
+        if hasattr (self, 'hdlistTemplate'):
+            self.hdlist= self.hdlistTemplate % self
         hdlist= "%(tempDir)s/%(repoDir)s/%(baseDir)s/%(hdlist)s" % self
         logger.debug ("opening %s" % hdlist)
         pipe= popen ('zcat %s' % hdlist)
@@ -48,13 +53,15 @@ class Urpmi (Rpm):
         for header in headerList:
             rpmArch= header[rpm.RPMTAG_ARCH]
             # logger.debug ("rpm %s arch: %s" % (header[1000000], rpmArch))
-            if rpmArch==self.arch:
+            if rpmArch==self.arch or rpmArch=='noarch':
                 # 1000000-> rpm file name, 1000001-> rpm file size
                 yield (self.rpmDir+'/'+header[1000000], header[1000001])
         
         pipe.close ()
 
     def finalDBs (self):
+        if hasattr (self, 'hdlistTemplate'):
+            self.hdlist= self.hdlistTemplate % self
         hdsplit= (dirname (self.hdlist), basename (self.hdlist))
         synthesis= hdsplit[0]+'/synthesis.'+hdsplit[1]
         return [ (synthesis, True), (self.hdlist, True) ]
