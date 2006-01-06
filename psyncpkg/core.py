@@ -98,7 +98,7 @@ class Psync(object):
         distros= getattr (self, 'distros', None)
         if distros is not None:
             for distro in distros:
-                ans.append ("distro: %s" % distro)
+                summary.append ("distro: %s" % distro)
                 self.distro= distro
                 for release in self.releases:
                     self.release= release
