@@ -1,1 +1,1 @@
-include psync.conf.py INSTALL COPYING RUNNING.txt
+include psync.conf.py INSTALL COPYING RUNNING.txt Makefile
