@@ -71,17 +71,6 @@ config.append (dict (
 ###########
 # mandrake
 ###########
-#config+= [{
-    #'local': 'mandrake',
-    #'driver': 'Urpmi',
-    #'url': 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
-    #'release': '2005',
-    #'arch': 'i586',
-    #'distroSpec': '%(release)s/%(arch)s',
-    #'rpmSpec': 'media/%(module)s',
-    #'modules': [ 'main', 'contrib', 'jpackage' ],
-    #'hdlist': '../media_info/synthesis.hdlist_%(module)s.cz',
-#}]
 config.append (dict (
     repo= 'mandrake',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
