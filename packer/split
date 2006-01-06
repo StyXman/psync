@@ -1,0 +1,2 @@
+cp -ra ${install_dir}/* ${psync_dir}
+mkdir -p $psync_dir/usr/share/applications

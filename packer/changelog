@@ -1,0 +1,12 @@
+0.2.4-1
+Wed, 04 Jan 2006 14:43:06 -0300
+* Full support for Urpmi repositories.
+* Support for several archs and downloading of Release files for Debian repositories.
+* More verbose help. 
+* Much better summary email with total MiB per module. 
+* More examples in the config file.
+* Lots of docs, both in the project site and the distribution package. 
+* Better info when not in verbose or debug mode.
+* Processes the rest of the repo even if there was some problem with one module.
+* Several bugfixes.
+-- Marcos Dione <mdione@grulic.org.ar>

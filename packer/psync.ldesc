@@ -1,0 +1,4 @@
+psync is a distribution mirroring utility. Its main goal is to be able to update
+a distribution mirror but keep it as consistent as possible. It also aims to
+support as many distributions as possible. It's more like debmirror, but with
+more distros (repo types) support.
