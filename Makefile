@@ -42,6 +42,13 @@ check: test
 fullcheck:
 	$(CHECKER) -t -9 -v -a -8 --changetypes *.py 2>&1 | less -S
 
+release:
+	@echo "You're about to make a new release. This will fire packer."
+	@echo "Please select the Changelog option from the menu (10)."
+	@echo "Press <Enter> to continue..."
+	@read
+	packer
+
 dist: $(TARGZ) mk-packer deb-cp rpm-cp
 
 $(TARGZ):
