@@ -4,7 +4,7 @@ from distutils.core import setup
 
 data= dict (
     name='psync',
-    version='0.2.4',
+    version='0.2.4a',
     description="psync is a distribution mirroring utility with consistency in mind.",
     long_description="""
 psync is a mirroring utility. its main goal is to be able to update a  
