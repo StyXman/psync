@@ -27,31 +27,46 @@ config.append (dict (
     repoDir= 'debian/debian-security',
     driver= 'Debian',
     # releases= [ 'woody/updates', 'sarge/updates' ],
-    archs= [ 'i386', 'sparc' ],
     releases= [ 'sarge/updates' ],
     # archs= [ 'i386' ],
+    archs= [ 'i386', 'sparc' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDirTemplate= '',
 ))
-
-#config+=[{
-    #'local': 'debian-non-US',
-    #'driver': 'Debian',
-    #'url': 'http://non-us.debian.org/debian-non-US',
-    #'release': 'sid/non-US',
-    #'arch': 'i386',
-    #'modules': [ 'main', 'non-free', 'contrib' ],
-#}]
-
+config.append (dict (
+    repo= 'debian-non-US',
+    repoUrl= 'http://non-us.debian.org/debian-non-US',
+    repoDir= 'debian/debian-non-US',
+    driver= 'Debian',
+    # sarge is the last release that needs non-US
+    releases= [ 'sarge/non-US' ],
+    archs= [ 'i386', 'sparc' ],
+    modules= [ 'main', 'non-free', 'contrib' ],
+    baseDirTemplate= '',
+))
 ## deb ftp://ftp.nerim.net/debian-marillat/ unstable main
-#config+= [{
-    #'local': 'marillat',
-    #'driver': 'Debian',
-    #'url': 'ftp://ftp.nerim.net/debian-marillat',
-    #'release': 'sid',
-    #'arch': 'i386',
-    #'modules': [ 'main' ],
-#}]
+config.append (dict (
+    repo= 'marillat',
+    # ftp sucks because it's a whole auth handshaking for each downloaded file
+    repoUrl= 'ftp://ftp.nerim.net/debian-marillat',
+    repoDir= 'debian/marillat',
+    driver= 'Debian',
+    releases= [ 'sid' ],
+    archs= [ 'i386' ],
+    modules= [ 'main' ],
+    baseDirTemplate= '',
+))
+# deb http://www.backports.org/debian/ sarge-backports main
+config.append (dict (
+    repo= 'backports',
+    repoUrl= 'http://www.backports.org/debian/',
+    repoDir= 'debian/backports',
+    driver= 'Debian',
+    releases= [ 'sarge-backports' ],
+    archs= [ 'i386' ],
+    modules= [ 'main' ],
+    baseDirTemplate= '',
+))
 
 ###########
 # mandrake
@@ -67,6 +82,20 @@ config.append (dict (
     #'modules': [ 'main', 'contrib', 'jpackage' ],
     #'hdlist': '../media_info/synthesis.hdlist_%(module)s.cz',
 #}]
+config.append (dict (
+    repo= 'mandrake',
+    repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
+    repoDir= 'mandrake',
+    driver= 'Urpmi',
+    releases= [ '2005' ],
+    # archs= [ 'i586', 'noarch' ],
+    archs= [ 'i586' ],
+    modules= [ 'main', 'contrib', 'jpackage' ],
+    # it does not include the arch because the paths in the hdlist already has it
+    baseDirTemplate= '%(release)s/%(arch)s/media/%(module)s',
+    rpmDir= '.',
+    hdlistTemplate= '../media_info/hdlist_%(module)s.cz',
+))
 
 # urpmi.addmedia contrib-ttu    ftp://ftp.phys.ttu.edu/pub/mandrake/ 9.2/contrib/i586          with hdlist.cz
 #                \<-- repo -->| |<-- repoUrl                    -->| |<-- baseDirTemplate -->|      |<-- hdlist -->|
@@ -78,23 +107,28 @@ config.append (dict (
     releases= [ 'LE2005' ],
     archs= [ 'i586', 'noarch' ],
     modules= [ 'main_updates' ],
+    # it does not include the arch because the paths in the hdlist already has it
     baseDirTemplate= '%(release)s/%(module)s',
     rpmDir= '.',
     hdlist= 'media_info/hdlist.cz',
 ))
-
-# urpmi.addmedia plf-free http://plf.acnova.com/mandrake/free/10.2 with hdlist.cz
-# urpmi.addmedia plf-nonfree http://plf.acnova.com/mandrake/non-free/10.2 with hdlist.cz
+# http://plf.zarb.org/
+# urpmi.addmedia plf-free http://plf.lastdot.org/plf/free/10.2 with hdlist.cz
+# urpmi.addmedia plf-nonfree http://plf.lastdot.org/plf/non-free/10.2 with hdlist.cz
 config.append (dict (
     repo= 'plf',
-    repoUrl= 'http://ftp.club-internet.fr/pub/linux/plf/',
+    # repoUrl= 'http://ftp.club-internet.fr/pub/linux/plf/',
+    repoUrl= 'http://plf.lastdot.org/plf',
     repoDir= 'mandrake/plf',
     driver= 'Urpmi',
     distros= [ 'mandrake' ],
     releases= [ '10.2' ],
     archs= [ 'i586', 'noarch' ],
-    baseDirTemplate= '%(distro)s/free/%(release)s/%(arch)s',
+    modules= [ 'free', 'non-free' ],
+    # baseDirTemplate= '%(distro)s/%(module)s/%(release)s/%(arch)s',
+    baseDirTemplate= '%(module)s/%(release)s/%(arch)s',
     rpmDir= '.',
+    # see http://plf.lastdot.org/plf/free/10.2/
     hdlist= '../hdlist.cz',
 ))
 
@@ -129,6 +163,17 @@ config.append (dict (
     repoDir= 'ubuntu/security',
     driver= 'Debian',
     releases= [ 'breezy-security' ],
+    archs= [ 'i386' ],
+    modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
+    baseDirTemplate= '',
+))
+# also has official backports!
+config.append (dict (
+    repo= 'ubuntu-backports',
+    repoUrl= 'http://security.ubuntu.com/ubuntu',
+    repoDir= 'ubuntu/backports',
+    driver= 'Debian',
+    releases= [ 'breezy-backports' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
