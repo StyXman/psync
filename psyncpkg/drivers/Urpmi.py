@@ -1,6 +1,5 @@
-# (c) 2005
+# (c) 2005-2006
 # Marcos Dione <mdione@grulic.org.ar>
-# Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
 from os import listdir, popen
 from os.path import basename, dirname, join

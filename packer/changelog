@@ -1,3 +1,8 @@
+0.2.4a-1
+Fri, 06 Jan 2006 08:46:51 -0300
+* fixed bug in the Urpmi driver that prevented to download a Mandrake distro.
+* more example repos defined with the new format.
+-- Marcos Dione <mdione@grulic.org.ar>
 0.2.4-1
 Wed, 04 Jan 2006 14:43:06 -0300
 * Full support for Urpmi repositories.

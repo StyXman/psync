@@ -48,6 +48,7 @@ release:
 	@echo "Press <Enter> to continue..."
 	@read
 	packer
+	packer -fe
 
 dist: $(TARGZ) mk-packer deb-cp rpm-cp
 

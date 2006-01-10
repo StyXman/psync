@@ -1,10 +1,8 @@
 #! /usr/bin/python2.3
 # -*- coding: iso-8859-1 -*-
-# (c) 2004, 2005
+# (c) 2004-2005
 # Marcos Dione <mdione@grulic.org.ar>
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
-
-# thanks to cholo
 
 from tempfile import mkdtemp
 from optparse import OptionParser

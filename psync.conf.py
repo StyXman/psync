@@ -1,6 +1,5 @@
-# (c) 2005
+# (c) 2005-2006
 # Marcos Dione <mdione@grulic.org.ar>
-# Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
 # example config file
 
@@ -44,6 +43,7 @@ config.append (dict (
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDirTemplate= '',
 ))
+
 ## deb ftp://ftp.nerim.net/debian-marillat/ unstable main
 config.append (dict (
     repo= 'marillat',
@@ -101,6 +101,7 @@ config.append (dict (
     rpmDir= '.',
     hdlist= 'media_info/hdlist.cz',
 ))
+
 # http://plf.zarb.org/
 # urpmi.addmedia plf-free http://plf.lastdot.org/plf/free/10.2 with hdlist.cz
 # urpmi.addmedia plf-nonfree http://plf.lastdot.org/plf/non-free/10.2 with hdlist.cz
@@ -182,6 +183,18 @@ config.append (dict (
     #'rpmDir': 'Fedora/RPMS',
 #}]
 
+config.append (dict (
+    repo= 'fedora-updates',
+    repoUrl= 'http://www.las.ic.unicamp.br/pub/fedora/linux/core/updates',
+    repoDir= 'fedora/updates',
+    driver= 'Yum',
+    releases= [ '3' ],
+    archs= [ 'i386' ],
+    baseDirTemplate= '%(release)s/%(arch)s',
+    rpmDir= '.',
+    debug= False,
+    source= False,
+))
 config.append (dict (
     repo= 'fedora-updates',
     repoUrl= 'http://www.las.ic.unicamp.br/pub/fedora/linux/core/updates',
