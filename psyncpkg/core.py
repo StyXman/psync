@@ -15,6 +15,12 @@ import logging
 logger = logging.getLogger('psync.core')
 logger.setLevel(logLevel)
 
+class ProtocolError (Exception):
+    def __init__ (self, **kwargs):
+        self.__dict__.update(kwargs)
+        self.args= kwargs
+        # super (ProtocolError, self).__init__ ()
+
 class Psync(object):
     def __init__ (self, verbose=False, **kwargs):
         self.delete= [] # files for deletion (old package versions)
@@ -104,6 +110,8 @@ class Psync(object):
                     self.release= release
                     releaseSummary= self.processRelease ()
         else:
+            # we force to be a release!
+            # some third party repos have none
             for release in self.releases:
                 self.release= release
                 releaseSummary= self.processRelease ()
@@ -134,6 +142,8 @@ class Psync(object):
         It is for human consumption.
         """
         summary= []
+        # we force to be at least ona arch!
+        # some third party repos have none
         for arch in self.archs:
             self.arch= arch
             msg= "architecture %s:" % arch
@@ -208,6 +218,8 @@ class Psync(object):
     
             found= grab (dababaseFilename, databaseUrl,
                             limit=self.limit, progress=self.progress, cont=False)
+            if found!=0 and critic:
+                raise ProtocolError (proto=databaseUrl[:databaseUrl.index (':')].upper (), code=found, url=databaseUrl)
 
     def updateDatabases (self):
         logger.info ('updating databases')

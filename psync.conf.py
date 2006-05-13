@@ -67,6 +67,18 @@ config.append (dict (
     modules= [ 'main' ],
     baseDirTemplate= '',
 ))
+		
+# deb http://packages.debianbase.de/etch/i386/nx/ ./
+config.append (dict (
+    repo= 'freenx',
+    repoUrl= 'http://packages.debianbase.de/',
+    repoDir= 'debian/freenx',
+    driver= 'SimpleDebian',
+    releases= [ 'etch' ],
+    archs= [ 'i386' ],
+    modules= [ 'nx' ],
+    baseDirTemplate= '%(release)s/%(arch)s/%(module)s',
+))
 
 ###########
 # mandrake
