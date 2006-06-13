@@ -7,9 +7,9 @@ import gzip
 import re
 import rpm
 
-from psyncpkg.drivers.Rpm import Rpm
+from psync.drivers.Rpm import Rpm
 
-from psyncpkg import logLevel
+from psync import logLevel
 import logging
 logger = logging.getLogger('psync.drivers.Urpmi')
 logger.setLevel(logLevel)

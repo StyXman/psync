@@ -6,10 +6,10 @@ from os import listdir
 from os.path import dirname, basename
 import gzip
 
-from psyncpkg.core import Psync
-from psyncpkg.utils import stat
+from psync.core import Psync
+from psync.utils import stat
 
-from psyncpkg import logLevel
+from psync import logLevel
 import logging
 logger = logging.getLogger('psync.drivers.SimpleDebian')
 logger.setLevel(logLevel)
@@ -17,19 +17,14 @@ logger.setLevel(logLevel)
 class SimpleDebian(Psync):
     def __init__ (self, **kwargs):
         super (SimpleDebian, self).__init__ (**kwargs)
-        apt_pkg.init ()
-        self.firstDatabase= True
 
     def databases(self):
         ans= []
         logger.debug (self.__dict__)
-        # skipping Release
-
         # Contents and Release
         # ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
         ans.append ( ("/Release", False) )
         ans.append ( ("/Release.gpg", False) )
-        self.firstDatabase= False
         
         # download the .gz only and process from there
         packages= "/Packages"
@@ -41,7 +36,6 @@ class SimpleDebian(Psync):
         return ans
 
     def files(self):
-        # packages= "%(tempDir)s/%(repoDir)s/dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % self
         packages= ("%(tempDir)s/%(repoDir)s/" % self)+self.baseDir+"/Packages"
         packagesGz= packages+".gz"
         

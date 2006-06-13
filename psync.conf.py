@@ -56,6 +56,20 @@ config.append (dict (
     modules= [ 'main' ],
     baseDirTemplate= '',
 ))
+# deb http://www.debian-multimedia.org sarge main
+# deb http://www.debian-multimedia.org etch main
+# amd64, i386 and sparc
+config.append (dict (
+    repo= 'debian-mm',
+    repoUrl= 'http://www.debian-multimedia.org',
+    repoDir= 'debian/debian-mm',
+    driver= 'Debian',
+    releases= [ 'sarge', 'sid' ],
+    archs= [ 'i386', 'amd64' ],
+    modules= [ 'main' ],
+    baseDirTemplate= '',
+))
+
 # deb http://www.backports.org/debian/ sarge-backports main
 config.append (dict (
     repo= 'backports',
@@ -74,11 +88,48 @@ config.append (dict (
     repoUrl= 'http://packages.debianbase.de/',
     repoDir= 'debian/freenx',
     driver= 'SimpleDebian',
-    releases= [ 'etch' ],
+    releases= [ 'sarge', 'etch' ],
     archs= [ 'i386' ],
     modules= [ 'nx' ],
     baseDirTemplate= '%(release)s/%(arch)s/%(module)s',
 ))
+
+# test site
+# deb http://snapshot.debian.net/archive pool irssi-scripts
+config.append (dict (
+    repo= 'test',
+    repoUrl= 'http://luon.net/debian',
+    repoDir= 'debian/test',
+    driver= 'Debian',
+    releases= [ 'sarge', 'sid' ],
+    archs= [ 'i386' ],
+    modules= [ 'main' ],
+    baseDirTemplate= '',
+))
+
+# http://people.debian.org/~aurel32/BACKPORTS
+config.append (dict (
+    repo= 'aurel',
+    repoUrl= 'http://people.debian.org/~aurel32/BACKPORTS',
+    repoDir= 'test',
+    driver= 'Debian',
+    releases= [ 'sarge' ],
+    archs= [ 'i386', 'amd64' ],
+    modules= [ 'main' ],
+    baseDirTemplate= '',
+))
+
+config.append (dict (
+    repo= 'local-test',
+    repoUrl= 'http://localhost/~mdione/test',
+    repoDir= 'local-test',
+    driver= 'Debian',
+    releases= [ 'sarge' ],
+    archs= [ 'i386', ],
+    modules= [ 'main' ],
+    baseDirTemplate= '',
+))
+
 
 ###########
 # mandrake
@@ -234,4 +285,16 @@ config.append (dict (
     rpmDir= '.',
     debug= False,
     source= False,
+))
+
+
+# http://mirror.slacklife.com.br/slackware-current/
+config.append (dict (
+    repo= 'slack-current',
+    repoUrl= 'http://ftp.gwdg.de/pub/linux/slackware',
+    repoDir= 'slackware',
+    driver= 'Slack',
+    releases= [ '10.2', 'current' ],
+    modules= [ 'slackware', 'extras' ],
+    baseDirTemplate= 'slackware-%(release)s',
 ))

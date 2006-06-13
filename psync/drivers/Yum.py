@@ -1,15 +1,21 @@
 # (c) 2005
 # Marcos Dione <mdione@grulic.org.ar>
 
-from yum.mdcache import RepodataParser
+from psync.core import DependencyError
+try:
+    from yum.mdcache import RepodataParser
+except:
+    raise DependencyError (package='yum')
+    
 from os import listdir
 from os.path import basename
 import libxml2
 
-from psyncpkg.drivers.Rpm import Rpm
-from psyncpkg.utils import gunzip, grab
+from psync.drivers.Rpm import Rpm
+from psync.utils import gunzip, grab
+from psync.utils import gunzip, grab
 
-from psyncpkg import logLevel
+from psync import logLevel
 import logging
 logger = logging.getLogger('psync.drivers.Yum')
 logger.setLevel(logLevel)

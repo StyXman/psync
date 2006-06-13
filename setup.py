@@ -4,7 +4,7 @@ from distutils.core import setup
 
 data= dict (
     name='psync',
-    version='0.2.4a',
+    version='0.3.0',
     description="psync is a distribution mirroring utility with consistency in mind.",
     long_description="""
 psync is a mirroring utility. its main goal is to be able to update a  
@@ -19,13 +19,14 @@ to fix this. it also aims to support as many distributions as possible.
     url='http://plantalta.homelinux.net/~mdione/projects/psync/',
     license='GPL',
     packages=[
-        'psyncpkg',
-        'psyncpkg.drivers',
+        'psync',
+        'psync.drivers',
         ],
-    scripts= ['psync.py'],
+    scripts= ['psy'],
+    # data_files= [('bin', ['psync.py'])],
     # data_files= [('examples', ['psync.conf.py'])],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: GNU General Public License (GPL)',

@@ -1,4 +1,4 @@
-#! /usr/bin/python2.3
+#! /usr/bin/python
 # -*- coding: iso-8859-1 -*-
 # (c) 2004-2005
 # Marcos Dione <mdione@grulic.org.ar>
@@ -11,9 +11,9 @@ import sys
 import smtplib
 import datetime
 
-import psyncpkg
+import psync
 
-from psyncpkg import logLevel
+from psync import logLevel
 import logging
 logger = logging.getLogger('psync')
 logger.setLevel(logLevel)
@@ -49,7 +49,7 @@ def confToDict (conf):
 
 def handleOpts ():
     parser= OptionParser ()
-    parser.add_option ('-c', '--continue', action='store_true', default=False,
+    parser.add_option ('-c', '--continue', action='store_true', dest='cont', default=False,
         help="Continue processing the databases instead of donwloading new ones.")
     parser.add_option ('-r', '--repo', action='append', dest='repos',
         help="a repo name to be processed. you can specify any number of them. if none specified, all repos defined in the config file will be processed.")
@@ -71,10 +71,10 @@ def handleOpts ():
         help="show a progress when downloading anything. Not suitable for non interactive running (e.g., from a cron job).")
     parser.add_option ('-q', '--quiet', action='store_false', default=False,
         help="Shh! Don't say anything!")
-    parser.add_option ('-s', '--save-space', action='store_true',
-        dest='save_space', default=False, help="Do not maintain consistency, saving space.")
+    # parser.add_option ('-s', '--save-space', action='store_true',
+        # dest='save_space', default=False, help="Do not maintain consistency, saving space.")
     parser.add_option ('-t', '--consistent', action='store_false',
-        dest='save_space', help="Maintain consistency, wasting temporarily space.")
+        dest='save_space', default=False, help="Maintain consistency, wasting temporarily space.")
     parser.add_option ('-v', '--verbose', action='store_const', dest='log_level',
         const=logging.INFO, help="Be verbose on what's being done.")
     return parser.parse_args ()
@@ -83,7 +83,7 @@ def main ():
     (conf, args)= handleOpts ()
     conf.debugging= conf.log_level==logging.DEBUG
     conf.verbose= conf.log_level==logging.INFO or conf.debugging
-    psyncpkg.logLevel= conf.log_level
+    psync.logLevel= conf.log_level
 
     # load config file
     configVars= {}
@@ -110,10 +110,11 @@ def main ():
             driverName= repo['driver']
             
             # instantiate a driver and process it
-            DriverClass= getattr(__import__('psyncpkg.drivers.'+driverName, {},
+            DriverClass= getattr(__import__('psync.drivers.'+driverName, {},
                                  {}, [driverName]), driverName)
             driver= DriverClass(**repo)
-            mail+= driver.processRepo ()
+            # mail+= driver.processRepo ()
+            driver.processRepo ()
 
         if not conf.mail_to is None:
             # send mail

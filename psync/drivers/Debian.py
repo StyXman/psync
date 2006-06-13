@@ -4,13 +4,13 @@
 
 from os import listdir
 from os.path import dirname, basename
-import apt_pkg
+# import apt_pkg
 import gzip
 
-from psyncpkg.core import Psync
-from psyncpkg.utils import stat
+from psync.core import Psync
+from psync.utils import stat
 
-from psyncpkg import logLevel
+from psync import logLevel
 import logging
 logger = logging.getLogger('psync.drivers.Debian')
 logger.setLevel(logLevel)
@@ -18,26 +18,24 @@ logger.setLevel(logLevel)
 class Debian(Psync):
     def __init__ (self, **kwargs):
         super (Debian, self).__init__ (**kwargs)
-        apt_pkg.init ()
+        # apt_pkg.init ()
         self.firstDatabase= True
 
     def databases(self):
         ans= []
-        # skipping Release
-
         # Contents and Release
         if self.firstDatabase:
             ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
             ans.append (("dists/%(release)s/Release" % self, False))
             ans.append (("dists/%(release)s/Release.gpg" % self, False))
-            self.firstDatabase= False
         
         # download the .gz only and process from there
         packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
         packagesGz= packages+".gz"
         release= "dists/%(release)s/%(module)s/binary-%(arch)s/Release" % (self)
 
-        if self.save_space or not stat (packagesGz):
+        # this should be in core
+        if self.save_space or not self.cont:
             ans.append ((packagesGz, True))
             ans.append ((release, False))
         
@@ -63,6 +61,7 @@ class Debian(Psync):
             # grab size and process
             if line.startswith ('Size'):
                 size= int(line.split()[1])
+                logger.debug ('found file %s, size %d' % (filename, size))
                 yield (filename, size)
 
             line= f.readline ()
@@ -81,43 +80,10 @@ class Debian(Psync):
 
         # Contents
         if self.firstDatabase:
-            self.firstDatabase= False
-        
             ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
+            self.firstDatabase= False
 
         logger.debug (ans)
-        return ans
-
-    def checkold(self, path):
-        """ Checks for present files for an older version of this package.
-            Also creates the directory just in case it doesn't exist.
-        """
-        _dir= dirname (path)
-        filename= basename (path)
-        (name, version, arch) = filename.split('_')
-        arch= arch.split ('.')[0]
-        ans = []
-
-        if self.verbose:
-            # print 'processing dir %s for %s %s ' % (_dir, name, version)
-            pass
-        
-        for f in listdir(_dir):
-            try:
-                (fname, fversion, farch) = f.split('_')
-                farch= farch.split ('.')[0]
-                if self.verbose:
-                    # print fname, fversion
-                    pass
-                # if it's newer, delete the old one
-                if farch==arch and fname == name and apt_pkg.VersionCompare(version, fversion) == 1:
-                    ans.append("%s/%s" % (_dir, f))
-            except ValueError:
-                # unpack list of wrong size
-                # could be anything
-                # when in doubt, leave alne
-                logger.debug ("ignoring %s" % f)
-
         return ans
 
 # end

@@ -8,7 +8,7 @@ from os.path import dirname
 from gzip import GzipFile
 import errno
 
-from psyncpkg import logLevel
+from psync import logLevel
 import logging
 logger = logging.getLogger('psync.utils')
 logger.setLevel(logLevel)
