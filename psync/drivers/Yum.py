@@ -4,8 +4,8 @@
 from psync.core import DependencyError
 try:
     from yum.mdcache import RepodataParser
-except:
-    raise DependencyError (package='yum')
+except Exception, e:
+    raise DependencyError (package='yum', )
     
 from os import listdir
 from os.path import basename

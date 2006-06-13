@@ -235,26 +235,15 @@ config.append (dict (
 #########
 # fedora
 #########
-#config+= [{
-    #'local': 'fedora',
-    #'driver': 'Yum',
-    #'url': 'http://www.las.ic.unicamp.br/pub/fedora/linux/core',
-    #'release': '4',
-    #'arch': 'i386',
-    #'modules': [ '' ],
-    #'baseDir': "%(release)s/%(arch)s/os",
-    #'rpmDir': 'Fedora/RPMS',
-#}]
-
 config.append (dict (
-    repo= 'fedora-updates',
-    repoUrl= 'http://www.las.ic.unicamp.br/pub/fedora/linux/core/updates',
-    repoDir= 'fedora/updates',
+    repo= 'fedora',
+    repoUrl= 'http://www.las.ic.unicamp.br/pub/fedora/linux/core',
+    repoDir= 'fedora',
     driver= 'Yum',
     releases= [ '3' ],
     archs= [ 'i386' ],
     baseDirTemplate= '%(release)s/%(arch)s',
-    rpmDir= '.',
+    rpmDir= 'Fedora/RPMS',
     debug= False,
     source= False,
 ))

@@ -5,7 +5,6 @@ from os import listdir, popen
 from os.path import basename, dirname, join
 import gzip
 import re
-import rpm
 
 from psync.drivers.Rpm import Rpm
 

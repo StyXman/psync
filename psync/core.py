@@ -144,13 +144,14 @@ class Psync(object):
             distros= getattr (self, 'distros', [ None ])
             for distro in distros:
                 self.distro= distro
-                for release in self.releases:
+                releases= getattr (self, 'releases', [ None ])
+                for release in releases:
                     self.release= release
-                    for arch in self.archs:
+                    archs= getattr (self, 'archs', [ None ])
+                    for arch in archs:
                         self.arch= arch
                         modules= getattr (self, 'modules', [ None ])
                         for module in self.modules:
-                            # won't log what module we are processing
                             self.module= module
                             for filename, size in self.files ():
                                 filename= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+filename)
@@ -182,7 +183,7 @@ class Psync(object):
             # summary.append (msg)
             # summary.append ("~" * len (msg))
             modules= getattr (self, 'modules', [ None ])
-            for module in self.modules:
+            for module in modules:
                 # won't log what module we are processing
                 self.module= module
                 # summary+= self.process ()
