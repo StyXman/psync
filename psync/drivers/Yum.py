@@ -27,7 +27,8 @@ class Yum (Rpm):
 
         # download repomd.xml and take from there
         filename= '%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata/repomd.xml' % self
-        grab (filename, '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self)
+        grab (filename, '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self, 
+	      cont=False, progress=self.progress)
         
         repomd= libxml2.parseFile(filename).getRootElement()
         repomdChild= repomd.children
@@ -78,7 +79,7 @@ class Yum (Rpm):
                  (not isSource and not isDebug) ):
                 # (filename, size)
                 yield ( ("%(rpmDir)s/" % self)+i.location['href'],
-                             int(i.size['package']) )
+                        int(i.size['package']) )
 
     def finalDBs (self):
         finals= self.databases ()

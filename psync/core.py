@@ -29,9 +29,7 @@ class DependencyError (Exception):
 
 class Psync(object):
     def __init__ (self, verbose=False, **kwargs):
-        # self.delete= [] # files for deletion (old package versions)
-        self.failed= [] # files taht failed to download
-        # self.updatedFiles= [] # updated packages
+        self.failed= [] # files that failed to download
         self.keep= {}
         self.repoFiles= 0
         self.downloadedSize= 0
