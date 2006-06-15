@@ -22,13 +22,14 @@ logger.setLevel(logLevel)
 
 class Yum (Rpm):
     
-    def databases (self):
+    def databases (self, download=True):
         ans= []
-
-        # download repomd.xml and take from there
-        filename= '%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata/repomd.xml' % self
-        grab (filename, '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self, 
-	      cont=False, progress=self.progress)
+	
+	if download:
+	    # download repomd.xml and take from there
+	    filename= '%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata/repomd.xml' % self
+	    grab (filename, '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self, 
+		  cont=False, progress=self.progress)
         
         repomd= libxml2.parseFile(filename).getRootElement()
         repomdChild= repomd.children
@@ -73,17 +74,17 @@ class Yum (Rpm):
             # nevra= (name, epoch, version, release, arch)
             isDebug= 'debuginfo' in i.location['href']
             isSource= i.nevra[4]=='src'
-            if ( (self.source and not isDebug) or
-                 (self.debug and not isSource) or
-                 (self.source and self.debug) or
-                 (not isSource and not isDebug) ) and
-                (i.nevra[4]==self.arch or i.nevra[4]=='all'):
+            if ( ( (self.source and not isDebug) or
+                   (self.debug and not isSource) or
+                   (self.source and self.debug) or
+                   (not isSource and not isDebug) 
+		 ) and (i.nevra[4]==self.arch or i.nevra[4]=='noarch') ):
                 # (filename, size)
                 yield ( ("%(rpmDir)s/" % self)+i.location['href'],
                         int(i.size['package']) )
 
     def finalDBs (self):
-        finals= self.databases ()
+        finals= self.databases (download=False)
         finals.append (('repodata/repomd.xml', True))
         return finals
 

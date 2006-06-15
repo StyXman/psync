@@ -260,6 +260,24 @@ config.append (dict (
     source= False,
 ))
 
+#######
+# suse
+#######
+# http://mirrors.kernel.org/suse/update/10.1
+config.append (dict (
+    repo= 'suse-updates',
+    repoUrl= 'http://mirrors.kernel.org/suse/update',
+    repoDir= 'suse/updates',
+    driver= 'Yum',
+    releases= [ '10.1' ],
+    archs= [ 'i586' ],
+    baseDirTemplate= '%(release)s',
+    rpmDir= '.',
+    debug= False,
+    source= False,
+))
+    
+
 # http://apt.kde-redhat.org/apt/kde-redhat/fedora/4/i386/stable/
 config.append (dict (
     repo= 'kde-redhat',

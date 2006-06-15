@@ -143,7 +143,6 @@ def grab(filename, url, limit=0, cont=True, progress=False):
         limitStr= "--limit-rate %dk" % limit
 
     command = "curl -L -f %s %s %s -o %s %s" % (contStr, limitStr, silentStr, filename, url)
-    logger.debug (command)
 
     # Curl has not an equivalent parameter for Wget's -t (number of tries)...
     # Curl returns:
@@ -159,6 +158,7 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     finishCodes= (0, 2, 0x1600, 0x1200, 0x1700, 0x600)
     curlExitCode = 1
     while not curlExitCode in finishCodes:
+	logger.debug (command)
         curlExitCode = system(command)
         if curlExitCode==0x2100:
             # 33 The range "command" didn't work.
