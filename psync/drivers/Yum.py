@@ -76,7 +76,8 @@ class Yum (Rpm):
             if ( (self.source and not isDebug) or
                  (self.debug and not isSource) or
                  (self.source and self.debug) or
-                 (not isSource and not isDebug) ):
+                 (not isSource and not isDebug) ) and
+                (i.nevra[4]==self.arch or i.nevra[4]=='all'):
                 # (filename, size)
                 yield ( ("%(rpmDir)s/" % self)+i.location['href'],
                         int(i.size['package']) )

@@ -155,12 +155,13 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     # 18 Partial file. Only a part of the file was transferred.
     # 22 when the file was not found (http error 404)
     # 23 disk full
-    # 33 The range "command" didn't work.
-    finishCodes= (0, 2, 0x1600, 0x1200, 0x1700)
+    # 6 unknown host
+    finishCodes= (0, 2, 0x1600, 0x1200, 0x1700, 0x600)
     curlExitCode = 1
     while not curlExitCode in finishCodes:
         curlExitCode = system(command)
         if curlExitCode==0x2100:
+            # 33 The range "command" didn't work.
             command = "curl -L -f %s %s -o %s %s" % (limitStr, silentStr, filename, url)
 
         logger.debug ("cec= 0x%x" % curlExitCode)
