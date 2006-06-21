@@ -13,7 +13,7 @@ import libxml2
 
 from psync.drivers.Rpm import Rpm
 from psync.utils import gunzip, grab
-from psync.utils import gunzip, grab
+from psync.core import ProtocolError
 
 from psync import logLevel
 import logging
@@ -25,11 +25,14 @@ class Yum (Rpm):
     def databases (self, download=True):
         ans= []
 	
+	filename= '%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata/repomd.xml' % self
+	url= '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self
 	if download:
 	    # download repomd.xml and take from there
-	    filename= '%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata/repomd.xml' % self
-	    grab (filename, '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self, 
-		  cont=False, progress=self.progress)
+	    found= grab (filename, url, 
+			 cont=False, progress=self.progress)
+	    if found!=0:
+	    	raise ProtocolError (proto=url[:url.index (':')].upper (), code=found, url=url)
         
         repomd= libxml2.parseFile(filename).getRootElement()
         repomdChild= repomd.children

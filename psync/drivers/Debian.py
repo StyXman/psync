@@ -61,7 +61,7 @@ class Debian(Psync):
             # grab size and process
             if line.startswith ('Size'):
                 size= int(line.split()[1])
-                logger.debug ('found file %s, size %d' % (filename, size))
+                # logger.debug ('found file %s, size %d' % (filename, size))
                 yield (filename, size)
 
             line= f.readline ()

@@ -61,7 +61,7 @@ class Psync(object):
             s= os.stat (_file)
         except OSError:
             # the file does not exist; download it
-            logger.debug ("about to download %s" % _file)
+            # logger.debug ("about to download %s" % _file)
             if not self.dry_run:
                 ans= grab (_file, url, limit=self.limit, progress=self.progress)
             if size is None:
@@ -72,7 +72,7 @@ class Psync(object):
             # summary.append (basename(_file))
         else:
             if size is not None and s.st_size!=size:
-                logger.info ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
+                # logger.info ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
                 if not self.dry_run:
                     ans= grab (_file, url, limit=self.limit, cont=True, progress=self.progress)
                 if size is None:
@@ -82,7 +82,8 @@ class Psync(object):
                 # summary.append (basename(_file))
             else:
                 if self.verbose:
-                    logger.info ("%s: already here, skipping" % _file)
+                    # logger.info ("%s: already here, skipping" % _file)
+		    pass
         self.keep[_file]= 1
 
         if ans==0x1600:
@@ -113,9 +114,13 @@ class Psync(object):
             # summary.append ("distro: %s" % distro)
             self.distro= distro
             for release in self.releases:
-                self.release= release
-                # releaseSummary= self.processRelease ()
-                self.processRelease ()
+		try:
+            	    self.release= release
+            	    # releaseSummary= self.processRelease ()
+            	    self.processRelease ()
+		except Exception, e:
+		    logger.info ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
+		    print_exc ()
             
         # summary of failed pkgs
         if self.failed!=[]:
@@ -128,10 +133,9 @@ class Psync(object):
             self.keepOldFiles ()
         else:
             # summary+= releaseSummary
-            pass
 
-        # clean up
-        self.cleanRepo ()
+    	    # clean up
+    	    self.cleanRepo ()
 
         # return summary
     
@@ -149,7 +153,7 @@ class Psync(object):
                     for arch in archs:
                         self.arch= arch
                         modules= getattr (self, 'modules', [ None ])
-                        for module in self.modules:
+                        for module in modules:
                             self.module= module
                             for filename, size in self.files ():
                                 filename= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+filename)
@@ -232,7 +236,8 @@ class Psync(object):
             logger.info ('processing %s failed due to %s' % (self.repo, e))
             if ( self.debugging or
                  (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
-                 isinstance (e, KeyboardInterrupt) ):
+                 isinstance (e, KeyboardInterrupt) or
+		 isinstance (e, ProtocolError) ):
                 # debugging, out of disk space or keyb int
                 print_exc ()
                 raise e
