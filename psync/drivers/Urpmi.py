@@ -1,11 +1,16 @@
 # (c) 2005-2006
 # Marcos Dione <mdione@grulic.org.ar>
 
+from psync.core import DependencyError
+try:
+    import rpm
+except Exception, e:
+    raise DependencyError (package='python-rpm', )
+
 from os import listdir, popen
 from os.path import basename, dirname, join
 import gzip
 import re
-
 from psync.drivers.Rpm import Rpm
 
 from psync import logLevel
