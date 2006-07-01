@@ -18,6 +18,10 @@ import logging
 logger = logging.getLogger('psync.drivers.Urpmi')
 logger.setLevel(logLevel)
 
+# known BUG:
+# error: Unable to open /usr/lib/rpm/rpmrc for reading: No such file or directory.
+# zcat: .tmp/mandrake/updates/LE2005/main_updates/media_info/hdlist.cz: decompression OK, trailing garbage ignored
+
 class Urpmi (Rpm):
     def __init__ (self, **kwargs):
         super (Urpmi, self).__init__ (**kwargs)
