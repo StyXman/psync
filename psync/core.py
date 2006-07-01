@@ -113,15 +113,21 @@ class Psync(object):
         for distro in distros:
             # summary.append ("distro: %s" % distro)
             self.distro= distro
-            for release in self.releases:
-		try:
+	    try:
+        	for release in self.releases:
             	    self.release= release
             	    # releaseSummary= self.processRelease ()
             	    self.processRelease ()
-		except Exception, e:
-		    logger.info ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
-		    print_exc ()
-            
+	    except Exception, e:
+		logger.info ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
+		logger.info (e)
+		print_exc ()
+        	if ( self.debugging or
+	             (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
+		      isinstance (e, KeyboardInterrupt)):
+		    # debugging, out of disk space or keyb int
+		    raise e
+													                   
         # summary of failed pkgs
         if self.failed!=[]:
             logger.info ("failed packages:")
@@ -235,9 +241,9 @@ class Psync(object):
         except Exception, e:
             logger.info ('processing %s failed due to %s' % (self.repo, e))
             if ( self.debugging or
-                 (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
+        	 (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                  isinstance (e, KeyboardInterrupt) or
-		 isinstance (e, ProtocolError) ):
+	    	 isinstance (e, ProtocolError) ):
                 # debugging, out of disk space or keyb int
                 print_exc ()
                 raise e
