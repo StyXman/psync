@@ -92,7 +92,13 @@ def main ():
     del configVars
 
     if conf.repos is not None:
-        repos= [ x for x in config if x['repo'] in conf.repos ]
+        repos= []
+        for repo in config:
+            repoName= repo['repo']
+            if repoName in conf.repos:
+                repos.append (repo)
+                conf.repos.remove (repoName)
+        logger.warn ("%s: this repos were not found. not processing." % conf.repos)
     else:
         repos= config
 
@@ -114,7 +120,15 @@ def main ():
                                  {}, [driverName]), driverName)
             driver= DriverClass(**repo)
             # mail+= driver.processRepo ()
-            driver.processRepo ()
+            try:
+                driver.processRepo ()
+            except Exception, e:
+                if ( conf.debugging or
+                    (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
+                    isinstance (e, KeyboardInterrupt) ):
+                    # debugging, out of disk space or keyb int
+                    raise e
+                
 
         if not conf.mail_to is None:
             # send mail
