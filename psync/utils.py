@@ -37,7 +37,7 @@ def makedirs(_dirname):
         except OSError, e:
             # print "%s failed: %s" % (i, e)
             pass
-	else:
+        else:
             logger.debug ('make dir %s' % i)
 
 def touch (path):
@@ -155,11 +155,12 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     # 18 Partial file. Only a part of the file was transferred.
     # 22 when the file was not found (http error 404)
     # 23 disk full
+    # 52 no response
     # 6 unknown host
-    finishCodes= (0, 2, 0x1600, 0x1200, 0x1700, 0x600, 0x7f00)
+    finishCodes= (0, 2, 0x600, 0x1200, 0x1600, 0x1700, 0x3400, 0x7f00)
     curlExitCode = 1
     while not curlExitCode in finishCodes:
-	logger.debug (command)
+        logger.debug (command)
         curlExitCode = system(command)
         if curlExitCode==0x2100:
             # 33 The range "command" didn't work.
