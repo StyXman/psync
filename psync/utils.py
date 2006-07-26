@@ -157,7 +157,7 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     # 23 disk full
     # 52 no response
     # 6 unknown host
-    finishCodes= (0, 2, 0x600, 0x1200, 0x1600, 0x1700, 0x3400, 0x7f00)
+    finishCodes= (0, 2, 0x600, 0x1200, 0x1600, 0x1700, 0x3400, 0x7f00, 0xffffffff)
     curlExitCode = 1
     while not curlExitCode in finishCodes:
         logger.debug (command)

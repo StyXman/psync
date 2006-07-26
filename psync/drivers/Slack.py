@@ -22,9 +22,8 @@ class Slack(Psync):
         ans= []
         if self.firstDatabase:
             ans.append ( ('PACKAGES.TXT', True) )
-            self.firstDatabase= False
         ans.append ( (self.module+'/PACKAGES.TXT', True) )
-        return []
+        return ans
 
     def files(self):
         logger.debug ("opening PACKAGES.TXT")
@@ -49,9 +48,11 @@ class Slack(Psync):
             line= f.readline ()
         
         f.close ()
-        self.firstDatabase= True
+        # self.firstDatabase= True
 
     def finalDBs (self):
-        return [('PACKEGES.TXT', True)]
+	ans= self.databases ()
+        self.firstDatabase= False
+        return ans
 
 # end

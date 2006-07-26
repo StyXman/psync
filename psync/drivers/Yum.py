@@ -82,9 +82,10 @@ class Yum (Rpm):
                    (self.source and self.debug) or
                    (not isSource and not isDebug) 
 		 ) and (i.nevra[4]==self.arch or i.nevra[4]=='noarch') ):
+		relUrl= ("%(rpmDir)s/" % self)+i.location['href']
+		logger.debug ("found: %s" % relUrl)
                 # (filename, size)
-                yield ( ("%(rpmDir)s/" % self)+i.location['href'],
-                        int(i.size['package']) )
+                yield ( relUrl, int(i.size['package']) )
 
     def finalDBs (self):
         finals= self.databases (download=False)
