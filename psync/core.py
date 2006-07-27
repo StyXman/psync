@@ -215,9 +215,9 @@ class Psync(object):
 
     def keepOldReleaseFiles (self):
         # force it to use the old databases
+        oldTempDir= self.tempDir
+        self.tempDir= '.'
         try:
-            oldTempDir= self.tempDir
-            self.tempDir= '.'
             archs= getattr (self, 'archs', [ None ])
             for arch in archs:
                 self.arch= arch
@@ -236,8 +236,8 @@ class Psync(object):
             # some database does not exist in the mirror
             # so, wipe'em all anyways
             pass
-        finally:
-            self.tempDir= oldTempDir
+        
+        self.tempDir= oldTempDir
 
     
     def process (self):
