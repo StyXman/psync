@@ -191,7 +191,7 @@ config.append (dict (
 config.append (dict (
     repo= 'ubuntu',
     repoUrl= 'http://archive.ubuntu.com/ubuntu',
-    repoDir= 'ubuntu',
+    repoDir= 'ubuntu/ubuntu',
     driver= 'Debian',
     releases= [ 'breezy' ],
     archs= [ 'i386' ],
@@ -295,6 +295,9 @@ config.append (dict (
 ))
 
 
+############
+# slackware
+############
 # http://mirror.slacklife.com.br/slackware-current/
 config.append (dict (
     repo= 'slack-current',
@@ -302,6 +305,6 @@ config.append (dict (
     repoDir= 'slackware',
     driver= 'Slack',
     releases= [ '10.2', 'current' ],
-    modules= [ 'slackware', 'extras' ],
+    modules= [ 'slackware', 'extra' ],
     baseDirTemplate= 'slackware-%(release)s',
 ))

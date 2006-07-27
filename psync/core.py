@@ -203,8 +203,8 @@ class Psync(object):
             logger.info (e)
             print_exc ()
             if ( self.debugging or
-                    (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
-                    isinstance (e, KeyboardInterrupt)):
+                 (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
+                 isinstance (e, KeyboardInterrupt) ):
                 # debugging, out of disk space or keyb int
                 raise e
             
@@ -216,6 +216,7 @@ class Psync(object):
     def keepOldReleaseFiles (self):
         # force it to use the old databases
         try:
+            oldTempDir= self.tempDir
             self.tempDir= '.'
             archs= getattr (self, 'archs', [ None ])
             for arch in archs:
@@ -235,6 +236,9 @@ class Psync(object):
             # some database does not exist in the mirror
             # so, wipe'em all anyways
             pass
+        finally:
+            self.tempDir= oldTempDir
+
     
     def process (self):
         """
@@ -268,7 +272,7 @@ class Psync(object):
                     (self.save_space, self.dry_run, self.failedFiles))
             
         except Exception, e:
-            logger.info ('processing %s failed due to %s' % (self.repo, e))
+            logger.debug ('processing %s failed due to %s' % (self.repo, e))
             if ( self.debugging or
                  (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                  isinstance (e, KeyboardInterrupt) or
