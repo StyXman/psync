@@ -291,6 +291,7 @@ class Psync(object):
             ignore= False
             for ignorePath in ignorePaths:
                 if path.startswith (ignorePath):
+                    logger.debug ('ignoring %s' % path)
                     ignore= True
                 
             if not ignore:
