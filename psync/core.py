@@ -239,7 +239,6 @@ class Psync(object):
         
         self.tempDir= oldTempDir
 
-    
     def process (self):
         """
         Process one module.
@@ -286,7 +285,10 @@ class Psync(object):
     def cleanRepo (self):
         logger.debug ('here comes the janitor')
         ignorePaths= getattr (self, 'ignore', [])
+        # add repoDir to all ignored paths
+        ignorePaths= [ "%s/%s" % (self.repoDir, i) for i in ignorePaths ]
         logger.debug (ignorePaths)
+        
         for (path, dirs, files) in os.walk (self.repoDir):
             ignore= False
             for ignorePath in ignorePaths:
