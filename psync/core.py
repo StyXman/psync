@@ -23,7 +23,7 @@ class DictException (Exception):
 class ProtocolError (DictException):
     pass
 
-class DependencyError (Exception):
+class DependencyError (DictException):
     pass
 
 class Psync(object):
@@ -90,6 +90,8 @@ class Psync(object):
         self.keep[_file]= 1
 
         if ans==0x1600:
+            # only 404 is relevant here
+            logger.warn ('failed')
             self.failedFiles.append (_file)
             self.releaseFailed= True
         elif ans==0x02:
@@ -174,12 +176,14 @@ class Psync(object):
         It is for human consumption.
         """
         try:
+            logger.info ('----- processing %(repo)s/%(distro)s/%(release)s' % self)
             # summary= []
             self.releaseFailed= False
             
             archs= getattr (self, 'archs', [ None ])
             for arch in archs:
                 self.arch= arch
+                logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
                 # msg= "architecture %s:" % arch
                 # summary.append (msg)
                 # summary.append ("~" * len (msg))
@@ -209,6 +213,7 @@ class Psync(object):
                 raise e
             
         if self.releaseFailed:
+            logger.warn ('loading old databases for %(repo)s/%(distro)s/%(release)s' % self)
             self.keepOldReleaseFiles ()
         
         # return summary

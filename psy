@@ -82,7 +82,7 @@ def handleOpts ():
 def main ():
     (conf, args)= handleOpts ()
     conf.debugging= conf.log_level==logging.DEBUG
-    conf.verbose= conf.log_level==logging.INFO or conf.debugging
+    conf.verbose= conf.log_level==logging.WARN or conf.debugging
     psync.logLevel= conf.log_level
 
     # load config file
@@ -108,7 +108,7 @@ def main ():
     try:
         for repo in repos:
             repo.update (confToDict (conf))
-            logger.info ("processing repo "+repo['repo'])
+            logger.info ("----- processing "+repo['repo'])
 
             # prepare teh mail body
             mail.append (repo['repo'].center (75))
