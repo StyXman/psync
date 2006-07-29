@@ -337,7 +337,7 @@ class Psync(object):
         """
         Move the downloaded databases over the old ones
         """
-        logger.info ('----- updating databases for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s')
+        logger.info ('----- updating databases for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s' % self)
         # get the databases relative paths
         # these can be more 
         databases= self.finalDBs()
