@@ -125,10 +125,10 @@ class Psync(object):
         
         # summary of failed pkgs
         if self.failedFiles!=[]:
-            logger.info ("failed packages:")
+            logger.warn ("failed packages:")
             for i in self.failedFiles:
-                logger.info (i)
-            logger.info ("----- %d/%d package(s) failed" % (len (self.failedFiles), self.repoFiles))
+                logger.warn (i)
+            logger.warn ("----- %d/%d package(s) failed" % (len (self.failedFiles), self.repoFiles))
             # this is gonna be ugly
             # so ugly I sent it to another function
         else:
@@ -180,6 +180,8 @@ class Psync(object):
             # summary= []
             self.releaseFailed= False
             
+            # self.getReleaseDatabases ()
+            
             archs= getattr (self, 'archs', [ None ])
             for arch in archs:
                 self.arch= arch
@@ -203,8 +205,8 @@ class Psync(object):
     
         except Exception, e:
             self.releaseFailed= True
-            logger.info ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
-            logger.info (e)
+            logger.warn ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
+            logger.warn (e)
             print_exc ()
             if ( self.debugging or
                  (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
@@ -213,12 +215,15 @@ class Psync(object):
                 raise e
             
         if self.releaseFailed:
-            logger.warn ('loading old databases for %(repo)s/%(distro)s/%(release)s' % self)
             self.keepOldReleaseFiles ()
+        else:
+            # self.updateReleaseDatabases ()
+            pass
         
         # return summary
 
     def keepOldReleaseFiles (self):
+        logger.warn ('loading old databases for %(repo)s/%(distro)s/%(release)s' % self)
         # force it to use the old databases
         oldTempDir= self.tempDir
         self.tempDir= '.'
@@ -231,8 +236,8 @@ class Psync(object):
                     self.module= module
                     for filename, size in self.files ():
                         filename= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+filename)
-                        logger.debug ('keeping %s' % filename)
                         self.keep[filename]= 1
+                        logger.debug (filename+ ('kept for %(repo)s/%(distro)s/%(release)s' % self))
                     databases= self.finalDBs()
                     for (database, critic) in databases:
                         dst= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+database)
@@ -268,7 +273,7 @@ class Psync(object):
             
             # yes, there is a BUG here, but it's not that grave.
             # which bug? I don't remember :(
-            # planned to be fixed in 0.2.5 or never
+            # databases must be updated at release lever.
             if not self.save_space and not self.dry_run and self.failedFiles==[] and not self.process_old:
                 self.updateDatabases ()
             else:
@@ -308,11 +313,8 @@ class Psync(object):
                         # delete de bastard
                         logger.info ('deleting %s' % filepath)
                         os.unlink (filepath)
-        logger.debug ('janitor finished cleaning')
-        files= self.keep.keys ()
-        files.sort()
-        for file in files:
-            logger.debug (file)
+                    else:
+                        logger.debug ('keeping %s' % filepath)
         logger.debug ('janitor out')
         
     def getDatabases (self):
