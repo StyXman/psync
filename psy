@@ -7,6 +7,7 @@
 from tempfile import mkdtemp
 from optparse import OptionParser
 from socket import getfqdn
+from traceback import print_exc
 import sys
 import smtplib
 import datetime
@@ -98,7 +99,8 @@ def main ():
             if repoName in conf.repos:
                 repos.append (repo)
                 conf.repos.remove (repoName)
-        logger.warn ("%s: this repos were not found. not processing." % conf.repos)
+        if repos != []:
+            logger.warn ("%s: this repos were not found. not processing." % conf.repos)
     else:
         repos= config
 
@@ -114,7 +116,7 @@ def main ():
             mail.append (repo['repo'].center (75))
             mail.append (('~' * len (repo['repo'])).center (75))
             driverName= repo['driver']
-            
+
             # instantiate a driver and process it
             DriverClass= getattr(__import__('psync.drivers.'+driverName, {},
                                  {}, [driverName]), driverName)
@@ -127,8 +129,9 @@ def main ():
                     (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                     isinstance (e, KeyboardInterrupt) ):
                     # debugging, out of disk space or keyb int
+                    print_exc ()
                     raise e
-                
+
 
         if not conf.mail_to is None:
             # send mail
