@@ -4,7 +4,6 @@
 
 from os import listdir
 from os.path import dirname, basename
-# import apt_pkg
 import gzip
 
 from psync.core import Psync
@@ -18,33 +17,32 @@ logger.setLevel(logLevel)
 class Debian(Psync):
     def __init__ (self, **kwargs):
         super (Debian, self).__init__ (**kwargs)
-        # apt_pkg.init ()
-        self.firstDatabase= True
 
-    def databases(self):
+    def releaseDatabases(self):
         ans= []
         # Contents and Release
-        if self.firstDatabase:
-            ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
+        def releaseFunc (self):
             ans.append (("dists/%(release)s/Release" % self, False))
             ans.append (("dists/%(release)s/Release.gpg" % self, False))
-        
-        # download the .gz only and process from there
-        packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
-        packagesGz= packages+".gz"
-        release= "dists/%(release)s/%(module)s/binary-%(arch)s/Release" % (self)
 
-        # this should be in core
-        if self.save_space or not self.cont:
-            ans.append ((packagesGz, True))
-            ans.append ((release, False))
-        
+        def archFunc (self):
+            ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
+
+        def moduleFunc (self):
+            # download the .gz only and process from there
+            packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
+            packagesGz= packages+".gz"
+            release= "dists/%(release)s/%(module)s/binary-%(arch)s/Release" % (self)
+            ans.append ( (packagesGz, True) )
+            ans.append ( (release, False) )
+
+        self.walkRelease (releaseFunc, archFunc, moduleFunc)
         return ans
 
     def files(self):
         packages= "%(tempDir)s/%(repoDir)s/dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % self
         packagesGz= packages+".gz"
-        
+
         logger.debug ("opening %s" % packagesGz)
         f= gzip.open (packagesGz)
         o= open (packages, "w+")
@@ -65,7 +63,7 @@ class Debian(Psync):
                 yield (filename, size)
 
             line= f.readline ()
-        
+
         o.close ()
         f.close ()
         self.firstDatabase= True
@@ -84,6 +82,17 @@ class Debian(Psync):
             self.firstDatabase= False
 
         logger.debug (ans)
+        return ans
+
+    def finalReleaseDBs (self):
+        ans= self.releaseDatabases ()
+
+        def moduleFunc (self):
+            # download the .gz only and process from there
+            packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
+            ans.append ( (packages, True) )
+        self.walkRelease (None, None, moduleFunc)
+
         return ans
 
 # end
