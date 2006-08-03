@@ -15,14 +15,12 @@ logger.setLevel(logLevel)
 class Slack(Psync):
     def __init__ (self, **kwargs):
         super (Slack, self).__init__ (**kwargs)
-        # apt_pkg.init ()
-        self.firstDatabase= True
 
-    def databases(self):
-        ans= []
-        if self.firstDatabase:
-            ans.append ( ('PACKAGES.TXT', True) )
-        ans.append ( (self.module+'/PACKAGES.TXT', True) )
+    def releaseDatabases(self):
+        ans= [ ('PACKAGES.TXT', True) ]
+        for self.module in self.modules:
+            ans.append ( (self.module+'/PACKAGES.TXT', True) )
+
         return ans
 
     def files(self):
@@ -40,19 +38,17 @@ class Slack(Psync):
                 baseDir= line.split()[-1]
                 path= "%s/%s" % (baseDir, filename)
                 logger.debug ('found file %s' % path)
-                
+
                 yield (path, None)
                 yield (path+".asc", None)
                 yield (path[:-4]+".txt", None)
 
             line= f.readline ()
-        
-        f.close ()
-        # self.firstDatabase= True
 
-    def finalDBs (self):
-	ans= self.databases ()
-        self.firstDatabase= False
+        f.close ()
+
+    def finalReleaseDBs (self):
+        ans= self.releaseDatabases ()
         return ans
 
 # end
