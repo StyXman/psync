@@ -70,7 +70,7 @@ class Psync(object):
         except OSError, e:
             if e.errno==errno.ENOENT:
                 # the file does not exist; download it
-                logger.debug ("about to download %s" % _file)
+                # logger.debug ("about to download %s" % _file)
                 get= True
             else:
                 raise e
@@ -214,24 +214,11 @@ class Psync(object):
         It is for human consumption.
         """
         # summary= []
-        try:
-
-            # now files
-            for filename, size in self.files ():
-                # summary+= self.getPackage (filename, size)
-                filename= os.path.normpath (filename)
-                self.repoFiles+= 1
-                self.getPackage (filename, size)
-
-        except Exception, e:
-            logger.debug ('processing %s failed due to %s' % (self.repo, e))
-            if ( self.debugging or
-                 (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
-                 isinstance (e, KeyboardInterrupt) or
-                 isinstance (e, ProtocolError) ):
-                # debugging, out of disk space or keyb int
-                print_exc ()
-                raise e
+        for filename, size in self.files ():
+            # summary+= self.getPackage (filename, size)
+            filename= os.path.normpath (filename)
+            self.repoFiles+= 1
+            self.getPackage (filename, size)
 
         # return summary
 
@@ -312,7 +299,7 @@ class Psync(object):
             except OSError, e:
                 # better error report!
                 if not critic:
-                    logger.info ('[Ign] %s (%s)' % (src, str (e)))
+                    logger.warn ('[Ign] %s (%s)' % (src, str (e)))
                 else:
                     raise e
         # removedirs (dirname (old))
