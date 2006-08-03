@@ -18,22 +18,23 @@ class SimpleDebian(Psync):
     def __init__ (self, **kwargs):
         super (SimpleDebian, self).__init__ (**kwargs)
 
-    def databases(self):
+    def releaseDatabases(self):
         ans= []
-        # logger.debug (self.__dict__)
-        if getattr (self, 'baseDirTemplate', None) is not None:
-            logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
-            self.baseDir= self.baseDirTemplate % self
-        # Contents and Release
-        # ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
-        ans.append ( ("%(baseDir)s/Release" % self, False) )
-        ans.append ( ("%(baseDir)s/Release.gpg" % self, False) )
+        def moduleFunc (self):
+            if getattr (self, 'baseDirTemplate', None) is not None:
+                logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
+                self.baseDir= self.baseDirTemplate % self
+            # Contents and Release
+            # ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
+            ans.append ( ("%(baseDir)s/Release" % self, False) )
+            ans.append ( ("%(baseDir)s/Release.gpg" % self, False) )
 
-        # download the .gz only and process from there
-        packages= "%(baseDir)s/Packages"  % self
-        packagesGz= packages+".gz"
-        ans.append ( (packagesGz, False) )
+            # download the .gz only and process from there
+            packages= "%(baseDir)s/Packages"  % self
+            packagesGz= packages+".gz"
+            ans.append ( (packagesGz, False) )
 
+        self.walkRelease (None, None, moduleFunc)
         return ans
 
     def files(self):
@@ -64,7 +65,7 @@ class SimpleDebian(Psync):
         f.close ()
         self.firstDatabase= True
 
-    def finalDBs (self):
+    def finalReleaseDBs (self):
         ans= self.releaseDatabases ()
 
         def moduleFunc (self):
