@@ -6,7 +6,7 @@ try:
     from yum.mdcache import RepodataParser
 except Exception, e:
     raise DependencyError (package='yum', )
-    
+
 from os import listdir
 from os.path import basename
 import libxml2
@@ -21,37 +21,41 @@ logger = logging.getLogger('psync.drivers.Yum')
 logger.setLevel(logLevel)
 
 class Yum (Rpm):
-    
-    def databases (self, download=True):
+
+    def releaseDatabases (self, download=True):
         ans= []
-	
-	filename= '%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata/repomd.xml' % self
-	url= '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self
-	if download:
-	    # download repomd.xml and take from there
-	    found= grab (filename, url, 
-			 cont=False, progress=self.progress)
-	    if found!=0:
-	    	raise ProtocolError (proto=url[:url.index (':')].upper (), code=found, url=url)
-        
-        repomd= libxml2.parseFile(filename).getRootElement()
-        repomdChild= repomd.children
-        while repomdChild:
-            if repomdChild.name=='data':
-                dataChild= repomdChild.children
-                while dataChild:
-                    if dataChild.name=='location':
-                        ans.append ((dataChild.prop ('href'), True))
-    
-                    dataChild= dataChild.next
-            
-            repomdChild= repomdChild.next
-        
+
+        def moduleFunc (self):
+            self.baseDir= self.baseDirTemplate % self
+            filename= '%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata/repomd.xml' % self
+            url= '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self
+            if download:
+                # download repomd.xml and take from there
+                found= grab (filename, url,
+                            cont=False, progress=self.progress)
+                if found!=0:
+                    raise ProtocolError (proto=url[:url.index (':')].upper (), code=found, url=url)
+
+            repomd= libxml2.parseFile(filename).getRootElement()
+            repomdChild= repomd.children
+            while repomdChild:
+                if repomdChild.name=='data':
+                    dataChild= repomdChild.children
+                    while dataChild:
+                        if dataChild.name=='location':
+                            ans.append ( (("%(baseDir)s/" % self)+dataChild.prop ('href'), True) )
+
+                        dataChild= dataChild.next
+
+                repomdChild= repomdChild.next
+
+        self.walkRelease (None, None, moduleFunc)
         return ans
 
     def files (self):
         # build a parser and use it
         # hack
+        self.baseDir= self.baseDirTemplate % self
         repodataDir= "%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata" % self
 
         self.parser= RepodataParser (repodataDir)
@@ -80,16 +84,16 @@ class Yum (Rpm):
             if ( ( (self.source and not isDebug) or
                    (self.debug and not isSource) or
                    (self.source and self.debug) or
-                   (not isSource and not isDebug) 
-		 ) and (i.nevra[4]==self.arch or i.nevra[4]=='noarch') ):
-		relUrl= ("%(rpmDir)s/" % self)+i.location['href']
-		logger.debug ("found: %s" % relUrl)
+                   (not isSource and not isDebug)
+                 ) and (i.nevra[4]==self.arch or i.nevra[4]=='noarch') ):
+                relUrl= ("%(baseDir)s/%(rpmDir)s/" % self)+i.location['href']
+                logger.debug ("found: %s" % relUrl)
                 # (filename, size)
                 yield ( relUrl, int(i.size['package']) )
 
-    def finalDBs (self):
+    def finalReleaseDBs (self):
         finals= self.databases (download=False)
-        finals.append (('repodata/repomd.xml', True))
+        finals.append (('%(baseDir)s/repodata/repomd.xml' % self, True))
         return finals
 
 # end
