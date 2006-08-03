@@ -5,6 +5,7 @@
 from os import unlink, removedirs
 from os.path import dirname, basename
 from traceback import print_exc
+from time import sleep
 import os
 import errno
 
@@ -337,6 +338,10 @@ class Psync(object):
                         # delete de bastard
                         logger.info ('deleting %s' % filepath)
                         os.unlink (filepath)
+                        if self.debug:
+                            # make it slower so we can stop it in time
+                            # when it's destroying a repo
+                            sleep (0.1)
                     else:
                         logger.debug ('keeping %s' % filepath)
         logger.debug ('janitor out')
