@@ -303,7 +303,7 @@ class Psync(object):
         logger.debug (databases)
         for (database, critic) in databases:
             # logger.debug (self.__dict__)
-            dst= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+database)
+            dst= os.path.normpath (("%(repoDir)s/" % self)+database)
             src= self.tempDir+'/'+dst
             try:
                 makedirs (dirname (dst))
