@@ -58,8 +58,8 @@ class Psync(object):
         ans= 0
         get= False
 
-        url= ("%(repoUrl)s/%(baseDir)s/" % self)+filename
-        _file= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+filename)
+        url= ("%(repoUrl)s/" % self)+filename
+        _file= os.path.normpath (("%(repoDir)s/" % self)+filename)
 
         tempDir = dirname (_file)
         makedirs (tempDir)
