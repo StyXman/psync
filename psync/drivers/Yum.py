@@ -92,7 +92,7 @@ class Yum (Rpm):
                 yield ( relUrl, int(i.size['package']) )
 
     def finalReleaseDBs (self):
-        finals= self.databases (download=False)
+        finals= self.releaseDatabases (download=False)
         finals.append (('%(baseDir)s/repodata/repomd.xml' % self, True))
         return finals
 
