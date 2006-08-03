@@ -99,7 +99,7 @@ def main ():
             if repoName in conf.repos:
                 repos.append (repo)
                 conf.repos.remove (repoName)
-        if repos != []:
+        if conf.repos != []:
             logger.warn ("%s: this repos were not found. not processing." % conf.repos)
     else:
         repos= config

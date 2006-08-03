@@ -131,7 +131,8 @@ class Psync(object):
         for distro in distros:
             # summary.append ("distro: %s" % distro)
             self.distro= distro
-            for release in self.releases:
+            releases= getattr (self, 'releases', [None])
+            for release in releases:
                 self.release= release
                 # releaseSummary= self.processRelease ()
                 self.processRelease ()

@@ -10,6 +10,7 @@ logger.setLevel(logLevel)
 
 class OpenOfficeOrg (Psync):
     # TODO: download indexes and get stat from them
+    # no localized support... yet?
     def releaseDatabases (self):
         return []
 
@@ -23,9 +24,9 @@ class OpenOfficeOrg (Psync):
         for self.lang in self.languages:
             subLangs= self.subLanguages[self.languages.index (self.lang)]
             for self.subLang in subLangs:
-                yield ("contrib/dictionaries/%(lang)s_%(subLang)s.zip", None)
+                yield ("contrib/dictionaries/%(lang)s_%(subLang)s.zip" % self, None)
                 if False:
-                    yield ("contrib/dictionaries/%(lang)s_%(subLang)s-pack.zip", None)
+                    yield ("contrib/dictionaries/%(lang)s_%(subLang)s-pack.zip" % self, None)
 
     def finalReleaseDBs (self):
         return []
