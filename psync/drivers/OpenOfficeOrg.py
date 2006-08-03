@@ -21,10 +21,11 @@ class OpenOfficeOrg (Psync):
             yield ("stable/%(release)s/OOo_%(release)s_%(arch)s_install_wJRE.%(ext)s" % self, None)
 
         for self.lang in self.languages:
-            for self.sub in self.subLanguages:
-                yield ("contrib/dictionaries/%(lang)s_%(sub)s.zip", None)
+            subLangs= self.subLanguages[self.languages.index (self.lang)]
+            for self.subLang in subLangs:
+                yield ("contrib/dictionaries/%(lang)s_%(subLang)s.zip", None)
                 if False:
-                    yield ("contrib/dictionaries/%(lang)s_%(sub)s-pack.zip", None)
+                    yield ("contrib/dictionaries/%(lang)s_%(subLang)s-pack.zip", None)
 
     def finalReleaseDBs (self):
         return []
