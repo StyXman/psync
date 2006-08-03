@@ -28,7 +28,7 @@ class Slack(Psync):
 
     def files(self):
         logger.debug ("opening PACKAGES.TXT")
-        packages= "%(tempDir)s/%(repoDir)s/slackware-%(release)s/%(module)s/PACKAGES.TXT" % self
+        packages= "%(tempDir)s/%(repoDir)s/%(baseDir)s/%(module)s/PACKAGES.TXT" % self
         f= open (packages)
 
         line= f.readline ()
@@ -39,7 +39,7 @@ class Slack(Psync):
 
             if line.startswith ('PACKAGE LOCATION:'):
                 baseDir= line.split()[-1]
-                path= "%s/%s" % (baseDir, filename)
+                path= self.baseDir + ( "/%s/%s" % (baseDir, filename) )
                 logger.debug ('found file %s' % path)
 
                 yield (path, None)
