@@ -21,7 +21,7 @@ class SimpleDebian(Psync):
     def releaseDatabases(self):
         ans= []
         def moduleFunc (self):
-            if getattr (self, 'baseDirTemplate', None) is not None:
+            if hasattr (self, 'baseDirTemplate'):
                 logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
                 self.baseDir= self.baseDirTemplate % self
             # Contents and Release
@@ -32,12 +32,15 @@ class SimpleDebian(Psync):
             # download the .gz only and process from there
             packages= "%(baseDir)s/Packages"  % self
             packagesGz= packages+".gz"
-            ans.append ( (packagesGz, False) )
+            ans.append ( (packagesGz, True) )
 
         self.walkRelease (None, None, moduleFunc)
         return ans
 
     def files(self):
+        if hasattr (self, 'baseDirTemplate'):
+            logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
+            self.baseDir= self.baseDirTemplate % self
         packages= ("%(tempDir)s/%(repoDir)s/" % self)+self.baseDir+"/Packages"
         packagesGz= packages+".gz"
 
@@ -70,7 +73,7 @@ class SimpleDebian(Psync):
 
         def moduleFunc (self):
             # download the .gz only and process from there
-            packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
+            packages= "%(baseDir)s/Packages" % self
             ans.append ( (packages, True) )
         self.walkRelease (None, None, moduleFunc)
 
