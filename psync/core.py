@@ -65,25 +65,33 @@ class Psync(object):
 
         try:
             s= os.stat (_file)
-        except OSError:
-            # the file does not exist; download it
-            # logger.debug ("about to download %s" % _file)
-            if not self.dry_run:
+        except OSError, e:
+            if e.errno==errno.ENOENT:
+                # the file does not exist; download it
+                logger.debug ("about to download %s" % _file)
                 get= True
+            else:
+                raise e
         else:
             if size is not None and s.st_size!=size:
-                # logger.info ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
-                if not self.dry_run:
-                    get= True
+                logger.info ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
+                get= True
             else:
                 if self.verbose:
-                    # logger.info ("%s: already here, skipping" % _file)
+                    logger.info ("%s: already here, skipping" % _file)
                     pass
+
         if get:
-            ans= grab (_file, url, limit=self.limit, progress=self.progress)
+            if not self.dry_run:
+                ans= grab (_file, url, limit=self.limit, progress=self.progress)
             if size is None:
-                s= os.stat (_file)
-                size= s.st_size
+                try:
+                    s= os.stat (_file)
+                except OSError, e:
+                    if e.errno==errno.ENOENT:
+                        size= 0
+                else:
+                    size= s.st_size
 
             self.downloadedSize+= size
             # summary.append (basename(_file))
@@ -251,7 +259,7 @@ class Psync(object):
             for filename, size in self.files ():
                 filename= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+filename)
                 self.keep[filename]= 1
-                logger.debug (filename+ ('kept for %(repo)s/%(distro)s/%(release)s' % self))
+                logger.debug (filename+ (' kept for %(repo)s/%(distro)s/%(release)s' % self))
             databases= self.finalDBs()
             for (database, critic) in databases:
                 dst= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+database)
