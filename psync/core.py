@@ -63,6 +63,7 @@ class Psync(object):
         tempDir = dirname (_file)
         makedirs (tempDir)
 
+	# logger.debug ('getPackage: asked for %s' % _file)
         try:
             s= os.stat (_file)
         except OSError, e:
@@ -74,12 +75,11 @@ class Psync(object):
                 raise e
         else:
             if size is not None and s.st_size!=size:
-                logger.info ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
+                logger.warn ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
                 get= True
             else:
                 if self.verbose:
                     logger.info ("%s: already here, skipping" % _file)
-                    pass
 
         if get:
             if not self.dry_run:
@@ -92,6 +92,8 @@ class Psync(object):
                         size= 0
                 else:
                     size= s.st_size
+	    else:
+		size= 0
 
             self.downloadedSize+= size
             # summary.append (basename(_file))
@@ -191,10 +193,9 @@ class Psync(object):
             logger.warn ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
             logger.warn (e)
             print_exc ()
-            if ( self.debugging or
-                 (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
+            if ( (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                  isinstance (e, KeyboardInterrupt) ):
-                # debugging, out of disk space or keyb int
+                # out of disk space or keyb int
                 raise e
 
         if self.releaseFailed:
@@ -276,12 +277,13 @@ class Psync(object):
                 filename= os.path.normpath (("%(repoDir)s/" % self)+filename)
                 self.keep[filename]= 1
                 logger.debug (filename+ (' kept for %(repo)s/%(distro)s/%(release)s' % self))
-            databases= self.finalDBs()
+	    # the final ones
+            databases= self.finalReleaseDBs ()
             for (database, critic) in databases:
-                dst= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+database)
+                dst= os.path.normpath (("%(repoDir)s/" % self)+database)
                 self.keep[dst]= 1
         try:
-            walkRelease (moduleFunc=loadFilesAndDatabases)
+            self.walkRelease (moduleFunc=loadFilesAndDatabases)
         except IOError:
             # some database does not exist in the mirror
             # so, wipe'em all anyways
