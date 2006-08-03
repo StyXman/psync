@@ -9,7 +9,6 @@ except Exception, e:
 
 from os import listdir, popen
 from os.path import basename, dirname, join
-import gzip
 import re
 from psync.drivers.Rpm import Rpm
 
@@ -18,33 +17,31 @@ import logging
 logger = logging.getLogger('psync.drivers.Urpmi')
 logger.setLevel(logLevel)
 
-# known BUG:
+# known BUGs:
 # error: Unable to open /usr/lib/rpm/rpmrc for reading: No such file or directory.
 # zcat: .tmp/mandrake/updates/LE2005/main_updates/media_info/hdlist.cz: decompression OK, trailing garbage ignored
 
 class Urpmi (Rpm):
     def __init__ (self, **kwargs):
         super (Urpmi, self).__init__ (**kwargs)
-        # this flag is for downloading the databases just once
-        # self.first= None
-    
-    def databases (self):
-        # logger.debug ("%s, %s" % (self.first, self.release))
-        # if self.first==self.release:
-            # databases already dowloaded and updated
-            # self.tempDir= '.'
-            # ans= []
-        # else:
-        if True:
-            # self.first= self.release
+
+    def releaseDatabases (self):
+        ans= []
+
+        def moduleFunc (self):
+            self.baseDir= self.baseDirTemplate % self
             if hasattr (self, 'hdlistTemplate'):
                 self.hdlist= self.hdlistTemplate % self
             hdsplit= (dirname (self.hdlist), basename (self.hdlist))
             synthesis= hdsplit[0]+'/synthesis.'+hdsplit[1]
-            ans= [ (synthesis, True), (self.hdlist, True) ]
+            ans.append ( (("%(baseDir)s/" % self)+synthesis, True) )
+            ans.appned ( ("%(baseDir)s/%(hdlist)s" % self, True) )
+
+        self.walkRelease (None, None, moduleFunc)
         return ans
 
     def files(self):
+        self.baseDir= self.baseDirTemplate % self
         if hasattr (self, 'hdlistTemplate'):
             self.hdlist= self.hdlistTemplate % self
         hdlist= "%(tempDir)s/%(repoDir)s/%(baseDir)s/%(hdlist)s" % self
@@ -62,17 +59,10 @@ class Urpmi (Rpm):
             # logger.debug ("rpm %s arch: %s" % (header[1000000], rpmArch))
             if rpmArch==self.arch or rpmArch=='noarch':
                 # 1000000-> rpm file name, 1000001-> rpm file size
-                yield (self.rpmDir+'/'+header[1000000], header[1000001])
-        
+                yield ("%(baseDir)s/%(rpmDir)s/" % self)+header[1000000], header[1000001])
+
         pipe.close ()
 
-    def finalDBs (self):
-        if hasattr (self, 'hdlistTemplate'):
-            self.hdlist= self.hdlistTemplate % self
-        hdsplit= (dirname (self.hdlist), basename (self.hdlist))
-        synthesis= hdsplit[0]+'/synthesis.'+hdsplit[1]
-        return [ (synthesis, True), (self.hdlist, True) ]
+    finalReleaseDBs= releaseDatabases
 
-    # finalDBs= databases
-    
 # end
