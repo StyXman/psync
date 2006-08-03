@@ -1,0 +1,32 @@
+# (c) 2006
+# Marcos Dione <mdione@grulic.org.ar>
+
+from psync.core import Psync
+
+from psync import logLevel
+import logging
+logger = logging.getLogger('psync.drivers.OpenOfficeOrg')
+logger.setLevel(logLevel)
+
+class OpenOfficeOrg (Psync):
+    # TODO: download indexes and get stat from them
+    def releaseDatabases (self):
+        return []
+
+    def files (self):
+        self.ext= self.exts[self.archs.index (self.arch)]
+
+        yield ("stable/%(release)s/OOo_%(release)s_%(arch)s_install.%(ext)s" % self, None)
+        if self.withJRE:
+            yield ("stable/%(release)s/OOo_%(release)s_%(arch)s_install_wJRE.%(ext)s" % self, None)
+
+        for self.lang in self.languages:
+            for self.sub in self.subLanguages:
+                yield ("contrib/dictionaries/%(lang)s_%(sub)s.zip", None)
+                if False:
+                    yield ("contrib/dictionaries/%(lang)s_%(sub)s-pack.zip", None)
+
+    def finalReleaseDBs (self):
+        return []
+
+# end
