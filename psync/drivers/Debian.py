@@ -20,7 +20,6 @@ class Debian(Psync):
 
     def releaseDatabases(self):
         ans= []
-        # Contents and Release
         def releaseFunc (self):
             ans.append (("dists/%(release)s/Release" % self, False))
             ans.append (("dists/%(release)s/Release.gpg" % self, False))
@@ -67,22 +66,6 @@ class Debian(Psync):
         o.close ()
         f.close ()
         self.firstDatabase= True
-
-    def finalDBs (self):
-        ans= []
-        # skipping Release
-
-        # Packages
-        for ext in ('', '.gz'):
-            ans.append (( ("dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % self)+ext, True ))
-
-        # Contents
-        if self.firstDatabase:
-            ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
-            self.firstDatabase= False
-
-        logger.debug (ans)
-        return ans
 
     def finalReleaseDBs (self):
         ans= self.releaseDatabases ()

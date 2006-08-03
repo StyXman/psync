@@ -20,25 +20,26 @@ class SimpleDebian(Psync):
 
     def databases(self):
         ans= []
-        logger.debug (self.__dict__)
+        # logger.debug (self.__dict__)
+        if getattr (self, 'baseDirTemplate', None) is not None:
+            logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
+            self.baseDir= self.baseDirTemplate % self
         # Contents and Release
         # ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
-        ans.append ( ("/Release", False) )
-        ans.append ( ("/Release.gpg", False) )
-        
-        # download the .gz only and process from there
-        packages= "/Packages"
-        packagesGz= packages+".gz"
+        ans.append ( ("%(baseDir)s/Release" % self, False) )
+        ans.append ( ("%(baseDir)s/Release.gpg" % self, False) )
 
-        if self.save_space or not stat (packagesGz):
-            ans.append ( (packagesGz, True) )
-        
+        # download the .gz only and process from there
+        packages= "%(baseDir)s/Packages"  % self
+        packagesGz= packages+".gz"
+        ans.append ( (packagesGz, False) )
+
         return ans
 
     def files(self):
         packages= ("%(tempDir)s/%(repoDir)s/" % self)+self.baseDir+"/Packages"
         packagesGz= packages+".gz"
-        
+
         logger.debug ("opening %s" % packagesGz)
         f= gzip.open (packagesGz)
         o= open (packages, "w+")
@@ -50,7 +51,7 @@ class SimpleDebian(Psync):
 
             # grab filename
             if line.startswith ('Filename'):
-                filename= line.split()[1]
+                filename= ("%(baseDir)s/" % self)+line.split()[1]
 
             # grab size and process
             if line.startswith ('Size'):
@@ -58,26 +59,20 @@ class SimpleDebian(Psync):
                 yield (filename, size)
 
             line= f.readline ()
-        
+
         o.close ()
         f.close ()
         self.firstDatabase= True
 
     def finalDBs (self):
-        ans= []
-        # skipping Release
+        ans= self.releaseDatabases ()
 
-        # Packages
-        for ext in ('', '.gz'):
-            ans.append (( "/Packages"+ext, True ))
+        def moduleFunc (self):
+            # download the .gz only and process from there
+            packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
+            ans.append ( (packages, True) )
+        self.walkRelease (None, None, moduleFunc)
 
-        # Contents
-        if self.firstDatabase:
-            self.firstDatabase= False
-        
-            # ans.append (("dists/%(release)s/Contents-%(arch)s.gz" % self, False))
-
-        logger.debug (ans)
         return ans
 
 # end

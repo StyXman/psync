@@ -150,35 +150,6 @@ class Psync(object):
 
         # return summary
 
-    def keepOldFiles (self):
-        # force it to use the old databases
-        try:
-            self.tempDir= '.'
-            distros= getattr (self, 'distros', [ None ])
-            for distro in distros:
-                self.distro= distro
-                releases= getattr (self, 'releases', [ None ])
-                for release in releases:
-                    self.release= release
-                    archs= getattr (self, 'archs', [ None ])
-                    for arch in archs:
-                        self.arch= arch
-                        modules= getattr (self, 'modules', [ None ])
-                        for module in modules:
-                            self.module= module
-                            for filename, size in self.files ():
-                                filename= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+filename)
-                                logger.debug ('keeping %s' % filename)
-                                self.keep[filename]= 1
-                            databases= self.finalDBs()
-                            for (database, critic) in databases:
-                                dst= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+database)
-                                self.keep[dst]= 1
-        except IOError:
-            # some database does not exist in the mirror
-            # so, wipe'em all anyways
-            pass
-
     def processRelease (self):
         """
         Process one release.
@@ -229,9 +200,36 @@ class Psync(object):
         if self.releaseFailed:
             self.keepOldReleaseFiles ()
         else:
-            if not self.process_old:
+            if not self.save_space and not self.dry_run and not self.process_old:
                 self.updateReleaseDatabases ()
-            # pass
+
+        # return summary
+
+    def process (self):
+        """
+        Process one module.
+        Returns a list of strings with a summary of what was done.
+        It is for human consumption.
+        """
+        # summary= []
+        try:
+
+            # now files
+            for filename, size in self.files ():
+                # summary+= self.getPackage (filename, size)
+                filename= os.path.normpath (filename)
+                self.repoFiles+= 1
+                self.getPackage (filename, size)
+
+        except Exception, e:
+            logger.debug ('processing %s failed due to %s' % (self.repo, e))
+            if ( self.debugging or
+                 (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
+                 isinstance (e, KeyboardInterrupt) or
+                 isinstance (e, ProtocolError) ):
+                # debugging, out of disk space or keyb int
+                print_exc ()
+                raise e
 
         # return summary
 
@@ -250,6 +248,24 @@ class Psync(object):
                 if moduleFunc is not None:
                     moduleFunc (self)
 
+    def getReleaseDatabases (self):
+        """
+        Downloads the database for the whole release
+        """
+        # get the databases relative paths
+        databases= self.releaseDatabases ()
+        logger.debug (databases)
+        for (database, critic) in databases:
+            # yes: per design, we don't follow the dry_run option here,
+            # but the databases won't be swaped at the end either.
+            dababaseFilename= ("%(tempDir)s/%(repoDir)s/" % self)+database
+            databaseUrl= ("%(repoUrl)s/" % self)+database
+
+            found= grab (dababaseFilename, databaseUrl,
+                         limit=self.limit, progress=self.progress, cont=False)
+            if found!=0 and critic:
+                raise ProtocolError (proto=databaseUrl[:databaseUrl.index (':')].upper (), code=found, url=databaseUrl)
+
     def keepOldReleaseFiles (self):
         logger.warn ('loading old databases for %(repo)s/%(distro)s/%(release)s' % self)
         # force it to use the old databases
@@ -257,7 +273,7 @@ class Psync(object):
         self.tempDir= '.'
         def loadFilesAndDatabases (self):
             for filename, size in self.files ():
-                filename= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+filename)
+                filename= os.path.normpath (("%(repoDir)s/" % self)+filename)
                 self.keep[filename]= 1
                 logger.debug (filename+ (' kept for %(repo)s/%(distro)s/%(release)s' % self))
             databases= self.finalDBs()
@@ -272,138 +288,6 @@ class Psync(object):
             pass
 
         self.tempDir= oldTempDir
-
-    def process (self):
-        """
-        Process one module.
-        Returns a list of strings with a summary of what was done.
-        It is for human consumption.
-        """
-        # summary= []
-        try:
-            # download databases
-            if getattr (self, 'baseDirTemplate', None) is not None:
-                logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
-                self.baseDir= self.baseDirTemplate % self
-            logger.debug ("baseDir: %s" % self.baseDir)
-            if not self.process_old:
-                # self.getDatabases ()
-                pass
-
-            # now files
-            for filename, size in self.files ():
-                # summary+= self.getPackage (filename, size)
-                filename= os.path.normpath (filename)
-                self.repoFiles+= 1
-                self.getPackage (filename, size)
-
-            # yes, there is a BUG here, but it's not that grave.
-            # which bug? I don't remember :(
-            # databases must be updated at release lever.
-            if not self.save_space and not self.dry_run and self.failedFiles==[] and not self.process_old:
-                # self.updateDatabases ()
-                pass
-            else:
-                logger.debug ("save: %s, dry: %s, failed: %s" %
-                    (self.save_space, self.dry_run, self.failedFiles))
-
-        except Exception, e:
-            logger.debug ('processing %s failed due to %s' % (self.repo, e))
-            if ( self.debugging or
-                 (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
-                 isinstance (e, KeyboardInterrupt) or
-                 isinstance (e, ProtocolError) ):
-                # debugging, out of disk space or keyb int
-                print_exc ()
-                raise e
-
-        # return summary
-
-    def cleanRepo (self):
-        logger.debug ('here comes the janitor')
-        ignorePaths= getattr (self, 'ignore', [])
-        # add repoDir to all ignored paths
-        ignorePaths= [ "%s/%s" % (self.repoDir, i) for i in ignorePaths ]
-        logger.debug (ignorePaths)
-
-        for (path, dirs, files) in os.walk (self.repoDir):
-            ignore= False
-            for ignorePath in ignorePaths:
-                if path.startswith (ignorePath):
-                    logger.debug ('ignoring %s' % path)
-                    ignore= True
-
-            if not ignore:
-                for _file in files:
-                    filepath= os.path.join (path, _file)
-                    if not self.keep.has_key (filepath):
-                        # delete de bastard
-                        logger.info ('deleting %s' % filepath)
-                        os.unlink (filepath)
-                    else:
-                        logger.debug ('keeping %s' % filepath)
-        logger.debug ('janitor out')
-
-    def getDatabases (self):
-        """
-        Downloads the database from the repo
-        """
-        # get the databases relative paths
-        databases= self.databases ()
-        logger.debug (databases)
-        for (database, critic) in databases:
-            # yes: per design, we don't follow the dry_run option here,
-            # but the databases won't be swaped at the end either.
-            dababaseFilename= ("%(tempDir)s/%(repoDir)s/%(baseDir)s/" % self)+database
-            databaseUrl= ("%(repoUrl)s/%(baseDir)s/" % self)+database
-
-            found= grab (dababaseFilename, databaseUrl,
-                         limit=self.limit, progress=self.progress, cont=False)
-            if found!=0 and critic:
-                raise ProtocolError (proto=databaseUrl[:databaseUrl.index (':')].upper (), code=found, url=databaseUrl)
-
-    def updateDatabases (self):
-        """
-        Move the downloaded databases over the old ones
-        """
-        logger.info ('----- updating databases for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s' % self)
-        # get the databases relative paths
-        # these can be more
-        databases= self.finalDBs()
-        logger.debug (databases)
-        for (database, critic) in databases:
-            # logger.debug (self.__dict__)
-            dst= os.path.normpath (("%(repoDir)s/%(baseDir)s/" % self)+database)
-            src= self.tempDir+'/'+dst
-            try:
-                makedirs (dirname (dst))
-                rename (src, dst, overwrite=True)
-                self.keep[dst]= 1
-            except OSError, e:
-                # better error report!
-                if not critic:
-                    logger.info ('[Ign] %s (%s)' % (src, str (e)))
-                else:
-                    raise e
-        # removedirs (dirname (old))
-
-    def getReleaseDatabases (self):
-        """
-        Downloads the database for the whole release
-        """
-        # get the databases relative paths
-        databases= self.releaseDatabases ()
-        logger.debug (databases)
-        for (database, critic) in databases:
-            # yes: per design, we don't follow the dry_run option here,
-            # but the databases won't be swaped at the end either.
-            dababaseFilename= ("%(tempDir)s/%(repoDir)s/%(baseDir)s/" % self)+database
-            databaseUrl= ("%(repoUrl)s/%(baseDir)s/" % self)+database
-
-            found= grab (dababaseFilename, databaseUrl,
-                         limit=self.limit, progress=self.progress, cont=False)
-            if found!=0 and critic:
-                raise ProtocolError (proto=databaseUrl[:databaseUrl.index (':')].upper (), code=found, url=databaseUrl)
 
     def updateReleaseDatabases (self):
         """
@@ -429,5 +313,30 @@ class Psync(object):
                 else:
                     raise e
         # removedirs (dirname (old))
+
+    def cleanRepo (self):
+        logger.debug ('here comes the janitor')
+        ignorePaths= getattr (self, 'ignore', [])
+        # add repoDir to all ignored paths
+        ignorePaths= [ "%s/%s" % (self.repoDir, i) for i in ignorePaths ]
+        logger.debug (ignorePaths)
+
+        for (path, dirs, files) in os.walk (self.repoDir):
+            ignore= False
+            for ignorePath in ignorePaths:
+                if path.startswith (ignorePath):
+                    logger.debug ('ignoring %s' % path)
+                    ignore= True
+
+            if not ignore:
+                for _file in files:
+                    filepath= os.path.join (path, _file)
+                    if not self.keep.has_key (filepath):
+                        # delete de bastard
+                        logger.info ('deleting %s' % filepath)
+                        os.unlink (filepath)
+                    else:
+                        logger.debug ('keeping %s' % filepath)
+        logger.debug ('janitor out')
 
 # end
