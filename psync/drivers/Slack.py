@@ -17,9 +17,12 @@ class Slack(Psync):
         super (Slack, self).__init__ (**kwargs)
 
     def releaseDatabases(self):
-        ans= [ ('PACKAGES.TXT', True) ]
+        if getattr (self, 'baseDirTemplate', None) is not None:
+            logger.debug ("baseDirTemplate: %s" % self.baseDirTemplate)
+            self.baseDir= self.baseDirTemplate % self
+        ans= [ ('%(baseDir)s/PACKAGES.TXT' % self, True) ]
         for self.module in self.modules:
-            ans.append ( (self.module+'/PACKAGES.TXT', True) )
+            ans.append ( ('%(baseDir)s/%(module)s/PACKAGES.TXT' % self, True) )
 
         return ans
 
