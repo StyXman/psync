@@ -77,11 +77,18 @@ class Cpan (Psync):
     def files (self):
         for chksum in self.checksums:
             chkfile= ("%(tempDir)s/%(repoDir)s/" % self)+chksum
-            data= self.perlToPython (chkfile)
-            for filename in data.keys ():
-                isdir= data[filename].get ('isdir')
-                if isdir is None or not isdir:
-                    yield (filename, data[filename]['size'])
+            try:
+                # we *need* a httpStat :-[
+                data= self.perlToPython (chkfile)
+                for filename in data.keys ():
+                    isdir= data[filename].get ('isdir')
+                    if isdir is None or not isdir:
+                        yield (filename, data[filename]['size'])
+            except OSError, e:
+                if e.errno!=2:
+                    raise e
+                else:
+                    logger.warn ('[Ign] %s (%s)' % (chkfile, str (e)))
 
     def finalReleaseDBs (self):
         for (db, critic) in self.releaseDatabases (download=False):
