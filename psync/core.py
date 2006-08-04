@@ -326,7 +326,7 @@ class Psync(object):
                         # delete de bastard
                         logger.info ('deleting %s' % filepath)
                         os.unlink (filepath)
-                        if self.debug:
+                        if self.debugging:
                             # make it slower so we can stop it in time
                             # when it's destroying a repo
                             sleep (0.1)
