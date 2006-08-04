@@ -58,7 +58,7 @@ def rename (src, dst, overwrite=False):
         e.errno= errno.EEXIST
         e.strerror= strerror (errno.EEXIST)
         raise e
-        
+
     try:
         os.rename (src, dst)
     except OSError, e:
@@ -78,6 +78,16 @@ def rename (src, dst, overwrite=False):
             # bye bye you src man
             unlink (src)
         else:
+            raise e
+
+def symlink (src, dst, verbose=False):
+    try:
+        os.symlink (src, dst)
+        if verbose:
+            logger.info ("%s-> %s" % (dst, src))
+    except OSError, e:
+        logger.debug ("symlink: %s" % e)
+        if e.errno not in (errno.EEXIST, ):
             raise e
 
 def gunzip (gzFileName, fileName):
@@ -105,19 +115,19 @@ def getFile(url, destination):
                     sys.stderr.write('%sK left.' % (left/1024))
                 else:
                     sys.stderr.write('done.')
- 
+
                 # it's possible that this line is shorter than the earlier one,
                 # so we need to "erase" any leftovers
                 sys.stderr.write(' '*10)
                 sys.stderr.write('\b'*10)
- 
+
             urllib.urlretrieve(url, destination, reporter)
             sys.stderr.write('\n')
         except: # bare except is ok, exception re-raised below
             if os.path.exists(destination):
                 os.unlink(destination)
             raise
- 
+
 def grab(filename, url, limit=0, cont=True, progress=False):
     """ Fetchs a file if it does not exist or continues downloading
         a previously partially downloaded file.
@@ -147,7 +157,7 @@ def grab(filename, url, limit=0, cont=True, progress=False):
 
     # Curl has not an equivalent parameter for Wget's -t (number of tries)...
     # Curl returns:
-    
+
     # 0 on successful download,
     # 2 when interrupted by the user with Ctrl-C,
 
@@ -157,7 +167,8 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     # 23 disk full
     # 52 no response
     # 6 unknown host
-    finishCodes= (0, 2, 0x600, 0x1200, 0x1600, 0x1700, 0x3400, 0x7f00, 0xffffffff)
+    # 2 'failed to initialize'
+    finishCodes= (0, 2, 0x200, 0x600, 0x1200, 0x1600, 0x1700, 0x3400, 0x7f00, 0xffffffff)
     curlExitCode = 1
     while not curlExitCode in finishCodes:
         logger.debug (command)
