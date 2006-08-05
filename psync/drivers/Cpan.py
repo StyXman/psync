@@ -75,20 +75,20 @@ class Cpan (Psync):
                 yield (chksum, False)
 
     def files (self):
-        for chksum in self.checksums:
-            chkfile= ("%s/%s" % (self.repoDir, chksum)
+        for chkfile in self.checksums:
             try:
                 # we *need* a httpStat :-[
-                data= self.perlToPython ("%s/%s" % (self.tempDir, chkfile))
-                for filename in data.keys ():
-                    isdir= data[filename].get ('isdir')
-                    if isdir is None or not isdir:
-                        yield ("%s/%s" % (dirname (chkfile), filename), data[filename]['size'])
+                data= self.perlToPython ("%s/%s/%s" % (self.tempDir, self.repoDir, chkfile))
             except IOError, e:
                 if e.errno!=2:
                     raise e
                 else:
                     logger.warn ('[Ign] %s (%s)' % (chkfile, str (e)))
+            else:
+                for filename in data.keys ():
+                    isdir= data[filename].get ('isdir')
+                    if isdir is None or not isdir:
+                        yield ("%s/%s" % (dirname (chkfile), filename), data[filename]['size'])
 
     def finalReleaseDBs (self):
         for (db, critic) in self.releaseDatabases (download=False):
