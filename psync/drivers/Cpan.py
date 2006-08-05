@@ -84,7 +84,7 @@ class Cpan (Psync):
                     isdir= data[filename].get ('isdir')
                     if isdir is None or not isdir:
                         yield (filename, data[filename]['size'])
-            except OSError, e:
+            except IOError, e:
                 if e.errno!=2:
                     raise e
                 else:
