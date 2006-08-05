@@ -76,10 +76,10 @@ class Cpan (Psync):
 
     def files (self):
         for chksum in self.checksums:
-            chkfile= ("%(tempDir)s/%(repoDir)s/" % self)+chksum
+            chkfile= ("%s/%s" % (self.repoDir, chksum)
             try:
                 # we *need* a httpStat :-[
-                data= self.perlToPython (chkfile)
+                data= self.perlToPython ("%s/%s" % (self.tempDir, chkfile))
                 for filename in data.keys ():
                     isdir= data[filename].get ('isdir')
                     if isdir is None or not isdir:
