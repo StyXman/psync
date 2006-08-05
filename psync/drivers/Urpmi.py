@@ -59,7 +59,7 @@ class Urpmi (Rpm):
             # logger.debug ("rpm %s arch: %s" % (header[1000000], rpmArch))
             if rpmArch==self.arch or rpmArch=='noarch':
                 # 1000000-> rpm file name, 1000001-> rpm file size
-                yield ("%(baseDir)s/%(rpmDir)s/" % self)+header[1000000], header[1000001])
+                yield (("%(baseDir)s/%(rpmDir)s/" % self)+header[1000000], header[1000001])
 
         pipe.close ()
 
