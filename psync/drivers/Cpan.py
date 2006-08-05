@@ -83,7 +83,7 @@ class Cpan (Psync):
                 for filename in data.keys ():
                     isdir= data[filename].get ('isdir')
                     if isdir is None or not isdir:
-                        yield (filename, data[filename]['size'])
+                        yield ("%s/%s" % (dirname (chkfile), filename), data[filename]['size'])
             except IOError, e:
                 if e.errno!=2:
                     raise e
