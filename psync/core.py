@@ -247,7 +247,7 @@ class Psync(object):
         logger.debug (databases)
         for (database, critic) in databases:
             # yes: per design, we don't follow the dry_run option here,
-            # but the databases won't be swaped at the end either.
+            # but the databases won't be swapped at the end either.
             dababaseFilename= ("%(tempDir)s/%(repoDir)s/" % self)+database
             databaseUrl= ("%(repoUrl)s/" % self)+database
 

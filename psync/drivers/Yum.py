@@ -1,4 +1,4 @@
-# (c) 2005
+# (c) 2005-2006
 # Marcos Dione <mdione@grulic.org.ar>
 
 from psync.core import DependencyError
@@ -87,7 +87,7 @@ class Yum (Rpm):
                    (not isSource and not isDebug)
                  ) and (i.nevra[4]==self.arch or i.nevra[4]=='noarch') ):
                 relUrl= ("%(baseDir)s/%(rpmDir)s/" % self)+i.location['href']
-                logger.debug ("found: %s" % relUrl)
+                # logger.debug ("found: %s" % relUrl)
                 # (filename, size)
                 yield ( relUrl, int(i.size['package']) )
 
