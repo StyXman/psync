@@ -93,7 +93,7 @@ class Cpan (Psync):
                         chksum= "%s/%s/CHECKSUMS" % (dirname (chkfile), filename)
                         # download the CHECKSUM
                         filename= ("%(tempDir)s/%(repoDir)s/" % self)+chksum
-                        url= ("%s/%s" % (self.repoUrl, chksum)
+                        url= ("%s/%s" % (self.repoUrl, chksum))
                         found= grab (filename, url, cont=False, progress=self.progress)
                         if found!=0:
                             raise ProtocolError (proto=url[:url.index (':')].upper (), code=found, url=url)
