@@ -80,7 +80,8 @@ class Psync(object):
                 get= True
             else:
                 if self.verbose:
-                    logger.info ("%s: already here, skipping" % _file)
+                    # logger.info ("%s: already here, skipping" % _file)
+		    pass
 
         if get:
             if not self.dry_run:
@@ -280,7 +281,7 @@ class Psync(object):
             # some database does not exist in the mirror
             # so, wipe'em all anyways
             logger.warn ('could not load database for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(modules)s' % self)
-            logger warn (e)
+            logger.warn (e)
 
         self.tempDir= oldTempDir
 
