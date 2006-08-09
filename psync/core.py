@@ -191,6 +191,7 @@ class Psync(object):
                 self.downloadedSize= 0
 
         except Exception, e:
+            # BUG: what happens when a database fails to load?
             self.releaseFailed= True
             logger.warn ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
             logger.warn (e)
@@ -261,22 +262,25 @@ class Psync(object):
         # force it to use the old databases
         oldTempDir= self.tempDir
         self.tempDir= '.'
+
         def loadFilesAndDatabases (self):
             for filename, size in self.files ():
                 filename= os.path.normpath (("%(repoDir)s/" % self)+filename)
                 self.keep[filename]= 1
                 logger.debug (filename+ (' kept for %(repo)s/%(distro)s/%(release)s' % self))
-	    # the final ones
+            # the final ones
             databases= self.finalReleaseDBs ()
             for (database, critic) in databases:
                 dst= os.path.normpath (("%(repoDir)s/" % self)+database)
                 self.keep[dst]= 1
+
         try:
             self.walkRelease (moduleFunc=loadFilesAndDatabases)
-        except IOError:
+        except IOError, e:
             # some database does not exist in the mirror
             # so, wipe'em all anyways
-            pass
+            logger.warn ('could not load database for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(modules)s' % self)
+            logger warn (e)
 
         self.tempDir= oldTempDir
 
