@@ -22,7 +22,10 @@ class Mozilla (Psync):
                 self.template= self.archTemplates[self.archs.index (self.arch)]
                 self.filename= self.template % self
                 for self.lang in self.languages:
-                    yield ("%{app}s/releases/%{version}s/%{arch}s/%{lang}s/%{filename}s" % self, None)
+                    yield ("%(app)s/releases/%(version)s/%(arch)s/%(lang)s/%(filename)s" % self, None)
+                    if self.updates:
+                        self.update= "$(app)s-$(version)s.complete.mar"
+                        yield ("%(app)s/releases/%(version)s/update/%(arch)s/%(lang)s/%(update)s" % self, None)
 
     def finalReleaseDBs (self):
         return []
