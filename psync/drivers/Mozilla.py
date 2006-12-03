@@ -24,7 +24,7 @@ class Mozilla (Psync):
                 for self.lang in self.languages:
                     yield ("%(app)s/releases/%(version)s/%(arch)s/%(lang)s/%(filename)s" % self, None)
                     if self.updates:
-                        self.update= "$(app)s-$(version)s.complete.mar"
+                        self.update= "$(app)s-$(version)s.complete.mar" % self
                         yield ("%(app)s/releases/%(version)s/update/%(arch)s/%(lang)s/%(update)s" % self, None)
 
     def finalReleaseDBs (self):
