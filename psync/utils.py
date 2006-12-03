@@ -82,9 +82,8 @@ def rename (src, dst, overwrite=False):
 
 def symlink (src, dst, verbose=False):
     try:
+        logger.debug ("%s-> %s" % (dst, src))
         os.symlink (src, dst)
-        if verbose:
-            logger.info ("%s-> %s" % (dst, src))
     except OSError, e:
         logger.debug ("symlink: %s" % e)
         if e.errno not in (errno.EEXIST, ):

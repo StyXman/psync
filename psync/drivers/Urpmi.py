@@ -35,7 +35,7 @@ class Urpmi (Rpm):
             hdsplit= (dirname (self.hdlist), basename (self.hdlist))
             synthesis= hdsplit[0]+'/synthesis.'+hdsplit[1]
             ans.append ( (("%(baseDir)s/" % self)+synthesis, True) )
-            ans.appned ( ("%(baseDir)s/%(hdlist)s" % self, True) )
+            ans.append ( ("%(baseDir)s/%(hdlist)s" % self, True) )
 
         self.walkRelease (None, None, moduleFunc)
         return ans
