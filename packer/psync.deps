@@ -1,3 +1,5 @@
 d:curl
-d:python2.3
-ds:python-apt
+d:python
+ds:python2.3-rpm
+ds:python2.4-rpm
+

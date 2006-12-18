@@ -1,9 +1,9 @@
 CHECKER=pychecker
 
 README=README
-INDEX_HTML=$(HOME)/www/projects/psync/index.html
+INDEX_HTML=www/index.html
 RUNNING_txt=RUNNING.txt
-RUNNING_HTML=$(HOME)/www/projects/psync/running.html
+RUNNING_HTML=www/running.html
 # HTML_DUMP=lynx -dump
 HTML_DUMP=links -dump
 
@@ -18,7 +18,7 @@ RPM_SUSE=$(RPM_DIR)/RPMS/noarch/psync-$(VERSION)-1suse.noarch.rpm
 
 TARGETS=$(README) $(RUNNING_txt)
 
-instdir=$(install_dir)/usr
+instdir=$(install_dir)
 
 all: $(TARGETS)
 
@@ -29,7 +29,7 @@ $(RUNNING_txt): $(RUNNING_HTML)
 	$(HTML_DUMP) $< > $@
 
 install:
-	python2.3 setup.py install --prefix=$(instdir)
+	python setup.py install --root=$(instdir) --prefix=/usr
 
 clean:
 	rm -f $(TARGETS)

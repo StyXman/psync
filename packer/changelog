@@ -1,3 +1,16 @@
+0.3.1-1
+Sun, 03 Dec 2006 19:05:56 -0300
+* disabled mail report. has to be rethought.
+* warn for repos asked via command line which doesn't have a definition in the config file.
+* better error handling.
+* correct dependencies and suggestions.
+* more correct consistency implementation.
+* support for undefined fields in repo definitions.
+* more drivers: Cpan, Mozilla, OpenOfficeOrg.
+* does not depend on python-apt anymore.
+* new driver API, more suitable for different repo structures.
+* lots of bug fixes.
+-- Marcos Dione <mdione@grulic.org.ar>
 0.2.4a-1
 Fri, 06 Jan 2006 08:46:51 -0300
 * fixed bug in the Urpmi driver that prevented to download a Mandrake distro.

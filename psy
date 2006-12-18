@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 # -*- coding: iso-8859-1 -*-
 # (c) 2004-2006
 # Marcos Dione <mdione@grulic.org.ar>
@@ -58,12 +58,12 @@ def handleOpts ():
         help="Process this config file instead of psync.conf.py in the current dir.")
     parser.add_option ('-d', '--debug', action='store_const', dest='log_level',
         const=logging.DEBUG, help="Be *very* verbose on what's being done.")
-    parser.add_option ('-j', '--subject', default='Updates del día %(date)s',
-        help="The subject of the mail sent.")
+    # parser.add_option ('-j', '--subject', default='Updates del dï¿½ %(date)s',
+    #     help="The subject of the mail sent.")
     parser.add_option ('-l', '--limit', type='int', default=0,
         help="Limit the bandwidth used to n KiB/s.")
-    parser.add_option ('-m', '--mail-to',
-        help="Send a summary mail to this email account. If not specified, the summary is printed on stdout.")
+    # parser.add_option ('-m', '--mail-to',
+    #     help="Send a summary mail to this email account. If not specified, the summary is printed on stdout.")
     parser.add_option ('-n', '--dry-run', action='store_true', default=False,
         help="Do a dry run: download databases, process them, but don't download any package. It does the summary. Usefull for foreseeing how much it will download.")
     parser.add_option ('-o', '--process-old', action='store_true', default=False,
@@ -104,7 +104,7 @@ def main ():
     else:
         repos= config
 
-    mail= []
+    # mail= []
     if conf.dry_run:
         logger.info ("doing dry run!")
     try:
@@ -113,8 +113,8 @@ def main ():
             logger.info ("----- processing "+repo['repo'])
 
             # prepare teh mail body
-            mail.append (repo['repo'].center (75))
-            mail.append (('~' * len (repo['repo'])).center (75))
+            # mail.append (repo['repo'].center (75))
+            # mail.append (('~' * len (repo['repo'])).center (75))
             driverName= repo['driver']
 
             # instantiate a driver and process it
@@ -133,11 +133,11 @@ def main ():
                     raise e
 
 
-        if not conf.mail_to is None:
+        # if not conf.mail_to is None:
             # send mail
-            sendmail (conf, mail)
-        else:
-            print "\n".join (mail)
+            # sendmail (conf, mail)
+        # else:
+            # print "\n".join (mail)
 
     except KeyboardInterrupt:
         # curl stays always in the same line

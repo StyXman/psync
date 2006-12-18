@@ -1,10 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
-from distutils.core import setup
+# from distutils.core import setup
+import kdedistutils
 
 data= dict (
     name='psync',
-    version='0.3.0',
+    version='0.3.1',
     description="psync is a distribution mirroring utility with consistency in mind.",
     long_description="""
 psync is a mirroring utility. its main goal is to be able to update a  
@@ -22,9 +23,10 @@ to fix this. it also aims to support as many distributions as possible.
         'psync',
         'psync.drivers',
         ],
-    scripts= ['psy'],
+    # scripts= ['psy'],
     # data_files= [('bin', ['psync.py'])],
-    # data_files= [('examples', ['psync.conf.py'])],
+    application_data = ['psy.py', ('examples', ['psync.conf.py'])],
+    executable_links = [('psync','psy.py')],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -41,4 +43,4 @@ to fix this. it also aims to support as many distributions as possible.
     )
       
 if __name__=='__main__':
-    setup(**data)
+    kdedistutils.setup(**data)
