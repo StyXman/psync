@@ -30,6 +30,10 @@ class DependencyError (DictException):
 class Psync(object):
     def __init__ (self, verbose=False, **kwargs):
         self.verbose= verbose
+        
+        # defaults
+        self.cleanLevel= 'release'
+        
         self.__dict__.update(kwargs)
 
         # file tracking
@@ -138,20 +142,8 @@ class Psync(object):
                 # releaseSummary= self.processRelease ()
                 self.processRelease ()
 
-        # summary of failed pkgs
-        if self.failedFiles!=[]:
-            logger.warn ("failed packages:")
-            for i in self.failedFiles:
-                logger.warn (i)
-            logger.warn ("----- %d/%d package(s) failed" % (len (self.failedFiles), self.repoFiles))
-            # this is gonna be ugly
-            # so ugly I sent it to another function
-        else:
-            # summary+= releaseSummary
-            pass
-
-        # clean up
-        self.cleanRepo ()
+        if self.cleanLevel=='repo':
+            self.cleanRepo (self.repoDir)
 
         # return summary
 
@@ -208,6 +200,8 @@ class Psync(object):
             if not self.save_space and not self.dry_run and not self.process_old:
                 self.updateReleaseDatabases ()
 
+        if self.cleanLevel=='release':
+            self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
         # return summary
 
     def process (self):
@@ -310,14 +304,27 @@ class Psync(object):
                     raise e
         # removedirs (dirname (old))
 
-    def cleanRepo (self):
+    def cleanRepo (self, cleaningPath):
+        # summary of failed pkgs
+        if self.failedFiles!=[]:
+            logger.warn ("failed packages:")
+            for i in self.failedFiles:
+                logger.warn (i)
+            logger.warn ("----- %d/%d package(s) failed" % (len (self.failedFiles), self.repoFiles))
+            # this is gonna be ugly
+            # so ugly I sent it to another function
+        else:
+            # summary+= releaseSummary
+            pass
+
+        # clean up
         logger.debug ('here comes the janitor')
         ignorePaths= getattr (self, 'ignore', [])
-        # add repoDir to all ignored paths
-        ignorePaths= [ "%s/%s" % (self.repoDir, i) for i in ignorePaths ]
+        # add cleaningPath to all ignored paths
+        ignorePaths= [ "%s/%s" % (cleaningPath, i) for i in ignorePaths ]
         logger.debug (ignorePaths)
 
-        for (path, dirs, files) in os.walk (self.repoDir):
+        for (path, dirs, files) in os.walk (cleaningPath):
             ignore= False
             for ignorePath in ignorePaths:
                 if path.startswith (ignorePath):

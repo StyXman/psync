@@ -167,7 +167,7 @@ def grab(filename, url, limit=0, cont=True, progress=False):
     # 52 no response
     # 6 unknown host
     # 2 'failed to initialize'
-    finishCodes= (0, 2, 0x200, 0x600, 0x1200, 0x1600, 0x1700, 0x3400, 0x7f00, 0xffffffff)
+    finishCodes= (0, 2, 0x200, 0x600, 0x1200, 0x1600, 0x1700, 0x3400, 0x7f00, 4294967295L)
     curlExitCode = 1
     while not curlExitCode in finishCodes:
         logger.debug (command)

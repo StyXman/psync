@@ -6,7 +6,7 @@ import os
 import libxml2
 import errno
 
-from psync.core import Psync
+from psync.core import Psync, ProtocolError
 from psync.utils import makedirs, grab, symlink
 
 from psync import logLevel
@@ -92,6 +92,7 @@ class Cpan (Psync):
                     else:
                         chksum= "%s/%s/CHECKSUMS" % (dirname (chkfile), filename)
                         # download the CHECKSUM
+                        # BUG: this makes CHECKSUMS to be downloaded twice
                         filename= ("%(tempDir)s/%(repoDir)s/" % self)+chksum
                         url= "%s/%s" % (self.repoUrl, chksum)
                         found= grab (filename, url, cont=False, progress=self.progress)
