@@ -9,7 +9,7 @@ from time import sleep
 import os
 import errno
 
-from psync.utils import stat, makedirs, grab, rename
+from psync.utils import stat, makedirs, grab, rename, touch
 
 from psync import logLevel
 import logging
@@ -89,7 +89,11 @@ class Psync(object):
 
         if get:
             if not self.dry_run:
-                ans= grab (_file, url, limit=self.limit, progress=self.progress)
+                if not self.experiment:
+                    ans= grab (_file, url, limit=self.limit, progress=self.progress)
+                else:
+                    touch (_file)
+                    ans= 0
             if size is None:
                 try:
                     s= os.stat (_file)
