@@ -88,6 +88,10 @@ def symlink (src, dst, verbose=False):
         logger.debug ("symlink: %s" % e)
         if e.errno not in (errno.EEXIST, ):
             raise e
+        
+def touch (filename):
+    file (filename, 'a')
+    os.utime (filename, None)
 
 def gunzip (gzFileName, fileName):
     inFile= GzipFile (gzFileName)

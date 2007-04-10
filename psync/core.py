@@ -79,9 +79,16 @@ class Psync(object):
             else:
                 raise e
         else:
-            if size is not None and s.st_size!=size:
-                logger.warn ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
-                get= True
+            if size is not None:
+                if s.st_size<size:
+                    logger.warn ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
+                    get= True
+                elif s.st_size>size:
+		    # bigger? how's bigger? reget!
+                    logger.warn ("%s: wrong size %d; should be %d." % (_file, s.st_size, size))
+                    logger.warn ("bigger means something went wrong. deleting and downloading.")
+                    os.unlink (_file)
+                    get= True
             else:
                 if self.verbose:
                     # logger.info ("%s: already here, skipping" % _file)

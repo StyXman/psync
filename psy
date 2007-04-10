@@ -51,7 +51,7 @@ def confToDict (conf):
 def handleOpts ():
     parser= OptionParser ()
     parser.add_option ('-c', '--continue', action='store_true', dest='cont', default=False,
-        help="Continue processing the databases instead of donwloading new ones.")
+        help="Continue processing the databases instead of donwloading new ones. Tries to use temp ones first; if they don't exist, tries the actual ones.")
     parser.add_option ('-r', '--repo', action='append', dest='repos',
         help="A repo name to be processed. you can specify any number of them. if none specified, all repos defined in the config file will be processed.")
     parser.add_option ('-f', '--config-file', default='psync.conf.py',

@@ -40,7 +40,7 @@ class Slack(Psync):
             if line.startswith ('PACKAGE LOCATION:'):
                 baseDir= line.split()[-1]
                 path= self.baseDir + ( "/%s/%s" % (baseDir, filename) )
-                logger.debug ('found file %s' % path)
+                # logger.debug ('found file %s' % path)
 
                 yield (path, None)
                 yield (path+".asc", None)
