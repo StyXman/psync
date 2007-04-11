@@ -183,6 +183,7 @@ def grab(filename, url, limit=0, cont=True, progress=False):
         logger.debug ("cec= 0x%x" % curlExitCode)
 
     if curlExitCode==2:
+	logger.debug ("curl C-c'ed!")
         raise KeyboardInterrupt
     elif curlExitCode==0x1700:
         e= IOError ()
@@ -191,5 +192,22 @@ def grab(filename, url, limit=0, cont=True, progress=False):
         raise e
 
     return curlExitCode
+        
+def lockFile (path):
+    ans= True
+    try:
+	makedirs (dirname (path))
+        os.open (path, os.O_CREAT|os.O_EXCL, 0400)
+    except OSError, e:
+        if e.errno==17:
+            ans= False
+        else:
+            raise e
+    
+    return ans
+    
+def unlockFile (path):
+    logger.debug ("unlocking %s" % path)
+    unlink (path)
 
 #end

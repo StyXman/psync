@@ -9,7 +9,7 @@ from time import sleep
 import os
 import errno
 
-from psync.utils import stat, makedirs, grab, rename, touch
+from psync.utils import stat, makedirs, grab, rename, touch, lockFile, unlockFile
 
 from psync import logLevel
 import logging
@@ -136,25 +136,48 @@ class Psync(object):
         It is for human consumption.
         """
         # summary= []
-        if not self.save_space and not self.process_old:
-            # create tmp dir
-            self.tempDir= ".tmp"
-            logger.debug ("not cont: working on %s" % self.tempDir)
-        else:
-            self.tempDir= '.'
-
-        distros= getattr (self, 'distros', [None])
-        for distro in distros:
-            # summary.append ("distro: %s" % distro)
-            self.distro= distro
-            releases= getattr (self, 'releases', [None])
-            for release in releases:
-                self.release= release
-                # releaseSummary= self.processRelease ()
-                self.processRelease ()
-
+        notLocked= True
+	logger.debug ("clean level: %s" % self.cleanLevel)
         if self.cleanLevel=='repo':
-            self.cleanRepo (self.repoDir)
+            # try to lock
+            notLocked= False
+            lockfile= '%s/lock' % self.repoDir
+	    logger.debug ("lockfile is %s" % lockfile)
+            if lockFile (lockfile):
+                notLocked= True
+        
+        if notLocked:
+            # we gotta clean the lockfile later
+            try:
+                if not self.save_space and not self.process_old:
+                    # create tmp dir
+                    self.tempDir= ".tmp"
+                    logger.debug ("not cont: working on %s" % self.tempDir)
+                else:
+                    self.tempDir= '.'
+
+                distros= getattr (self, 'distros', [None])
+                for distro in distros:
+                    # summary.append ("distro: %s" % distro)
+                    self.distro= distro
+                    releases= getattr (self, 'releases', [None])
+                    for release in releases:
+                        self.release= release
+                        # releaseSummary= self.processRelease ()
+                        self.processRelease ()
+
+                if self.cleanLevel=='repo':
+                    self.cleanRepo (self.repoDir)
+            except Exception, e:
+                if self.cleanLevel=='repo':
+                    unlockFile (lockfile)
+                # reraise
+                raise e
+            else:
+                if self.cleanLevel=='repo':
+                    unlockFile (lockfile)
+        else:
+            logger.warn ("repo %s is being processed by another instance; skipping..." % self.repo)
 
         # return summary
 
@@ -164,55 +187,74 @@ class Psync(object):
         Returns a list of strings with a summary of what was done.
         It is for human consumption.
         """
-        try:
-            logger.info ('----- processing %(repo)s/%(distro)s/%(release)s' % self)
-            # summary= []
-            self.releaseFailed= False
-            self.releaseFailedFiles= []
-
-            if not self.process_old:
-                self.getReleaseDatabases ()
-
-            archs= getattr (self, 'archs', [ None ])
-            for arch in archs:
-                self.arch= arch
-                logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
-                # msg= "architecture %s:" % arch
-                # summary.append (msg)
-                # summary.append ("~" * len (msg))
-                modules= getattr (self, 'modules', [ None ])
-                for module in modules:
-                    # won't log what module we are processing
-                    self.module= module
-                    # summary+= self.process ()
-                    self.process ()
-
-                # summary.append (("total update: %7.2f MiB" % (self.downloadedSize/1048576.0)).rjust (75))
-                # summary.append ('')
-                # summary.append ('')
-
-                # reset count
-                self.downloadedSize= 0
-
-        except Exception, e:
-            # BUG: what happens when a database fails to load?
-            self.releaseFailed= True
-            logger.warn ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
-            logger.warn (e)
-            print_exc ()
-            if ( (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
-                 isinstance (e, KeyboardInterrupt) ):
-                # out of disk space or keyb int
-                raise e
-
-        if self.releaseFailed:
-            self.keepOldReleaseFiles ()
-        else:
-            if not self.save_space and not self.dry_run and not self.process_old:
-                self.updateReleaseDatabases ()
-
+        notLocked= True
         if self.cleanLevel=='release':
-            self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
+            notLocked= False
+            # try to lock
+            lockfile= '%(repoDir)s/lock-%(distro)s-%(release)s' % self
+	    logger.debug ("lockfile is %s" % lockfile)
+            if lockFile (lockfile):
+                notLocked= True
+        
+        if notLocked:
+            # we gotta clean the lockfile later
+            try:
+                logger.info ('----- processing %(repo)s/%(distro)s/%(release)s' % self)
+                # summary= []
+                self.releaseFailed= False
+                self.releaseFailedFiles= []
+
+                if not self.process_old:
+                    self.getReleaseDatabases ()
+
+                archs= getattr (self, 'archs', [ None ])
+                for arch in archs:
+                    self.arch= arch
+                    logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
+                    # msg= "architecture %s:" % arch
+                    # summary.append (msg)
+                    # summary.append ("~" * len (msg))
+                    modules= getattr (self, 'modules', [ None ])
+                    for module in modules:
+                        # won't log what module we are processing
+                        self.module= module
+                        # summary+= self.process ()
+                        self.process ()
+
+                    # summary.append (("total update: %7.2f MiB" % (self.downloadedSize/1048576.0)).rjust (75))
+                    # summary.append ('')
+                    # summary.append ('')
+
+                    # reset count
+                    self.downloadedSize= 0
+
+            except (Exception, KeyboardInterrupt), e:
+                # BUG: what happens when a database fails to load?
+                self.releaseFailed= True
+                if self.cleanLevel=='release':
+                    unlockFile (lockfile)
+                logger.warn ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
+                logger.warn (e)
+                print_exc ()
+                if ( (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
+                     isinstance (e, KeyboardInterrupt) ):
+                    # out of disk space or keyb int
+                    raise e
+            else:
+                if self.cleanLevel=='release':
+                    unlockFile (lockfile)
+
+            if self.releaseFailed:
+                self.keepOldReleaseFiles ()
+            else:
+                if not self.save_space and not self.dry_run and not self.process_old:
+                    self.updateReleaseDatabases ()
+            
+            if self.cleanLevel=='release':
+                self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
+        else:
+            logger.warn ("%(repo)s/%(distro)s/%(release)s is being processed by another instance; skipping..." % self)
+
         # return summary
 
     def process (self):
@@ -260,6 +302,7 @@ class Psync(object):
 
             found= grab (dababaseFilename, databaseUrl,
                          limit=self.limit, progress=self.progress, cont=False)
+	    logger.debug ("%s grabbed" % dababaseFilename)
             if found!=0 and critic:
                 raise ProtocolError (proto=databaseUrl[:databaseUrl.index (':')].upper (), code=found, url=databaseUrl)
 
