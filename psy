@@ -129,7 +129,8 @@ def main ():
             try:
                 driver.processRepo ()
                 if driver.size:
-                    print "%s: %8.2fMiB" % (driver.repo, driver.totalSize/(1024*1024))
+                    # in MiB
+                    print "%s: %8.2fMiB" % (driver.repo, driver.totalSize/1048576.0)
             except Exception, e:
                 if ( conf.debugging or
                     (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
