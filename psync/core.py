@@ -136,6 +136,7 @@ class Psync(object):
         It is for human consumption.
         """
         # summary= []
+        self.totalSize= 0
         notLocked= True
 	logger.debug ("clean level: %s" % self.cleanLevel)
         if self.cleanLevel=='repo':
@@ -247,7 +248,7 @@ class Psync(object):
             if self.releaseFailed:
                 self.keepOldReleaseFiles ()
             else:
-                if not self.save_space and not self.dry_run and not self.process_old:
+                if not self.save_space and not self.dry_run and not self.process_old and not self.size:
                     self.updateReleaseDatabases ()
             
             if self.cleanLevel=='release':
@@ -268,7 +269,10 @@ class Psync(object):
             # summary+= self.getPackage (filename, size)
             filename= os.path.normpath (filename)
             self.repoFiles+= 1
-            self.getPackage (filename, size)
+            if not self.size:
+                self.getPackage (filename, size)
+            else:
+                self.totalSize+= size
 
         # return summary
 

@@ -74,6 +74,8 @@ def handleOpts ():
         help="Shh! Don't say anything!")
     # parser.add_option ('-s', '--save-space', action='store_true',
         # dest='save_space', default=False, help="Do not maintain consistency, saving space.")
+    parser.add_option ('-s', '--size', action='store_true', default=False,
+        help="Calculates the final size of the repos from the new databases.")
     parser.add_option ('-t', '--consistent', action='store_false',
         dest='save_space', default=False, help="Maintain consistency, wasting temporarily space.")
     parser.add_option ('-v', '--verbose', action='store_const', dest='log_level',
@@ -126,6 +128,8 @@ def main ():
             # mail+= driver.processRepo ()
             try:
                 driver.processRepo ()
+                if driver.size:
+                    print "%s: %8.2fMiB" % (driver.repo, driver.totalSize/(1024*1024))
             except Exception, e:
                 if ( conf.debugging or
                     (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
