@@ -68,7 +68,7 @@ class Psync(object):
         tempDir = dirname (_file)
         makedirs (tempDir)
 
-	# logger.debug ('getPackage: asked for %s' % _file)
+        # logger.debug ('getPackage: asked for %s' % _file)
         try:
             s= os.stat (_file)
         except OSError, e:
@@ -84,7 +84,7 @@ class Psync(object):
                     logger.warn ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
                     get= True
                 elif s.st_size>size:
-		    # bigger? how's bigger? reget!
+                    # bigger? how's bigger? reget!
                     logger.warn ("%s: wrong size %d; should be %d." % (_file, s.st_size, size))
                     logger.warn ("bigger means something went wrong. deleting and downloading.")
                     os.unlink (_file)
@@ -92,7 +92,7 @@ class Psync(object):
             else:
                 if self.verbose:
                     # logger.info ("%s: already here, skipping" % _file)
-		    pass
+                    pass
 
         if get:
             if not self.dry_run:
@@ -109,8 +109,8 @@ class Psync(object):
                         size= 0
                 else:
                     size= s.st_size
-	    else:
-		size= 0
+            else:
+                size= 0
 
             self.downloadedSize+= size
             # summary.append (basename(_file))
@@ -138,12 +138,12 @@ class Psync(object):
         # summary= []
         self.totalSize= 0
         notLocked= True
-	logger.debug ("clean level: %s" % self.cleanLevel)
+        logger.debug ("clean level: %s" % self.cleanLevel)
         if self.cleanLevel=='repo':
             # try to lock
             notLocked= False
             lockfile= '%s/lock' % self.repoDir
-	    logger.debug ("lockfile is %s" % lockfile)
+            logger.debug ("lockfile is %s" % lockfile)
             if lockFile (lockfile):
                 notLocked= True
         
@@ -193,7 +193,7 @@ class Psync(object):
             notLocked= False
             # try to lock
             lockfile= '%(repoDir)s/lock-%(distro)s-%(release)s' % self
-	    logger.debug ("lockfile is %s" % lockfile)
+            logger.debug ("lockfile is %s" % lockfile)
             if lockFile (lockfile):
                 notLocked= True
         
@@ -306,7 +306,7 @@ class Psync(object):
 
             found= grab (dababaseFilename, databaseUrl,
                          limit=self.limit, progress=self.progress, cont=False)
-	    logger.debug ("%s grabbed" % dababaseFilename)
+            logger.debug ("%s grabbed" % dababaseFilename)
             if found!=0 and critic:
                 raise ProtocolError (proto=databaseUrl[:databaseUrl.index (':')].upper (), code=found, url=databaseUrl)
 
