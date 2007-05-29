@@ -50,8 +50,9 @@ def touch (path):
         f= open (path, 'w+')
         f.close()
 
-def rename (src, dst, overwrite=False):
-    logger.info ("move: %s -> %s" % (src, dst))
+def rename (src, dst, overwrite=False, verbose=False):
+    if verbose:
+        logger.info ("move: %s -> %s" % (src, dst))
     # os.rename does not bark when overwriting
     if stat (dst) and not overwrite:
         e= IOError ()

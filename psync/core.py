@@ -352,7 +352,7 @@ class Psync(object):
             src= self.tempDir+'/'+dst
             try:
                 makedirs (dirname (dst))
-                rename (src, dst, overwrite=True)
+                rename (src, dst, overwrite=True, self.verbose)
                 self.keep[dst]= 1
             except OSError, e:
                 # better error report!
