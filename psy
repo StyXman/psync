@@ -115,7 +115,6 @@ def main ():
     try:
         for repo in repos:
             repo.update (confToDict (conf))
-            logger.info ("----- processing "+repo['repo'])
 
             # prepare teh mail body
             # mail.append (repo['repo'].center (75))
@@ -139,6 +138,7 @@ def main ():
                     # debugging, out of disk space or keyb int
                     print_exc ()
                     raise e
+            logger.info ("")
 
 
         # if not conf.mail_to is None:

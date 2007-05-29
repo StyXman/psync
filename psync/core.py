@@ -136,6 +136,7 @@ class Psync(object):
         It is for human consumption.
         """
         # summary= []
+        logger.info ("----- processing "+repo['repo'])
         self.totalSize= 0
         notLocked= True
         logger.debug ("clean level: %s" % self.cleanLevel)
