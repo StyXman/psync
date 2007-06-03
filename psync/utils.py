@@ -132,12 +132,13 @@ def getFile(url, destination):
                 os.unlink(destination)
             raise
 
-def grab(filename, url, limit=0, cont=True, progress=False):
+def grab(filename, url, limit=0, cont=True, progress=False, verbose=True):
     """ Fetchs a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
     curlStr= "curl --connect-timeout 60 --max-time 3600 --location --fail %s %s %s --output %s %s"
-    logger.info ("downloading %s" % filename)
+    if verbose:
+        logger.info ("downloading %s" % filename)
     _dir = dirname(filename)
     makedirs(_dir)
 

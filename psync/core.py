@@ -256,6 +256,8 @@ class Psync(object):
                 self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
         else:
             logger.warn ("%(repo)s/%(distro)s/%(release)s is being processed by another instance; skipping..." % self)
+            
+        print ""
 
         # return summary
 
@@ -299,6 +301,7 @@ class Psync(object):
         # get the databases relative paths
         databases= self.releaseDatabases ()
         logger.debug (databases)
+        logger.info ('------ getting databases for %(repo)s/%(distro)s/%(release)s' % self)
         for (database, critic) in databases:
             # yes: per design, we don't follow the dry_run option here,
             # but the databases won't be swapped at the end either.
@@ -306,7 +309,7 @@ class Psync(object):
             databaseUrl= ("%(repoUrl)s/" % self)+database
 
             found= grab (dababaseFilename, databaseUrl,
-                         limit=self.limit, progress=self.progress, cont=False)
+                         limit=self.limit, progress=self.progress, cont=False, verbose=False)
             logger.debug ("%s grabbed" % dababaseFilename)
             if found!=0 and critic:
                 raise ProtocolError (proto=databaseUrl[:databaseUrl.index (':')].upper (), code=found, url=databaseUrl)
@@ -342,7 +345,7 @@ class Psync(object):
         """
         Move the downloaded databases over the old ones for the whole release
         """
-        logger.info ('----- updating databases for %(repo)s/%(distro)s/%(release)s' % self)
+        logger.info ('------ updating databases for %(repo)s/%(distro)s/%(release)s' % self)
         # get the databases relative paths
         # these can be more
         databases= self.finalReleaseDBs ()
