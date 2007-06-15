@@ -136,7 +136,7 @@ class Psync(object):
         It is for human consumption.
         """
         # summary= []
-        logger.info ("----- processing "+repo['repo'])
+        logger.info ("=== processing "+repo['repo'])
         self.totalSize= 0
         notLocked= True
         logger.debug ("clean level: %s" % self.cleanLevel)
@@ -201,7 +201,7 @@ class Psync(object):
         if notLocked:
             # we gotta clean the lockfile later
             try:
-                logger.info ('----- processing %(repo)s/%(distro)s/%(release)s' % self)
+                logger.info ('---- processing %(repo)s/%(distro)s/%(release)s' % self)
                 # summary= []
                 self.releaseFailed= False
                 self.releaseFailedFiles= []

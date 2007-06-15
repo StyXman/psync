@@ -64,7 +64,7 @@ class Yum (Rpm):
 
         primary= repodataDir+'/primary.xml'
         primaryGz= primary+".gz"
-        logger.info ("processing database %s" % primaryGz)
+        logger.debug ("processing database %s" % primaryGz)
         # decompress the gz file
         gunzip (primaryGz, primary)
 
