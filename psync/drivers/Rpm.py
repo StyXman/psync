@@ -8,7 +8,7 @@ from psync.core import Psync
 
 from psync import logLevel
 import logging
-logger = logging.getLogger('psync.drivers.Yum')
+logger = logging.getLogger('psync.drivers.Rpm')
 logger.setLevel(logLevel)
 
 class Rpm (Psync):

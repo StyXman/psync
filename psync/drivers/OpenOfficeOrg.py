@@ -24,9 +24,17 @@ class OpenOfficeOrg (Psync):
         for self.lang in self.languages:
             subLangs= self.subLanguages[self.languages.index (self.lang)]
             for self.subLang in subLangs:
+                yield ("contrib/dictionaries/Math_%(lang)s_%(subLang)s.zip" % self, None)
+                yield ("contrib/dictionaries/README_Math_%(lang)s_%(subLang)s.txt" % self, None)
+                yield ("contrib/dictionaries/README_%(lang)s_%(subLang)s-rh.txt" % self, None)
+                yield ("contrib/dictionaries/README_%(lang)s_%(subLang)s.txt" % self, None)
+                yield ("contrib/dictionaries/README_hyph_%(lang)s_%(subLang)s.txt" % self, None)
+                yield ("contrib/dictionaries/README_th_%(lang)s_%(subLang)s.txt" % self, None)
+                yield ("contrib/dictionaries/%(lang)s_%(subLang)s-pack.zip" % self, None)
                 yield ("contrib/dictionaries/%(lang)s_%(subLang)s.zip" % self, None)
-                if False:
-                    yield ("contrib/dictionaries/%(lang)s_%(subLang)s-pack.zip" % self, None)
+                yield ("contrib/dictionaries/hyph_%(lang)s_%(subLang)s.zip" % self, None)
+                yield ("contrib/dictionaries/thes_%(lang)s_%(subLang)s.zip" % self, None)
+                yield ("contrib/dictionaries/thes_%(lang)s_%(subLang)s_v2.zip" % self, None)
 
     def finalReleaseDBs (self):
         return []

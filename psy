@@ -81,8 +81,12 @@ def handleOpts ():
         dest='save_space', default=False, help="Maintain consistency, wasting temporarily space.")
     parser.add_option ('-v', '--verbose', action='store_const', dest='log_level',
         const=logging.WARN, help="Be verbose on what's being done.")
+    parser.add_option ('-w', '--wipe', action='store_true', dest='wipe',
+        help="Run the clean part, deleting unneeded files.")
     parser.add_option ('-x', '--experiment', action='store_true', default=False,
         help="Don't really download the files, just «touch» them. Faster for test.")
+    parser.add_option ('-y', '--download-databases', action='store_true', dest='download_db',
+        help="Force to download new datbases, even if it wouldn't.")
     return parser.parse_args ()
 
 def main ():

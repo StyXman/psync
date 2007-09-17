@@ -32,6 +32,8 @@ class Psync(object):
         self.verbose= verbose
         
         # defaults
+        # most distros have a release cleanLevel
+        # except debian and probably gentoo
         self.cleanLevel= 'release'
         
         self.__dict__.update(kwargs)
@@ -151,7 +153,7 @@ class Psync(object):
         if notLocked:
             # we gotta clean the lockfile later
             try:
-                if not self.save_space and not self.process_old:
+                if not self.save_space and not self.process_old and not self.wipe:
                     # create tmp dir
                     self.tempDir= ".tmp"
                     logger.debug ("not cont: working on %s" % self.tempDir)
@@ -206,29 +208,30 @@ class Psync(object):
                 self.releaseFailed= False
                 self.releaseFailedFiles= []
 
-                if not self.process_old:
+                if (not self.process_old and not self.wipe) or (self.wipe and self.download_db):
                     self.getReleaseDatabases ()
 
-                archs= getattr (self, 'archs', [ None ])
-                for arch in archs:
-                    self.arch= arch
-                    logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
-                    # msg= "architecture %s:" % arch
-                    # summary.append (msg)
-                    # summary.append ("~" * len (msg))
-                    modules= getattr (self, 'modules', [ None ])
-                    for module in modules:
-                        # won't log what module we are processing
-                        self.module= module
-                        # summary+= self.process ()
-                        self.process ()
+                if not self.wipe:
+                    archs= getattr (self, 'archs', [ None ])
+                    for arch in archs:
+                        self.arch= arch
+                        logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
+                        # msg= "architecture %s:" % arch
+                        # summary.append (msg)
+                        # summary.append ("~" * len (msg))
+                        modules= getattr (self, 'modules', [ None ])
+                        for module in modules:
+                            # won't log what module we are processing
+                            self.module= module
+                            # summary+= self.process ()
+                            self.process ()
 
-                    # summary.append (("total update: %7.2f MiB" % (self.downloadedSize/1048576.0)).rjust (75))
-                    # summary.append ('')
-                    # summary.append ('')
-
-                    # reset count
-                    self.downloadedSize= 0
+                        # summary.append (("total update: %7.2f MiB" % (self.downloadedSize/1048576.0)).rjust (75))
+                        # summary.append ('')
+                        # summary.append ('')
+    
+                        # reset count
+                        self.downloadedSize= 0
 
             except (Exception, KeyboardInterrupt), e:
                 # BUG: what happens when a database fails to load?
@@ -239,18 +242,21 @@ class Psync(object):
                 logger.warn (e)
                 print_exc ()
                 if ( (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
-                     isinstance (e, KeyboardInterrupt) ):
+                        isinstance (e, KeyboardInterrupt) ):
                     # out of disk space or keyb int
                     raise e
             else:
+                # BUG: we don't unlock if something fails!
                 if self.cleanLevel=='release':
                     unlockFile (lockfile)
 
-            if self.releaseFailed:
+            if self.releaseFailed or self.wipe:
                 self.keepOldReleaseFiles ()
             else:
                 if not self.save_space and not self.dry_run and not self.process_old and not self.size:
                     self.updateReleaseDatabases ()
+		# else:
+		#     logger.warn ('got no databases to continue!')
             
             if self.cleanLevel=='release':
                 self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
@@ -280,17 +286,20 @@ class Psync(object):
         # return summary
 
     def walkRelease (self, releaseFunc=None, archFunc=None, moduleFunc=None):
+        # logger.debug ("walking %(repo)s/%(distro)s/%(release)s" % self)
         if releaseFunc is not None:
             releaseFunc (self)
         archs= getattr (self, 'archs', [ None ])
         for arch in archs:
             self.arch= arch
+            # logger.debug ("walking %(repo)s/%(distro)s/%(release)s/%(arch)s" % self)
             if archFunc is not None:
                 archFunc (self)
 
             modules= getattr (self, 'modules', [ None ])
             for module in modules:
                 self.module= module
+                # logger.debug ("walking %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s" % self)
                 if moduleFunc is not None:
                     moduleFunc (self)
 
@@ -315,28 +324,28 @@ class Psync(object):
                 raise ProtocolError (proto=databaseUrl[:databaseUrl.index (':')].upper (), code=found, url=databaseUrl)
 
     def keepOldReleaseFiles (self):
-        logger.warn ('loading old databases for %(repo)s/%(distro)s/%(release)s' % self)
         # force it to use the old databases
         oldTempDir= self.tempDir
         self.tempDir= '.'
 
         def loadFilesAndDatabases (self):
+            logger.warn ('loading old databases for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s' % self)
             for filename, size in self.files ():
                 filename= os.path.normpath (("%(repoDir)s/" % self)+filename)
                 self.keep[filename]= 1
-                logger.debug (filename+ (' kept for %(repo)s/%(distro)s/%(release)s' % self))
+                # logger.debug (filename+ (' kept for %(repo)s/%(distro)s/%(release)s' % self))
+
+        try:
+            self.walkRelease (moduleFunc=loadFilesAndDatabases)
             # the final ones
             databases= self.finalReleaseDBs ()
             for (database, critic) in databases:
                 dst= os.path.normpath (("%(repoDir)s/" % self)+database)
                 self.keep[dst]= 1
-
-        try:
-            self.walkRelease (moduleFunc=loadFilesAndDatabases)
         except IOError, e:
             # some database does not exist in the mirror
             # so, wipe'em all anyways
-            logger.warn ('could not load database for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(modules)s' % self)
+            logger.warn ('could not load database for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s' % self)
             logger.warn (e)
 
         self.tempDir= oldTempDir
@@ -399,7 +408,8 @@ class Psync(object):
                     if not self.keep.has_key (filepath):
                         # delete de bastard
                         logger.info ('deleting %s' % filepath)
-                        os.unlink (filepath)
+                        if not self.dry_run:
+                            os.unlink (filepath)
                         if self.debugging:
                             # make it slower so we can stop it in time
                             # when it's destroying a repo
