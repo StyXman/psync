@@ -145,10 +145,11 @@ class Psync(object):
         if self.cleanLevel=='repo':
             # try to lock
             notLocked= False
-            lockfile= '%s/lock' % self.repoDir
-            logger.debug ("lockfile is %s" % lockfile)
-            if lockFile (lockfile):
+            self.lockfile= '%s/lock' % self.repoDir
+            logger.debug ("lockfile is %s" % self.lockfile)
+            if lockFile (self.lockfile):
                 notLocked= True
+            self.keep[self.lockfile]= 1
         
         if notLocked:
             # we gotta clean the lockfile later
@@ -174,12 +175,12 @@ class Psync(object):
                     self.cleanRepo (self.repoDir)
             except Exception, e:
                 if self.cleanLevel=='repo':
-                    unlockFile (lockfile)
+                    unlockFile (self.lockfile)
                 # reraise
                 raise e
             else:
                 if self.cleanLevel=='repo':
-                    unlockFile (lockfile)
+                    unlockFile (self.lockfile)
         else:
             logger.warn ("repo %s is being processed by another instance; skipping..." % self.repo)
 
@@ -195,10 +196,11 @@ class Psync(object):
         if self.cleanLevel=='release':
             notLocked= False
             # try to lock
-            lockfile= '%(repoDir)s/lock-%(distro)s-%(release)s' % self
-            logger.debug ("lockfile is %s" % lockfile)
-            if lockFile (lockfile):
+            self.lockfile= '%(repoDir)s/lock-%(distro)s-%(release)s' % self
+            logger.debug ("lockfile is %s" % self.lockfile)
+            if lockFile (self.lockfile):
                 notLocked= True
+            self.keep[self.lockfile]= 1
         
         if notLocked:
             # we gotta clean the lockfile later
@@ -237,7 +239,7 @@ class Psync(object):
                 # BUG: what happens when a database fails to load?
                 self.releaseFailed= True
                 if self.cleanLevel=='release':
-                    unlockFile (lockfile)
+                    unlockFile (self.lockfile)
                 logger.warn ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
                 logger.warn (e)
                 print_exc ()
@@ -248,15 +250,15 @@ class Psync(object):
             else:
                 # BUG: we don't unlock if something fails!
                 if self.cleanLevel=='release':
-                    unlockFile (lockfile)
+                    unlockFile (self.lockfile)
 
             if self.releaseFailed or self.wipe:
                 self.keepOldReleaseFiles ()
             else:
                 if not self.save_space and not self.dry_run and not self.process_old and not self.size:
                     self.updateReleaseDatabases ()
-		# else:
-		#     logger.warn ('got no databases to continue!')
+                # else:
+                #     logger.warn ('got no databases to continue!')
             
             if self.cleanLevel=='release':
                 self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
