@@ -5,7 +5,7 @@ import kdedistutils
 
 data= dict (
     name='psync',
-    version='0.3.1',
+    version='0.4.0',
     description="psync is a distribution mirroring utility with consistency in mind.",
     long_description="""
 psync is a mirroring utility. its main goal is to be able to update a  

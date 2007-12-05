@@ -1,3 +1,16 @@
+0.4.0-1
+Sat, 01 Dec 2007 20:06:24 -0300
+* Fixes bugs in drivers/Cpan, utils and core.
+* Repos definitions can specify the level at which they're cleaned.
+* New -x option: between normal and dry run, downloads databases, but just 'touchs' the files, saving time when trying some new features or repos.
+* Deletes files if they're bigger than they should.
+* Repo locking, so no two instances update the same repo.
+* New -s/--size option calculates the size of each processed repo (but doesn't do it).
+* Cleaner reports.
+* driver/OpenOfficeOrg supports math, hyphenation and theasaurus files.
+* New -w|--wipe option does the cleaning step only, deleting files that should not be (anymore?) in the repo. 
+* New -y|--download-databases option forces the databases to be downloaded, even it they shouldn't.
+-- Marcos Dione <mdione@grulic.org.ar>
 0.3.1-1
 Sun, 03 Dec 2006 19:05:56 -0300
 * disabled mail report. has to be rethought.

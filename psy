@@ -51,6 +51,7 @@ def confToDict (conf):
 
 def handleOpts ():
     parser= OptionParser ()
+
     parser.add_option ('-c', '--continue', action='store_true', dest='cont', default=False,
         help="Continue processing the databases instead of donwloading new ones. Tries to use temp ones first; if they don't exist, tries the actual ones.")
     parser.add_option ('-d', '--debug', action='store_const', dest='log_level',

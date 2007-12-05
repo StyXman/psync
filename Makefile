@@ -1,9 +1,12 @@
 CHECKER=pychecker
 
 README=README
-INDEX_HTML=www/index.html
+# INDEX_HTML=www/index.html
+INDEX_HTML=http://grulicueva.homelinux.net/~mdione/projects/psync/wiki
+
 RUNNING_txt=RUNNING.txt
-RUNNING_HTML=www/running.html
+# RUNNING_HTML=www/running.html
+RUNNING_HTML=http://grulicueva.homelinux.net/~mdione/projects/psync/wiki/HowToRun
 # HTML_DUMP=lynx -dump
 HTML_DUMP=links -dump
 
@@ -22,10 +25,10 @@ instdir=$(install_dir)
 
 all: $(TARGETS)
 
-$(README): $(INDEX_HTML)
-	$(HTML_DUMP) $< > $@
+$(README):
+	$(HTML_DUMP) $(INDEX_HTML) > $@ || rm $@
 
-$(RUNNING_txt): $(RUNNING_HTML)
+$(RUNNING_txt):
 	$(HTML_DUMP) $< > $@
 
 install:
