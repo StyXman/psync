@@ -288,20 +288,20 @@ class Psync(object):
         # return summary
 
     def walkRelease (self, releaseFunc=None, archFunc=None, moduleFunc=None):
-        # logger.debug ("walking %(repo)s/%(distro)s/%(release)s" % self)
+        logger.debug ("walking %(repo)s/%(distro)s/%(release)s" % self)
         if releaseFunc is not None:
             releaseFunc (self)
         archs= getattr (self, 'archs', [ None ])
         for arch in archs:
             self.arch= arch
-            # logger.debug ("walking %(repo)s/%(distro)s/%(release)s/%(arch)s" % self)
+            logger.debug ("walking %(repo)s/%(distro)s/%(release)s/%(arch)s" % self)
             if archFunc is not None:
                 archFunc (self)
 
             modules= getattr (self, 'modules', [ None ])
             for module in modules:
                 self.module= module
-                # logger.debug ("walking %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s" % self)
+                logger.debug ("walking %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s" % self)
                 if moduleFunc is not None:
                     moduleFunc (self)
 
@@ -391,7 +391,7 @@ class Psync(object):
             pass
 
         # clean up
-        logger.debug ('here comes the janitor')
+        logger.debug ('here comes the janitor %s' % cleaningPath)
         ignorePaths= getattr (self, 'ignore', [])
         # add cleaningPath to all ignored paths
         ignorePaths= [ "%s/%s" % (cleaningPath, i) for i in ignorePaths ]
