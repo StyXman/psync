@@ -1,4 +1,5 @@
-# (c) 2005-2006
+# -*- coding: utf-8 -*-
+# (c) 2005-2008
 # Marcos Dione <mdione@grulic.org.ar>
 
 # example config file
@@ -14,14 +15,25 @@ config1= []
 config.append (dict (
     repo= 'debian',
     # repoUrl= 'http://http.us.debian.org/debian',
-    repoUrl= 'http://ftp.ie.debian.org/debian',
-    # repoUrl= 'http://mirrors.kernel.org/debian',
+    # repoUrl= 'http://mirror/debian',
+    # repoUrl= 'http://ftp.ie.debian.org/debian',
+    repoUrl= 'http://mirrors.kernel.org/debian',
     repoDir= 'debian/debian',
     driver= 'Debian',
-    releases= [ 'sarge', 'etch', 'sid' ],
-    archs= [ 'i386', 'sparc' ],
+
+    # driver= 'DebianEdos',
+    releases= [ 'etch', 'lenny', 'sid' ],
+    # releases= [ 'etch'],
+    # archs= [ 'i386', 'sparc', 'amd64' ],
+    arch= [ 'i386', 'amd64' ],
+    # archs= [ 'i386' ],
     modules= [ 'main', 'non-free', 'contrib', 'main/debian-installer' ],
+    # modules= [ 'main' ],
     baseDir= '',
+    # DebianEdos repos need a(nother) debian repo as reference
+    # except for debian ones, which are their own reference
+    # see marillat repo below
+    cleanLevel= 'repo',
 ))
 config.append (dict (
     repo= 'debian-security',
@@ -30,19 +42,21 @@ config.append (dict (
     driver= 'Debian',
     # releases= [ 'sarge/updates', 'etch/updates' ],
     # archs= [ 'i386', 'sparc' ],
-    releases= [ 'sarge/updates' ],
-    archs= [ 'i386' ],
+    releases= [ 'etch/updates', 'lenny/updates' ],
+    # archs= [ 'i386', 'sparc', 'amd64' ],
+    archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDir= '',
 ))
-config.append (dict (
+config1.append (dict (
     repo= 'debian-non-US',
     repoUrl= 'http://non-us.debian.org/debian-non-US',
     repoDir= 'debian/debian-non-US',
     driver= 'Debian',
     # sarge is the last release that needs non-US
     releases= [ 'sarge/non-US' ],
-    archs= [ 'i386', 'sparc' ],
+    # archs= [ 'i386', 'sparc' ],
+    archs= [ 'i386' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDir= '',
 ))
@@ -53,11 +67,14 @@ config1.append (dict (
     # ftp sucks because it's a whole auth handshaking for each downloaded file
     repoUrl= 'ftp://ftp.nerim.net/debian-marillat',
     repoDir= 'debian/marillat',
-    driver= 'Debian',
+    driver= 'DebianEdos',
     releases= [ 'sid' ],
     archs= [ 'i386' ],
     modules= [ 'main' ],
     baseDir= '',
+    # DebianEdos repos need a(nother) debian repo as reference
+    debianRepo= 'debian/debian',
+    debianModules= [ 'main' ]
 ))
 
 # deb http://www.debian-multimedia.org sarge main
@@ -80,12 +97,13 @@ config.append (dict (
     repoUrl= 'http://www.backports.org/debian/',
     repoDir= 'debian/backports',
     driver= 'Debian',
-    releases= [ 'sarge-backports' ],
-    archs= [ 'i386', 'sparc' ],
+    releases= [ 'etch-backports' ],
+    # archs= [ 'i386', 'sparc', 'amd64' ],
+    archs= [ 'i386', 'amd64' ],
     modules= [ 'main' ],
     baseDir= '',
 ))
-		
+
 # deb http://packages.debianbase.de/etch/i386/nx/ ./
 config1.append (dict (
     repo= 'freenx',
@@ -104,8 +122,8 @@ config1.append (dict (
     repo= 'test',
     repoUrl= 'http://luon.net/debian',
     repoDir= 'debian/test',
-    driver= 'Debian',
-    releases= [ 'sarge', 'sid' ],
+    driver= 'DebianEdos',
+    releases= [ 'sid' ],
     archs= [ 'i386' ],
     modules= [ 'main' ],
     baseDir= '',
@@ -138,7 +156,7 @@ config1.append (dict (
 ###########
 # mandrake
 ###########
-config.append (dict (
+config1.append (dict (
     repo= 'mandrake-no_jpackage',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
     # repoUrl= 'http://ftp.heanet.ie/pub/mandrake/Mandrakelinux/official',
@@ -155,7 +173,7 @@ config.append (dict (
     ignore= [ '2005', '2006.0', 'updates' ],
 ))
 
-config.append (dict (
+config1.append (dict (
     repo= 'mandrake',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
     # repoUrl= 'http://ftp.heanet.ie/pub/mandrake/Mandrakelinux/official',
@@ -180,7 +198,7 @@ config.append (dict (
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
     # don't forget to ignore the old ones!
-    releases= [ '2007.0' ],
+    releases= [ '2008.1' ],
     archs= [ 'i586' ],
     modules= [ 'main', 'non-free' ],
     baseDirTemplate= '%(release)s/%(arch)s/media/%(module)s',
@@ -190,13 +208,13 @@ config.append (dict (
     ignore= [ '9.2', 'LE2005', '2005', '10.2', '2006.0' ],
 ))
 # http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates/2006.0/main_updates/
-config.append (dict (
+config1.append (dict (
     repo= 'mandrake-updates',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
     # don't forget to ignore the old ones!
-    releases= [ '2006.0' ],
+    releases= [ '2008.1' ],
     archs= [ 'i586' ],
     modules= [ 'main_updates' ],
     # it does not include the arch because the paths in the hdlist already has it
@@ -207,7 +225,7 @@ config.append (dict (
     ignore= [ '9.2', 'LE2005', '2005', '10.2' ],
 ))
 # fucking old version
-config.append (dict (
+config1.append (dict (
     # http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates/2005/base/synthesis.hdlist.cz
     # http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates/2005/main_updates/media_info/
     repo= 'mandrake-updates-old',
@@ -226,7 +244,7 @@ config.append (dict (
     ignore= [ '2006.0', 'LE2005', '10.2', '9.2', '2007.0' ],
 ))
 # fucking different version!
-config.append (dict (
+config1.append (dict (
     # http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates/9.2/base/synthesis.hdlist.cz
     repo= 'mandrake-updates-old-no_modules',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates',
@@ -267,7 +285,7 @@ config1.append (dict (
 #########
 # ubuntu
 #########
-config.append (dict (
+config1.append (dict (
     repo= 'ubuntu',
     repoUrl= 'http://archive.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/ubuntu',
@@ -284,28 +302,28 @@ config.append (dict (
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/updates',
     driver= 'Debian',
-    releases= [ 'edgy-updates' ],
+    releases= [ 'gutsy-updates', 'hardy-updates' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'restricted' ],
     baseDirTemplate= '',
 ))
-config.append (dict (
+config1.append (dict (
     repo= 'ubuntu-security',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/security',
     driver= 'Debian',
-    releases= [ 'edgy-security' ],
+    releases= [ 'gutsy-security', 'hardy-security' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'restricted' ],
     baseDirTemplate= '',
 ))
 # also has official backports!
-config.append (dict (
+config1.append (dict (
     repo= 'ubuntu-backports',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/backports',
     driver= 'Debian',
-    releases= [ 'edgy-backports' ],
+    releases= [ 'gutsy-backports', 'hardy-backports' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'restricted' ],
     baseDirTemplate= '',
@@ -317,12 +335,13 @@ config.append (dict (
 config.append (dict (
     repo= 'fedora',
     # repoUrl= 'http://www.las.ic.unicamp.br/pub/fedora/linux/core',
-    repoUrl= 'http://mirrors.kernel.org/fedora/core/',
+    # repoUrl= 'http://mirrors.kernel.org/fedora/core/',
+    repoUrl= 'http://fedora.c3sl.ufpr.br/linux/releases/',
     repoDir= 'fedora',
     driver= 'Yum',
-    releases= [ '4', '5' ],
+    releases= [ '8', '9' ],
     archs= [ 'i386' ],
-    baseDirTemplate= '%(release)s/%(arch)s/os',
+    baseDirTemplate= '%(release)s/Fedora/%(arch)s/os',
     # rpmDir= 'Fedora/RPMS',
     rpmDir= '.',
     debug= False,
@@ -335,12 +354,13 @@ config.append (dict (
     repoUrl= 'http://mirrors.kernel.org/fedora/core/updates',
     repoDir= 'fedora/updates',
     driver= 'Yum',
-    releases= [ '3', '4', '5' ],
+    releases= [ '8', '9' ],
     archs= [ 'i386' ],
     baseDirTemplate= '%(release)s/%(arch)s',
     rpmDir= '.',
     debug= False,
     source= False,
+    # debugging= True,
 ))
 
 # http://apt.kde-redhat.org/apt/kde-redhat/fedora/4/i386/stable/
@@ -364,7 +384,7 @@ config1.append (dict (
 # suse
 #######
 # http://mirrors.kernel.org/suse/update/10.1
-config.append (dict (
+config1.append (dict (
     repo= 'suse-updates',
     # repoUrl= 'http://mirrors.kernel.org/suse/update',
     # repoUrl= 'http://www.mirrors.net.ar/pub/suse/i386/update',
@@ -391,7 +411,7 @@ config.append (dict (
 # slack
 ########
 # http://mirror.slacklife.com.br/slackware-current/
-config.append (dict (
+config1.append (dict (
     repo= 'slackware',
     repoUrl= 'http://ftp.gwdg.de/pub/linux/slackware',
     repoDir= 'slackware',
@@ -410,7 +430,7 @@ config.append (dict (
     repoUrl= 'http://ftp.snt.utwente.nl/pub/software/openoffice',
     repoDir= 'ooffice',
     driver= 'OpenOfficeOrg',
-    releases= [ '2.0.3', '2.0.4' ],
+    releases= [ '2.4.1', '3.0.0' ],
     archs= [ 'LinuxIntel', 'Win32Intel', 'SolarisSparc', 'Solarisx86' ],
     exts= [ 'tar.gz', 'exe', 'tar.gz', 'tar.gz' ],
     languages= [ 'es' ],
@@ -439,7 +459,7 @@ config.append (dict (
     repoUrl= 'http://ftp.mozilla.org/pub/mozilla.org/',
     repoDir= 'mozilla',
     driver= 'Mozilla',
-    apps= [ ('firefox', [ '2.0', ]), ('thunderbird', [ '1.5', ]), ],
+    apps= [ ('firefox', [ '3.0.3', '2.0.0.17' ]), ('thunderbird', [ '3.0a3', '2.0.0.17' ]), ],
     languages= [ 'en-US', 'es-AR', ],
     archs= [ 'linux-i686', 'win32' ],
     # this really sucks
