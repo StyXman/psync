@@ -43,7 +43,7 @@ class Psync(object):
         self.releaseFailedFiles= [] # files that failed to download for a given release
 
         self.failedFiles= [] # files that failed to download
-        self.keep= {}
+        self.keep= set ()
 
         # counters
         self.repoFiles= 0
@@ -118,7 +118,8 @@ class Psync(object):
             # summary.append (basename(_file))
 
         # always keep it
-        self.keep[_file]= 1
+        logger.debug ("keeping %s" % _file)
+        self.keep.add (_file)
 
         if ans==0x1600:
             # only 404 is relevant here
@@ -149,7 +150,8 @@ class Psync(object):
             logger.debug ("lockfile is %s" % self.lockfile)
             if lockFile (self.lockfile):
                 notLocked= True
-            self.keep[self.lockfile]= 1
+            logger.debug ("keeping %s" % self.lockfile)
+            self.keep.add (self.lockfile)
         
         if notLocked:
             # we gotta clean the lockfile later
@@ -200,7 +202,8 @@ class Psync(object):
             logger.debug ("lockfile is %s" % self.lockfile)
             if lockFile (self.lockfile):
                 notLocked= True
-            self.keep[self.lockfile]= 1
+            logger.debug ("keeping %s" % self.lockfile)
+            self.keep.add (self.lockfile)
         
         if notLocked:
             # we gotta clean the lockfile later
@@ -226,7 +229,7 @@ class Psync(object):
                             # won't log what module we are processing
                             self.module= module
                             # summary+= self.process ()
-                            self.process ()
+                            self.processModule ()
 
                         # summary.append (("total update: %7.2f MiB" % (self.downloadedSize/1048576.0)).rjust (75))
                         # summary.append ('')
@@ -261,15 +264,18 @@ class Psync(object):
                 #     logger.warn ('got no databases to continue!')
             
             if self.cleanLevel=='release':
-                self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
+                if self.distro is not None:
+                    self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
+                else:
+                    self.cleanRepo ('%(repoDir)s/%(release)s' % self)
         else:
-            logger.warn ("%(repo)s/%(distro)s/%(release)s is being processed by another instance; skipping..." % self)
+            logger.warn ("%(repoDir)s/%(distro)s/%(release)s is being processed by another instance; skipping..." % self)
             
         print ""
 
         # return summary
 
-    def process (self):
+    def processModule (self):
         """
         Process one module.
         Returns a list of strings with a summary of what was done.
@@ -334,7 +340,8 @@ class Psync(object):
             logger.warn ('loading old databases for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s' % self)
             for filename, size in self.files ():
                 filename= os.path.normpath (("%(repoDir)s/" % self)+filename)
-                self.keep[filename]= 1
+                logger.debug ("keeping %s" % filename)
+                self.keep.add (filename)
                 # logger.debug (filename+ (' kept for %(repo)s/%(distro)s/%(release)s' % self))
 
         try:
@@ -343,7 +350,8 @@ class Psync(object):
             databases= self.finalReleaseDBs ()
             for (database, critic) in databases:
                 dst= os.path.normpath (("%(repoDir)s/" % self)+database)
-                self.keep[dst]= 1
+                logger.debug ("keeping %s" % dst)
+                self.keep.add (dst)
         except IOError, e:
             # some database does not exist in the mirror
             # so, wipe'em all anyways
@@ -368,7 +376,8 @@ class Psync(object):
             try:
                 makedirs (dirname (dst))
                 rename (src, dst, overwrite=True, verbose=self.verbose)
-                self.keep[dst]= 1
+                logger.debug ("keeping %s" % dst)
+                self.keep.add (dst)
             except OSError, e:
                 # better error report!
                 if not critic:
@@ -407,7 +416,7 @@ class Psync(object):
             if not ignore:
                 for _file in files:
                     filepath= os.path.join (path, _file)
-                    if not self.keep.has_key (filepath):
+                    if not filepath in self.keep:
                         # delete de bastard
                         logger.info ('deleting %s' % filepath)
                         if not self.dry_run:
@@ -417,7 +426,7 @@ class Psync(object):
                             # when it's destroying a repo
                             sleep (0.1)
                     else:
-                        logger.debug ('keeping %s' % filepath)
+                        logger.debug ('%s found in keep, keeping' % filepath)
         logger.debug ('janitor out')
 
 # end
