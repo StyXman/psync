@@ -156,25 +156,26 @@ config1.append (dict (
 ###########
 # mandrake
 ###########
-config1.append (dict (
-    repo= 'mandrake-no_jpackage',
+config.append (dict (
+    repo= 'mandrake',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
     # repoUrl= 'http://ftp.heanet.ie/pub/mandrake/Mandrakelinux/official',
     repoDir= 'mandrake',
     driver= 'Urpmi',
-    releases= [ '2007.0' ],
+    releases= [ '2008.1' ],
     archs= [ 'i586' ],
-    modules= [ 'contrib' ],
+    # modules= [ 'main', 'non-free', 'contrib' ],
+    modules= [ 'main', 'non-free' ],
     # it does not include the arch because the paths in the hdlist already has it
     baseDirTemplate= '%(release)s/%(arch)s/media/%(module)s',
     rpmDir= 'release',
     hdlistTemplate= '../media_info/hdlist_%(module)s.cz',
     # relative to repoDir
-    ignore= [ '2005', '2006.0', 'updates' ],
+    ignore= [ 'updates' ],
 ))
 
 config1.append (dict (
-    repo= 'mandrake',
+    repo= 'mandrake-with_jpackage',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
     # repoUrl= 'http://ftp.heanet.ie/pub/mandrake/Mandrakelinux/official',
     repoDir= 'mandrake',
