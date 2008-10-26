@@ -16,6 +16,11 @@ import logging
 logger = logging.getLogger('psync.core')
 logger.setLevel(logLevel)
 
+try:
+    TopmostException= BaseException
+except NameError:
+    TopmostException= Exception
+
 class DictException (Exception):
     def __init__ (self, **kwargs):
         self.__dict__.update(kwargs)
@@ -175,11 +180,12 @@ class Psync(object):
 
                 if self.cleanLevel=='repo':
                     self.cleanRepo (self.repoDir)
-            except Exception, e:
+            except TopmostException, e:
+                logger.debug ("repo except'ed! %s" % e)
                 if self.cleanLevel=='repo':
                     unlockFile (self.lockfile)
                 # reraise
-                raise e
+                raise
             else:
                 if self.cleanLevel=='repo':
                     unlockFile (self.lockfile)
@@ -238,18 +244,21 @@ class Psync(object):
                         # reset count
                         self.downloadedSize= 0
 
-            except (Exception, KeyboardInterrupt), e:
+            except TopmostException, e:
                 # BUG: what happens when a database fails to load?
                 self.releaseFailed= True
                 if self.cleanLevel=='release':
                     unlockFile (self.lockfile)
                 logger.warn ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
                 logger.warn (e)
+                logger.debug ('utter failure1! bailing out with %s' % e)
                 print_exc ()
+                logger.debug ('utter failure2! bailing out with %s' % e)
                 if ( (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                         isinstance (e, KeyboardInterrupt) ):
                     # out of disk space or keyb int
-                    raise e
+                    logger.debug ('utter failure! bailing out with %s' % e)
+                    raise
             else:
                 # BUG: we don't unlock if something fails!
                 if self.cleanLevel=='release':
