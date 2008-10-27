@@ -40,10 +40,7 @@ config.append (dict (
     repoUrl= 'http://security.debian.org/debian-security',
     repoDir= 'debian/debian-security',
     driver= 'Debian',
-    # releases= [ 'sarge/updates', 'etch/updates' ],
-    # archs= [ 'i386', 'sparc' ],
     releases= [ 'etch/updates', 'lenny/updates' ],
-    # archs= [ 'i386', 'sparc', 'amd64' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDir= '',
@@ -55,7 +52,6 @@ config1.append (dict (
     driver= 'Debian',
     # sarge is the last release that needs non-US
     releases= [ 'sarge/non-US' ],
-    # archs= [ 'i386', 'sparc' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDir= '',
@@ -80,15 +76,19 @@ config1.append (dict (
 # deb http://www.debian-multimedia.org sarge main
 # deb http://www.debian-multimedia.org etch main
 # amd64, i386 and sparc
-config1.append (dict (
+config.append (dict (
     repo= 'debian-mm',
     repoUrl= 'http://www.debian-multimedia.org',
-    repoDir= 'debian/debian-mm',
-    driver= 'Debian',
-    releases= [ 'sarge', 'sid' ],
-    archs= [ 'i386', 'amd64' ],
+    repoDir= 'debian/debian-multimedia',
+    driver= 'DebianEdos',
+    releases= [ 'sid' ],
+    archs= [ 'i386' ],
     modules= [ 'main' ],
     baseDir= '',
+    # DebianEdos repos which are not Debian itself
+    # need a(nother) debian repo as reference
+    debianRepo= 'debian/debian',
+    debianModules= [ 'main', 'non-free', 'contrib' ]
 ))
 
 # deb http://www.backports.org/debian/ sarge-backports main
@@ -154,10 +154,10 @@ config1.append (dict (
 
 
 ###########
-# mandrake
+# mandriva
 ###########
-config.append (dict (
-    repo= 'mandrake',
+config1.append (dict (
+    repo= 'mandriva',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
     # repoUrl= 'http://ftp.heanet.ie/pub/mandrake/Mandrakelinux/official',
     repoDir= 'mandrake',
@@ -175,7 +175,7 @@ config.append (dict (
 ))
 
 config1.append (dict (
-    repo= 'mandrake-with_jpackage',
+    repo= 'mandriva-with_jpackage',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official',
     # repoUrl= 'http://ftp.heanet.ie/pub/mandrake/Mandrakelinux/official',
     repoDir= 'mandrake',
@@ -194,7 +194,7 @@ config1.append (dict (
 #                \<-- repo -->| |<-- repoUrl                    -->| |<-- baseDirTemplate -->|      |<-- hdlist -->|
 # http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates/2007.0/i586/media/main/updates/
 config.append (dict (
-    repo= 'mandrake-updates-with_arch',
+    repo= 'mandriva-updates',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
@@ -210,7 +210,7 @@ config.append (dict (
 ))
 # http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates/2006.0/main_updates/
 config1.append (dict (
-    repo= 'mandrake-updates',
+    repo= 'mandriva-updates-without_arch',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
@@ -229,7 +229,7 @@ config1.append (dict (
 config1.append (dict (
     # http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates/2005/base/synthesis.hdlist.cz
     # http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates/2005/main_updates/media_info/
-    repo= 'mandrake-updates-old',
+    repo= 'mandriva-updates-old',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates',
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
@@ -247,7 +247,7 @@ config1.append (dict (
 # fucking different version!
 config1.append (dict (
     # http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates/9.2/base/synthesis.hdlist.cz
-    repo= 'mandrake-updates-old-no_modules',
+    repo= 'mandriva-updates-old-no_modules',
     repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/old/updates',
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
@@ -266,21 +266,23 @@ config1.append (dict (
 # http://plf.zarb.org/
 # urpmi.addmedia plf-free http://plf.lastdot.org/plf/free/10.2 with hdlist.cz
 # urpmi.addmedia plf-nonfree http://plf.lastdot.org/plf/non-free/10.2 with hdlist.cz
-config1.append (dict (
+config.append (dict (
     repo= 'plf',
     # repoUrl= 'http://ftp.club-internet.fr/pub/linux/plf/',
     repoUrl= 'http://plf.lastdot.org/plf',
     repoDir= 'mandrake/plf',
     driver= 'Urpmi',
     distros= [ 'mandrake' ],
-    releases= [ '10.2' ],
+    releases= [ '2008.1' ],
     archs= [ 'i586', 'noarch' ],
     modules= [ 'free', 'non-free' ],
     # baseDirTemplate= '%(distro)s/%(module)s/%(release)s/%(arch)s',
-    baseDirTemplate= '%(module)s/%(release)s/%(arch)s',
+    # baseDirTemplate= '%(module)s/%(release)s/%(arch)s',
+    baseDirTemplate= '%(release)s/%(module)s/release/binary/%(arch)s',
     rpmDir= '.',
     # see http://plf.lastdot.org/plf/free/10.2/
-    hdlist= '../hdlist.cz',
+    # hdlist= '../hdlist.cz',
+    hdlist= 'media_info/hdlist.cz',
 ))
 
 #########

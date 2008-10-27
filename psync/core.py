@@ -9,7 +9,7 @@ from time import sleep
 import os
 import errno
 
-from psync.utils import stat, makedirs, grab, rename, touch, lockFile, unlockFile
+from psync.utils import stat, makedirs, grab, rename, touch, lockFile, unlockFile, MEGABYTE
 
 from psync import logLevel
 import logging
@@ -52,8 +52,11 @@ class Psync(object):
 
         # counters
         self.repoFiles= 0
-        # repo, release or arch?
         self.repoSize= 0
+        self.distroSize= 0
+        self.releaseSize= 0
+        self.archSize= 0
+        self.moduleSize= 0
         self.downloadedSize= 0
 
     # simulate to be a dict for suitability to % operator
@@ -119,7 +122,7 @@ class Psync(object):
             else:
                 size= 0
 
-            self.downloadedSize+= size
+            self.downloadedSize+= size/MEGABYTE
             # summary.append (basename(_file))
 
         # always keep it
@@ -170,15 +173,25 @@ class Psync(object):
 
                 distros= getattr (self, 'distros', [None])
                 for distro in distros:
+                    self.distroSize= 0
                     # summary.append ("distro: %s" % distro)
                     self.distro= distro
                     releases= getattr (self, 'releases', [None])
                     for release in releases:
+                        self.releaseSize= 0
                         self.release= release
                         # releaseSummary= self.processRelease ()
                         self.processRelease ()
+                        if self.size:
+                            # in MiB
+                            print u"%(releaseSize)10.2f %(repo)s/%(distro)s/%(release)s" % self
+                        self.distroSize+= self.releaseSize
+                    if self.size:
+                        # in MiB
+                        print u"%(distroSize)10.2f %(repo)s/%(distro)s" % self
+                    self.repoSize+= self.distroSize
 
-                if self.cleanLevel=='repo':
+                if self.cleanLevel=='repo' and not self.size:
                     self.cleanRepo (self.repoDir)
             except TopmostException, e:
                 logger.debug ("repo except'ed! %s" % e)
@@ -226,21 +239,25 @@ class Psync(object):
                     archs= getattr (self, 'archs', [ None ])
                     for arch in archs:
                         self.arch= arch
+                        self.archSize= 0
                         logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
-                        # msg= "architecture %s:" % arch
-                        # summary.append (msg)
-                        # summary.append ("~" * len (msg))
                         modules= getattr (self, 'modules', [ None ])
                         for module in modules:
                             # won't log what module we are processing
                             self.module= module
-                            # summary+= self.process ()
+                            self.moduleSize= 0
                             self.processModule ()
+                            
+                            self.archSize+= self.moduleSize
+                            if self.size:
+                                # in MiB
+                                print u"%(moduleSize)10.2f %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s" % self
+                        
+                        if self.size:
+                            # in MiB
+                            print u"%(archSize)10.2f %(repo)s/%(distro)s/%(release)s/%(arch)s" % self
+                        self.releaseSize+= self.archSize
 
-                        # summary.append (("total update: %7.2f MiB" % (self.downloadedSize/1048576.0)).rjust (75))
-                        # summary.append ('')
-                        # summary.append ('')
-    
                         # reset count
                         self.downloadedSize= 0
 
@@ -251,13 +268,10 @@ class Psync(object):
                     unlockFile (self.lockfile)
                 logger.warn ('processing %(repo)s/%(distro)s/%(release)s failed due to' % self)
                 logger.warn (e)
-                logger.debug ('utter failure1! bailing out with %s' % e)
                 print_exc ()
-                logger.debug ('utter failure2! bailing out with %s' % e)
                 if ( (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                         isinstance (e, KeyboardInterrupt) ):
                     # out of disk space or keyb int
-                    logger.debug ('utter failure! bailing out with %s' % e)
                     raise
             else:
                 # BUG: we don't unlock if something fails!
@@ -279,8 +293,9 @@ class Psync(object):
                     self.cleanRepo ('%(repoDir)s/%(release)s' % self)
         else:
             logger.warn ("%(repoDir)s/%(distro)s/%(release)s is being processed by another instance; skipping..." % self)
-            
-        print ""
+
+        if not self.size:
+            print ""
 
         # return summary
 
@@ -297,8 +312,7 @@ class Psync(object):
             self.repoFiles+= 1
             if not self.size:
                 self.getPackage (filename, size)
-            else:
-                self.totalSize+= size
+            self.moduleSize+= size/MEGABYTE
 
         # return summary
 
