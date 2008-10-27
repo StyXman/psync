@@ -50,7 +50,7 @@ class Debian(Psync):
         while line:
             # print line
             o.write (line)
-
+            
             # grab filename
             if line.startswith ('Filename'):
                 filename= line.split()[1]
