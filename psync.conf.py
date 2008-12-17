@@ -76,7 +76,7 @@ config1.append (dict (
 # deb http://www.debian-multimedia.org sarge main
 # deb http://www.debian-multimedia.org etch main
 # amd64, i386 and sparc
-config.append (dict (
+config1.append (dict (
     repo= 'debian-mm',
     repoUrl= 'http://www.debian-multimedia.org',
     repoDir= 'debian/debian-multimedia',
@@ -288,12 +288,12 @@ config.append (dict (
 #########
 # ubuntu
 #########
-config1.append (dict (
+config.append (dict (
     repo= 'ubuntu',
     repoUrl= 'http://archive.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/ubuntu',
     driver= 'Debian',
-    releases= [ 'edgy' ],
+    releases= [ 'hardy', 'intrepid' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'restricted' ],
     baseDirTemplate= '',
@@ -305,30 +305,43 @@ config.append (dict (
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/updates',
     driver= 'Debian',
-    releases= [ 'gutsy-updates', 'hardy-updates' ],
+    releases= [ 'hardy-updates', 'intrepid-updates' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'restricted' ],
     baseDirTemplate= '',
 ))
-config1.append (dict (
+config.append (dict (
     repo= 'ubuntu-security',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/security',
     driver= 'Debian',
-    releases= [ 'gutsy-security', 'hardy-security' ],
+    releases= [ 'hardy-security', 'intrepid-security' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'restricted' ],
     baseDirTemplate= '',
 ))
 # also has official backports!
-config1.append (dict (
+config.append (dict (
     repo= 'ubuntu-backports',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/backports',
     driver= 'Debian',
-    releases= [ 'gutsy-backports', 'hardy-backports' ],
+    releases= [ 'hardy-backports', 'intrepid-backports' ],
     archs= [ 'i386' ],
     modules= [ 'main', 'restricted' ],
+    baseDirTemplate= '',
+))
+
+# kde3
+# deb http://ppa.launchpad.net/kb9vqf/ubuntu intrepid main
+config.append (dict (
+    repo= 'ubuntu-kde3',
+    repoUrl= 'http://ppa.launchpad.net/kb9vqf/ubuntu',
+    repoDir= 'ubuntu/kde3',
+    driver= 'Debian',
+    releases= [ 'intrepid' ],
+    archs= [ 'i386' ],
+    modules= [ 'main' ],
     baseDirTemplate= '',
 ))
 
@@ -355,7 +368,9 @@ config.append (dict (
 config.append (dict (
     repo= 'fedora-updates',
     # repoUrl= 'http://www.las.ic.unicamp.br/pub/fedora/linux/core/updates',
-    repoUrl= 'http://mirrors.kernel.org/fedora/core/updates',
+    # repoUrl= 'http://mirrors.kernel.org/fedora/core/updates',
+    # repoUrl= 'http://fedora.tu-chemnitz.de/pub/linux/fedora/linux/updates',
+    repoUrl= 'http://ftp.uni-kl.de/pub/linux/fedora/linux/updates',
     repoDir= 'fedora/updates',
     driver= 'Yum',
     releases= [ '8', '9' ],

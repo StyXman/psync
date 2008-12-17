@@ -31,10 +31,10 @@ class Yum (Rpm):
             url= '%(repoUrl)s/%(baseDir)s/repodata/repomd.xml' % self
             if download:
                 # download repomd.xml and take from there
-                found= grab (filename, url,
+                code= grab (filename, url,
                             cont=False, progress=self.progress)
-                if found!=0:
-                    raise ProtocolError (proto=url[:url.index (':')].upper (), code=found, url=url)
+                if code!=0:
+                    raise ProtocolError (proto=url[:url.index (':')].upper (), code=code, url=url)
 
             repomd= libxml2.parseFile(filename).getRootElement()
             repomdChild= repomd.children
@@ -50,6 +50,8 @@ class Yum (Rpm):
                 repomdChild= repomdChild.next
 
         self.walkRelease (None, None, moduleFunc)
+        # hack until I figure out what to do about it
+        # return [ database for database in ans if database ]
         return ans
 
     def files (self):
