@@ -17,13 +17,14 @@ class OpenOfficeOrg (Psync):
     def files (self):
         self.ext= self.exts[self.archs.index (self.arch)]
 
-        yield ("stable/%(release)s/OOo_%(release)s_%(arch)s_install.%(ext)s" % self, None)
-        if self.withJRE:
-            yield ("stable/%(release)s/OOo_%(release)s_%(arch)s_install_wJRE.%(ext)s" % self, None)
-
         for self.lang in self.languages:
             subLangs= self.subLanguages[self.languages.index (self.lang)]
             for self.subLang in subLangs:
+                logger.debug (self.__dict__)
+                yield (self.filenameTemplate % self, None)
+                # if self.withJRE:
+                #     yield ("stable/%(release)s/OOo_%(release)s_%(arch)s_install_wJRE.%(ext)s" % self, None)
+
                 yield ("contrib/dictionaries/Math_%(lang)s_%(subLang)s.zip" % self, None)
                 yield ("contrib/dictionaries/README_Math_%(lang)s_%(subLang)s.txt" % self, None)
                 yield ("contrib/dictionaries/README_%(lang)s_%(subLang)s-rh.txt" % self, None)

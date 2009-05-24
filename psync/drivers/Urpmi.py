@@ -17,6 +17,8 @@ import logging
 logger = logging.getLogger('psync.drivers.Urpmi')
 logger.setLevel(logLevel)
 
+import pdb
+
 # known BUGs:
 # error: Unable to open /usr/lib/rpm/rpmrc for reading: No such file or directory.
 # zcat: .tmp/mandrake/updates/LE2005/main_updates/media_info/hdlist.cz: decompression OK, trailing garbage ignored
@@ -59,8 +61,12 @@ class Urpmi (Rpm):
             # logger.debug ("rpm %s arch: %s" % (header[1000000], rpmArch))
             if rpmArch==self.arch or rpmArch=='noarch':
                 # 1000000-> rpm file name, 1000001-> rpm file size
-		filedata= ("%(baseDir)s/%(rpmDir)s/" % self)+header[1000000], header[1000001]
-		logger.debug ("yielding %s [%s, %s]" % (filedata[0], self.baseDir, self.rpmDir))
+                size= header[1000001]
+                if size==[]:
+                    # fuck mandriva, first giving the wrong sizes and now simply removing it.
+                    size= None
+                filedata= ("%(baseDir)s/%(rpmDir)s/" % self)+header[1000000], size)
+                logger.debug ("yielding %s [%s, %s]" % (filedata[0], self.baseDir, self.rpmDir))
                 yield (filedata)
 
         pipe.close ()

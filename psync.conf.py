@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2005-2008
+# (c) 2005-2009
 # Marcos Dione <mdione@grulic.org.ar>
 
 # example config file
@@ -41,6 +41,16 @@ config.append (dict (
     repoDir= 'debian/debian-security',
     driver= 'Debian',
     releases= [ 'etch/updates', 'lenny/updates' ],
+    archs= [ 'i386', 'amd64' ],
+    modules= [ 'main', 'non-free', 'contrib' ],
+    baseDir= '',
+))
+config.append (dict (
+    repo= 'debian-volatile',
+    repoUrl= 'http://volatile.debian.org/debian-volatile',
+    repoDir= 'debian/debian-volatile',
+    driver= 'Debian',
+    releases= [ 'lenny/volatile' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDir= '',
@@ -195,18 +205,19 @@ config1.append (dict (
 # http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates/2007.0/i586/media/main/updates/
 config.append (dict (
     repo= 'mandriva-updates',
-    repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
+    # repoUrl= 'http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates',
+    repoUrl= 'http://mirror.fis.unb.br/pub/linux/MandrivaLinux/official/updates',
     repoDir= 'mandrake/updates',
     driver= 'Urpmi',
     # don't forget to ignore the old ones!
-    releases= [ '2008.1' ],
+    releases= [ '2009.1' ],
     archs= [ 'i586' ],
-    modules= [ 'main', 'non-free' ],
-    baseDirTemplate= '%(release)s/%(arch)s/media/%(module)s',
-    rpmDir= 'updates',
+    modules= [ 'main' ],
+    baseDirTemplate= '%(release)s/%(arch)s/media/%(module)s/updates',
+    rpmDir= '.',
     # relative to repoDir
-    hdlistTemplate= '../media_info/hdlist_%(module)s_updates.cz',
-    ignore= [ '9.2', 'LE2005', '2005', '10.2', '2006.0' ],
+    hdlistTemplate= 'media_info/hdlist.cz',
+    # ignore= [ '9.2', 'LE2005', '2005', '10.2', '2006.0' ],
 ))
 # http://mirrors.kernel.org/mandrake/Mandrakelinux/official/updates/2006.0/main_updates/
 config1.append (dict (
@@ -266,15 +277,16 @@ config1.append (dict (
 # http://plf.zarb.org/
 # urpmi.addmedia plf-free http://plf.lastdot.org/plf/free/10.2 with hdlist.cz
 # urpmi.addmedia plf-nonfree http://plf.lastdot.org/plf/non-free/10.2 with hdlist.cz
-config.append (dict (
+config1.append (dict (
     repo= 'plf',
     # repoUrl= 'http://ftp.club-internet.fr/pub/linux/plf/',
-    repoUrl= 'http://plf.lastdot.org/plf',
+    # repoUrl= 'http://plf.lastdot.org/plf',
+    repoUrl= 'http://mirrors.lastdot.org:1280/plf',
     repoDir= 'mandrake/plf',
     driver= 'Urpmi',
     distros= [ 'mandrake' ],
-    releases= [ '2008.1' ],
-    archs= [ 'i586', 'noarch' ],
+    releases= [ '2009.1' ],
+    archs= [ 'i586' ],
     modules= [ 'free', 'non-free' ],
     # baseDirTemplate= '%(distro)s/%(module)s/%(release)s/%(arch)s',
     # baseDirTemplate= '%(module)s/%(release)s/%(arch)s',
@@ -307,7 +319,7 @@ config.append (dict (
     driver= 'Debian',
     releases= [ 'hardy-updates', 'intrepid-updates' ],
     archs= [ 'i386' ],
-    modules= [ 'main', 'restricted' ],
+    modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
 config.append (dict (
@@ -317,18 +329,18 @@ config.append (dict (
     driver= 'Debian',
     releases= [ 'hardy-security', 'intrepid-security' ],
     archs= [ 'i386' ],
-    modules= [ 'main', 'restricted' ],
+    modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
 # also has official backports!
-config.append (dict (
+config1.append (dict (
     repo= 'ubuntu-backports',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/backports',
     driver= 'Debian',
     releases= [ 'hardy-backports', 'intrepid-backports' ],
     archs= [ 'i386' ],
-    modules= [ 'main', 'restricted' ],
+    modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
 
@@ -449,13 +461,14 @@ config.append (dict (
     repoUrl= 'http://ftp.snt.utwente.nl/pub/software/openoffice',
     repoDir= 'ooffice',
     driver= 'OpenOfficeOrg',
-    releases= [ '2.4.1', '3.0.0' ],
+    releases= [ '3.0.1' ],
     archs= [ 'LinuxIntel', 'Win32Intel', 'SolarisSparc', 'Solarisx86' ],
     exts= [ 'tar.gz', 'exe', 'tar.gz', 'tar.gz' ],
     languages= [ 'es' ],
     subLanguages= [ [ 'ES', 'AR' ] ],
     withJRE= True,
     baseDirTemplate= '',
+    filenameTemplate= 'localized/%(lang)s/%(release)s/OOo_%(release)s_%(arch)s_install_%(lang)s.%(ext)s',
 ))
 
 #######
@@ -478,10 +491,10 @@ config.append (dict (
     repoUrl= 'http://ftp.mozilla.org/pub/mozilla.org/',
     repoDir= 'mozilla',
     driver= 'Mozilla',
-    apps= [ ('firefox', [ '3.0.3', '2.0.0.17' ]), ('thunderbird', [ '3.0a3', '2.0.0.17' ]), ],
+    apps= [ ('firefox', [ '3.0.7', '2.0.0.20' ]), ('thunderbird', [ '3.0b2', '2.0.0.19' ]), ],
     languages= [ 'en-US', 'es-AR', ],
     archs= [ 'linux-i686', 'win32' ],
     # this really sucks
-    archTemplates= [ '%(app)s-%(version)s.tar.gz', '%(App)s%%20Setup%%20%(version)s.exe' ],
+    archTemplates= [ '%(app)s-%(version)s.tar.bz2', '%(App)s%%20Setup%%20%(version)s.exe' ],
     updates= True,
 ))

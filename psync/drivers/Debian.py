@@ -31,8 +31,10 @@ class Debian(Psync):
             # download the .gz only and process from there
             packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
             packagesGz= packages+".gz"
+            packagesBz2= packages+".bz2"
             release= "dists/%(release)s/%(module)s/binary-%(arch)s/Release" % (self)
             ans.append ( (packagesGz, True) )
+            ans.append ( (packagesBz2, True) )
             ans.append ( (release, False) )
 
         self.walkRelease (releaseFunc, archFunc, moduleFunc)
@@ -41,15 +43,18 @@ class Debian(Psync):
     def files(self):
         packages= "%(tempDir)s/%(repoDir)s/dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % self
         packagesGz= packages+".gz"
+        packagesBz2= packages+".bz2"
 
         logger.debug ("opening %s" % packagesGz)
-        f= gzip.open (packagesGz)
+        gz= gzip.open (packagesGz)
+        bz2= bz2.BZ2File (packagezBz2, 'w+')
         o= open (packages, "w+")
 
-        line= f.readline ()
+        line= gz.readline ()
         while line:
             # print line
             o.write (line)
+            bz2.write (line)
             
             # grab filename
             if line.startswith ('Filename'):
@@ -61,10 +66,11 @@ class Debian(Psync):
                 # logger.debug ('found file %s, size %d' % (filename, size))
                 yield (filename, size)
 
-            line= f.readline ()
+            line= gz.readline ()
 
         o.close ()
-        f.close ()
+        gz.close ()
+        bz2.close ()
         self.firstDatabase= True
 
     def finalReleaseDBs (self):
