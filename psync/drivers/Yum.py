@@ -21,6 +21,9 @@ logger = logging.getLogger('psync.drivers.Yum')
 logger.setLevel(logLevel)
 
 class Yum (Rpm):
+    def __init__ (self, *args, **kwargs):
+        super (Yum, self).__init__ (*args, **kwargs)
+        self.primaries= {}
 
     def releaseDatabases (self, download=True):
         ans= []
@@ -47,7 +50,7 @@ class Yum (Rpm):
                             filename= dataChild.prop ('href')
                             filepath= ("%(baseDir)s/" % self)+dataChild.prop ('href')
                             if filename.endswith ('primary.xml.gz'):
-                                self.primary= filename
+                                self.primaries[self.arch]= filename
                                 logger.debug ("found primary "+filename)
                                 ans.append ( (filepath, True) )
                             else:
@@ -72,7 +75,7 @@ class Yum (Rpm):
         if self.verbose:
             self.parser.debug= True
 
-        primaryGz= repodataDir+'/'+self.primary
+        primaryGz= repodataDir+'/'+self.primaries[self.arch]
         primary= primaryGz[:-3]
         logger.debug ("processing database %s" % primaryGz)
         # decompress the gz file
