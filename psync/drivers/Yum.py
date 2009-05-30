@@ -43,7 +43,15 @@ class Yum (Rpm):
                     dataChild= repomdChild.children
                     while dataChild:
                         if dataChild.name=='location':
-                            ans.append ( (("%(baseDir)s/" % self)+dataChild.prop ('href'), True) )
+                            # only primary.xml is important
+                            filename= dataChild.prop ('href')
+                            filepath= ("%(baseDir)s/" % self)+dataChild.prop ('href')
+                            if filename.endswith ('primary.xml.gz'):
+                                self.primary= filename
+                                logger.debug ("found primary "+filename)
+                                ans.append ( (filepath, True) )
+                            else:
+                                ans.append ( (filepath, False) )
 
                         dataChild= dataChild.next
 
@@ -58,14 +66,14 @@ class Yum (Rpm):
         # build a parser and use it
         # hack
         self.baseDir= self.baseDirTemplate % self
-        repodataDir= "%(tempDir)s/%(repoDir)s/%(baseDir)s/repodata" % self
+        repodataDir= "%(tempDir)s/%(repoDir)s/%(baseDir)s" % self
 
         self.parser= RepodataParser (repodataDir)
         if self.verbose:
             self.parser.debug= True
 
-        primary= repodataDir+'/primary.xml'
-        primaryGz= primary+".gz"
+        primaryGz= repodataDir+'/'+self.primary
+        primary= primaryGz[:-3]
         logger.debug ("processing database %s" % primaryGz)
         # decompress the gz file
         gunzip (primaryGz, primary)

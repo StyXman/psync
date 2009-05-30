@@ -22,7 +22,7 @@ config.append (dict (
     driver= 'Debian',
 
     # driver= 'DebianEdos',
-    releases= [ 'etch', 'lenny', 'sid' ],
+    releases= [ 'etch', 'lenny', 'squeeze', 'sid' ],
     # releases= [ 'etch'],
     # archs= [ 'i386', 'sparc', 'amd64' ],
     archs= [ 'i386', 'amd64' ],
@@ -333,7 +333,7 @@ config.append (dict (
     baseDirTemplate= '',
 ))
 # also has official backports!
-config1.append (dict (
+config.append (dict (
     repo= 'ubuntu-backports',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/backports',
@@ -368,7 +368,7 @@ config.append (dict (
     repoUrl= 'http://fedora.tu-chemnitz.de/pub/linux/fedora/linux/releases',
     repoDir= 'fedora',
     driver= 'Yum',
-    releases= [ '8', '9' ],
+    releases= [ '9', '10' ],
     archs= [ 'i386' ],
     baseDirTemplate= '%(release)s/Fedora/%(arch)s/os',
     # rpmDir= 'Fedora/RPMS',
@@ -385,7 +385,7 @@ config.append (dict (
     repoUrl= 'http://ftp.uni-kl.de/pub/linux/fedora/linux/updates',
     repoDir= 'fedora/updates',
     driver= 'Yum',
-    releases= [ '8', '9' ],
+    releases= [ '9', '10' ],
     archs= [ 'i386' ],
     baseDirTemplate= '%(release)s/%(arch)s',
     rpmDir= '.',

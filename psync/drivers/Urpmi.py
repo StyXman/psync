@@ -65,7 +65,7 @@ class Urpmi (Rpm):
                 if size==[]:
                     # fuck mandriva, first giving the wrong sizes and now simply removing it.
                     size= None
-                filedata= ("%(baseDir)s/%(rpmDir)s/" % self)+header[1000000], size)
+                filedata= (("%(baseDir)s/%(rpmDir)s/" % self)+header[1000000], size)
                 logger.debug ("yielding %s [%s, %s]" % (filedata[0], self.baseDir, self.rpmDir))
                 yield (filedata)
 

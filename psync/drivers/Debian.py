@@ -5,6 +5,7 @@
 from os import listdir
 from os.path import dirname, basename
 import gzip
+import bz2 as bzip2
 
 from psync.core import Psync
 from psync.utils import stat
@@ -47,7 +48,7 @@ class Debian(Psync):
 
         logger.debug ("opening %s" % packagesGz)
         gz= gzip.open (packagesGz)
-        bz2= bz2.BZ2File (packagezBz2, 'w+')
+        bz2= bzip2.BZ2File (packagesBz2, 'w')
         o= open (packages, "w+")
 
         line= gz.readline ()

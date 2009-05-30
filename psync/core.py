@@ -68,7 +68,6 @@ class Psync(object):
             and that old versions will end deleted.
             Returns a list of really downloaded files. Could be empty.
         """
-        # summary= []
         ans= 0
         get= False
 
@@ -123,7 +122,6 @@ class Psync(object):
                 size= 0
 
             self.downloadedSize+= size/MEGABYTE
-            # summary.append (basename(_file))
 
         # always keep it
         logger.debug ("keeping %s" % _file)
@@ -137,8 +135,6 @@ class Psync(object):
         elif ans==0x02:
             # curl is not here
             raise DependencyError (package='curl')
-
-        # return summary
 
     def processRepo (self):
         """
@@ -228,7 +224,6 @@ class Psync(object):
             # we gotta clean the lockfile later
             try:
                 logger.info ('---- processing %(repo)s/%(distro)s/%(release)s' % self)
-                # summary= []
                 self.releaseFailed= False
                 self.releaseFailedFiles= []
 
@@ -297,24 +292,20 @@ class Psync(object):
         if not self.size:
             print ""
 
-        # return summary
-
     def processModule (self):
         """
         Process one module.
         Returns a list of strings with a summary of what was done.
         It is for human consumption.
         """
-        # summary= []
         for filename, size in self.files ():
-            # summary+= self.getPackage (filename, size)
             filename= os.path.normpath (filename)
             self.repoFiles+= 1
             if not self.size:
                 self.getPackage (filename, size)
-            self.moduleSize+= size/MEGABYTE
+                if size is not None:
+                    self.moduleSize+= size/MEGABYTE
 
-        # return summary
 
     def walkRelease (self, releaseFunc=None, archFunc=None, moduleFunc=None):
         logger.debug ("walking %(repo)s/%(distro)s/%(release)s" % self)
