@@ -88,7 +88,7 @@ class Cpan (Psync):
                 for filename in data.keys ():
                     isdir= data[filename].get ('isdir')
                     if isdir is None or not isdir:
-                        yield ("%s/%s" % (dirname (chkfile), filename), data[filename]['size'])
+                        yield ("%s/%s" % (dirname (chkfile), filename), int (data[filename]['size']))
                     else:
                         chksum= "%s/%s/CHECKSUMS" % (dirname (chkfile), filename)
                         # download the CHECKSUM
@@ -125,6 +125,7 @@ class Cpan (Psync):
             line= perl.readline ()
         code+= line.replace (';', '')
 
+        logger.debug (code)
         exec code
         return cksum
 
