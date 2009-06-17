@@ -112,21 +112,27 @@ class Cpan (Psync):
         """
         loads a CHECKSUM and returns a dict
         """
+        chsum= {}
         perl= open (chkfile)
 
         line= perl.readline ()
-        while line!='$cksum = {\n':
+        while line!='$cksum = {\n' and line!='':
             line= perl.readline ()
-        code= line.replace ('$', '')
 
-        line= perl.readline ()
-        while line!='};\n':
-            code+= line.replace ('=>', ':')
+        if line!='':
+            code= line.replace ('$', '')
+
             line= perl.readline ()
-        code+= line.replace (';', '')
+            while line!='};\n':
+                code+= line.replace ('=>', ':')
+                line= perl.readline ()
+            code+= line.replace (';', '')
 
-        logger.debug (code)
-        exec code
+            logger.debug (code)
+            exec code
+        else:
+            logger.warning ("%s could not be parsed")
+
         return cksum
 
     def getSubChkSums (self, chkfile):
