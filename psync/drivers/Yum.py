@@ -1,4 +1,4 @@
-# (c) 2005-2006
+# (c) 2005-2009
 # Marcos Dione <mdione@grulic.org.ar>
 
 from psync.core import DependencyError
@@ -25,7 +25,7 @@ class Yum (Rpm):
         super (Yum, self).__init__ (*args, **kwargs)
         self.primaries= {}
 
-    def releaseDatabases (self, download=True):
+    def releaseDatabases (self, download=True, includeRepomd=False):
         ans= []
 
         def moduleFunc (self):
@@ -38,6 +38,8 @@ class Yum (Rpm):
                             cont=False, progress=self.progress)
                 if code!=0:
                     raise ProtocolError (proto=url[:url.index (':')].upper (), code=code, url=url)
+            if includeRepomd:
+                ans.append (('%(baseDir)s/repodata/repomd.xml' % self, True))
 
             logger.debug ('opening '+filename)
             repomd= libxml2.parseFile(filename).getRootElement()
@@ -107,8 +109,8 @@ class Yum (Rpm):
                 yield ( relUrl, int(i.size['package']) )
 
     def finalReleaseDBs (self):
-        finals= self.releaseDatabases (download=False)
-        finals.append (('%(baseDir)s/repodata/repomd.xml' % self, True))
+        finals= self.releaseDatabases (download=False, includeRepomd=True)
+        # finals.append (('%(baseDir)s/repodata/repomd.xml' % self, True))
         logger.debug (finals)
         return finals
 

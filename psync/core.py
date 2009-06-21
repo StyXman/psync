@@ -35,12 +35,12 @@ class DependencyError (DictException):
 class Psync(object):
     def __init__ (self, verbose=False, **kwargs):
         self.verbose= verbose
-        
+
         # defaults
         # most distros have a release cleanLevel
         # except debian and probably gentoo
         self.cleanLevel= 'release'
-        
+
         self.__dict__.update(kwargs)
 
         # file tracking
@@ -88,12 +88,12 @@ class Psync(object):
             else:
                 raise e
         else:
-            if size is not None:
+            if size is not None and not self.experiment:
                 if s.st_size<size:
                     logger.warn ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
                     get= True
                 elif s.st_size>size:
-                    # bigger? how's bigger? reget!
+                    # bigger? it cannot be bigger! reget!
                     logger.warn ("%s: wrong size %d; should be %d." % (_file, s.st_size, size))
                     logger.warn ("bigger means something went wrong. deleting and downloading.")
                     os.unlink (_file)
@@ -219,7 +219,7 @@ class Psync(object):
                 notLocked= True
             logger.debug ("keeping %s" % self.lockfile)
             self.keep.add (self.lockfile)
-        
+
         if notLocked:
             # we gotta clean the lockfile later
             try:
@@ -242,12 +242,12 @@ class Psync(object):
                             self.module= module
                             self.moduleSize= 0
                             self.processModule ()
-                            
+
                             self.archSize+= self.moduleSize
                             if self.size:
                                 # in MiB
                                 print u"%(moduleSize)10.2f %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s" % self
-                        
+
                         if self.size:
                             # in MiB
                             print u"%(archSize)10.2f %(repo)s/%(distro)s/%(release)s/%(arch)s" % self
@@ -280,7 +280,7 @@ class Psync(object):
                     self.updateReleaseDatabases ()
                 # else:
                 #     logger.warn ('got no databases to continue!')
-            
+
             if self.cleanLevel=='release':
                 if self.distro is not None:
                     self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
