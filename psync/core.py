@@ -156,7 +156,7 @@ class Psync(object):
                 notLocked= True
             logger.debug ("keeping %s" % self.lockfile)
             self.keep.add (self.lockfile)
-        
+
         if notLocked:
             # we gotta clean the lockfile later
             try:

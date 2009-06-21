@@ -112,7 +112,7 @@ class Cpan (Psync):
         """
         loads a CHECKSUM and returns a dict
         """
-        chsum= {}
+        cksum= {}
         perl= open (chkfile)
 
         line= perl.readline ()

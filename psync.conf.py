@@ -278,7 +278,7 @@ config1.append (dict (
 # urpmi.addmedia plf-free http://plf.lastdot.org/plf/free/10.2 with hdlist.cz
 # urpmi.addmedia plf-nonfree http://plf.lastdot.org/plf/non-free/10.2 with hdlist.cz
 config1.append (dict (
-    repo= 'plf',
+    repo= 'rpmfusion',
     # repoUrl= 'http://ftp.club-internet.fr/pub/linux/plf/',
     # repoUrl= 'http://plf.lastdot.org/plf',
     repoUrl= 'http://mirrors.lastdot.org:1280/plf',
@@ -305,8 +305,8 @@ config.append (dict (
     repoUrl= 'http://archive.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/ubuntu',
     driver= 'Debian',
-    releases= [ 'hardy', 'intrepid' ],
-    archs= [ 'i386' ],
+    releases= [ 'hardy', 'intrepid', 'jaunty' ],
+    archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'restricted' ],
     baseDirTemplate= '',
 ))
@@ -317,8 +317,8 @@ config.append (dict (
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/updates',
     driver= 'Debian',
-    releases= [ 'hardy-updates', 'intrepid-updates' ],
-    archs= [ 'i386' ],
+    releases= [ 'hardy-updates', 'intrepid-updates', 'jaunty-updates' ],
+    archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
@@ -327,8 +327,8 @@ config.append (dict (
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/security',
     driver= 'Debian',
-    releases= [ 'hardy-security', 'intrepid-security' ],
-    archs= [ 'i386' ],
+    releases= [ 'hardy-security', 'intrepid-security', 'jaunty-security' ],
+    archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
@@ -338,8 +338,8 @@ config.append (dict (
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/backports',
     driver= 'Debian',
-    releases= [ 'hardy-backports', 'intrepid-backports' ],
-    archs= [ 'i386' ],
+    releases= [ 'hardy-backports', 'intrepid-backports', 'jaunty-backports' ],
+    archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
 ))
@@ -352,7 +352,7 @@ config.append (dict (
     repoDir= 'ubuntu/kde3',
     driver= 'Debian',
     releases= [ 'intrepid' ],
-    archs= [ 'i386' ],
+    archs= [ 'i386', 'amd64' ],
     modules= [ 'main' ],
     baseDirTemplate= '',
 ))

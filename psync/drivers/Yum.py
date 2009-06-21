@@ -39,6 +39,7 @@ class Yum (Rpm):
                 if code!=0:
                     raise ProtocolError (proto=url[:url.index (':')].upper (), code=code, url=url)
 
+            logger.debug ('opening '+filename)
             repomd= libxml2.parseFile(filename).getRootElement()
             repomdChild= repomd.children
             while repomdChild:
@@ -54,6 +55,7 @@ class Yum (Rpm):
                                 logger.debug ("found primary "+filename)
                                 ans.append ( (filepath, True) )
                             else:
+                                logger.debug ("found other "+filename)
                                 ans.append ( (filepath, False) )
 
                         dataChild= dataChild.next
@@ -107,6 +109,7 @@ class Yum (Rpm):
     def finalReleaseDBs (self):
         finals= self.releaseDatabases (download=False)
         finals.append (('%(baseDir)s/repodata/repomd.xml' % self, True))
+        logger.debug (finals)
         return finals
 
 # end
