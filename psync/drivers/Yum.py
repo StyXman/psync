@@ -98,11 +98,14 @@ class Yum (Rpm):
             # nevra= (name, epoch, version, release, arch)
             isDebug= 'debuginfo' in i.location['href']
             isSource= i.nevra[4]=='src'
-            if ( ( (self.source and not isDebug) or
-                   (self.debug and not isSource) or
-                   (self.source and self.debug) or
-                   (not isSource and not isDebug)
-                 ) and (i.nevra[4]==self.arch or i.nevra[4]=='noarch') ):
+
+            if not (i.nevra[4]==self.arch or i.nevra[4]=='noarch'):
+                logger.warning ('possible wrong arch '+i.location['href'])
+
+            if ( (self.source and not isDebug) or
+                 (self.debug and not isSource) or
+                 (self.source and self.debug) or
+                 (not isSource and not isDebug) ):
                 relUrl= ("%(baseDir)s/%(rpmDir)s/" % self)+i.location['href']
                 # logger.debug ("found: %s" % relUrl)
                 # (filename, size)
