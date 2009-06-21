@@ -99,7 +99,7 @@ class Yum (Rpm):
             isDebug= 'debuginfo' in i.location['href']
             isSource= i.nevra[4]=='src'
 
-            if not (i.nevra[4]==self.arch or i.nevra[4]=='noarch'):
+            if not (i.nevra[4]==self.arch or i.nevra[4]=='noarch') and self.verbose:
                 logger.warning ('possible wrong arch '+i.location['href'])
 
             if ( (self.source and not isDebug) or
