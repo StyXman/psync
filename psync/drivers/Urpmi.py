@@ -36,6 +36,9 @@ class Urpmi (Rpm):
                 self.hdlist= self.hdlistTemplate % self
             hdsplit= (dirname (self.hdlist), basename (self.hdlist))
             synthesis= hdsplit[0]+'/synthesis.'+hdsplit[1]
+            md5sum= hdsplit[0]+'/MD5SUM'
+
+            ans.append ( (("%(baseDir)s/" % self)+md5sum, True) )
             ans.append ( (("%(baseDir)s/" % self)+synthesis, True) )
             ans.append ( ("%(baseDir)s/%(hdlist)s" % self, True) )
 
