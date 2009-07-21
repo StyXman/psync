@@ -34,6 +34,7 @@ class Debian(Psync):
             packagesGz= packages+".gz"
             packagesBz2= packages+".bz2"
             release= "dists/%(release)s/%(module)s/binary-%(arch)s/Release" % (self)
+            ans.append ( (packages, True) )
             ans.append ( (packagesGz, True) )
             ans.append ( (packagesBz2, True) )
             ans.append ( (release, False) )
@@ -48,14 +49,14 @@ class Debian(Psync):
 
         logger.debug ("opening %s" % packagesGz)
         gz= gzip.open (packagesGz)
-        bz2= bzip2.BZ2File (packagesBz2, 'w')
-        o= open (packages, "w+")
+        # bz2= bzip2.BZ2File (packagesBz2, 'w')
+        # o= open (packages, "w+")
 
         line= gz.readline ()
         while line:
             # print line
-            o.write (line)
-            bz2.write (line)
+            # o.write (line)
+            # bz2.write (line)
             
             # grab filename
             if line.startswith ('Filename'):
@@ -69,9 +70,9 @@ class Debian(Psync):
 
             line= gz.readline ()
 
-        o.close ()
+        # o.close ()
         gz.close ()
-        bz2.close ()
+        # bz2.close ()
         self.firstDatabase= True
 
     def finalReleaseDBs (self):
@@ -81,7 +82,7 @@ class Debian(Psync):
             # download the .gz only and process from there
             packages= "dists/%(release)s/%(module)s/binary-%(arch)s/Packages" % (self)
             ans.append ( (packages, True) )
-        self.walkRelease (None, None, moduleFunc)
+        # self.walkRelease (None, None, moduleFunc)
 
         return ans
 
