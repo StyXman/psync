@@ -68,7 +68,7 @@ class SimpleDebian(Psync):
         f.close ()
         self.firstDatabase= True
 
-    def finalReleaseDBs (self):
+    def finalReleaseDBs (self, old=False):
         ans= self.releaseDatabases ()
 
         def moduleFunc (self):

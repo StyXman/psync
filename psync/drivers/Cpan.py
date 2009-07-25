@@ -103,7 +103,7 @@ class Cpan (Psync):
                         # we're sure this must be there
                         self.checksums.append ( chksum )
 
-    def finalReleaseDBs (self):
+    def finalReleaseDBs (self, old=False):
         for (db, critic) in self.releaseDatabases (download=False):
             yield (db, critic)
         yield ('authors/00whois.xml', True)

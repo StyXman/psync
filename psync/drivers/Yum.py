@@ -65,8 +65,6 @@ class Yum (Rpm):
                 repomdChild= repomdChild.next
 
         self.walkRelease (None, None, moduleFunc)
-        # hack until I figure out what to do about it
-        # return [ database for database in ans if database ]
         return ans
 
     def files (self):
@@ -111,9 +109,15 @@ class Yum (Rpm):
                 # (filename, size)
                 yield ( relUrl, int(i.size['package']) )
 
-    def finalReleaseDBs (self):
-        finals= self.releaseDatabases (download=False, includeRepomd=True)
-        # finals.append (('%(baseDir)s/repodata/repomd.xml' % self, True))
+    def finalReleaseDBs (self, old=False):
+        if not old:
+            finals= self.releaseDatabases (download=False, includeRepomd=True)
+        else:
+            tempDir= self.tempDir
+            self.tempDir= '.'
+            finals= self.releaseDatabases (download=False, includeRepomd=True)
+            self.tempDir= tempDir
+
         logger.debug (finals)
         return finals
 

@@ -1,6 +1,6 @@
 ###########################################################################
-#    Copyright (C) 2006 by Marcos Dione                                      
-#    <mdione@grulic.org.ar>                                                             
+#    Copyright (C) 2006 by Marcos Dione
+#    <mdione@grulic.org.ar>
 #
 # Copyright: See COPYING file that comes with this distribution
 #
@@ -27,7 +27,7 @@ class Mozilla (Psync):
                         self.update= "%(app)s-%(version)s.complete.mar" % self
                         yield ("%(app)s/releases/%(version)s/update/%(arch)s/%(lang)s/%(update)s" % self, None)
 
-    def finalReleaseDBs (self):
+    def finalReleaseDBs (self, old=False):
         return []
 
 # end

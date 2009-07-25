@@ -50,7 +50,7 @@ class Slack(Psync):
 
         f.close ()
 
-    def finalReleaseDBs (self):
+    def finalReleaseDBs (self, old=False):
         ans= self.releaseDatabases ()
         return ans
 

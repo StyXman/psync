@@ -37,7 +37,7 @@ class OpenOfficeOrg (Psync):
                 yield ("contrib/dictionaries/thes_%(lang)s_%(subLang)s.zip" % self, None)
                 yield ("contrib/dictionaries/thes_%(lang)s_%(subLang)s_v2.zip" % self, None)
 
-    def finalReleaseDBs (self):
+    def finalReleaseDBs (self, old=False):
         return []
 
 # end

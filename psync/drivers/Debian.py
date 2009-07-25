@@ -57,7 +57,7 @@ class Debian(Psync):
             # print line
             o.write (line)
             # bz2.write (line)
-            
+
             # grab filename
             if line.startswith ('Filename'):
                 filename= line.split()[1]
@@ -75,7 +75,7 @@ class Debian(Psync):
         # bz2.close ()
         self.firstDatabase= True
 
-    def finalReleaseDBs (self):
+    def finalReleaseDBs (self, old=False):
         ans= self.releaseDatabases ()
 
         def moduleFunc (self):

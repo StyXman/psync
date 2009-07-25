@@ -359,7 +359,7 @@ class Psync(object):
         try:
             self.walkRelease (moduleFunc=loadFilesAndDatabases)
             # the final ones
-            databases= self.finalReleaseDBs ()
+            databases= self.finalReleaseDBs (old=True)
             for (database, critic) in databases:
                 dst= os.path.normpath (("%(repoDir)s/" % self)+database)
                 logger.debug ("keeping %s" % dst)
