@@ -170,24 +170,22 @@ class Psync(object):
                 distros= getattr (self, 'distros', [None])
                 for distro in distros:
                     self.distroSize= 0
-                    # summary.append ("distro: %s" % distro)
                     self.distro= distro
                     releases= getattr (self, 'releases', [None])
                     for release in releases:
                         self.releaseSize= 0
                         self.release= release
-                        # releaseSummary= self.processRelease ()
                         self.processRelease ()
-                        if self.size:
+                        if self.showSize:
                             # in MiB
                             print u"%(releaseSize)10.2f %(repo)s/%(distro)s/%(release)s" % self
                         self.distroSize+= self.releaseSize
-                    if self.size:
+                    if self.showSize:
                         # in MiB
                         print u"%(distroSize)10.2f %(repo)s/%(distro)s" % self
                     self.repoSize+= self.distroSize
 
-                if self.cleanLevel=='repo' and not self.size:
+                if self.cleanLevel=='repo' and not self.showSize:
                     self.cleanRepo (self.repoDir)
             except TopmostException, e:
                 logger.debug ("repo except'ed! %s" % e)
@@ -244,11 +242,11 @@ class Psync(object):
                             self.processModule ()
 
                             self.archSize+= self.moduleSize
-                            if self.size:
+                            if self.showSize:
                                 # in MiB
                                 print u"%(moduleSize)10.2f %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s" % self
 
-                        if self.size:
+                        if self.showSize:
                             # in MiB
                             print u"%(archSize)10.2f %(repo)s/%(distro)s/%(release)s/%(arch)s" % self
                         self.releaseSize+= self.archSize
@@ -268,7 +266,7 @@ class Psync(object):
                         isinstance (e, KeyboardInterrupt) ):
                     # out of disk space or keyb int
                     raise
-            else:
+            finally:
                 # BUG: we don't unlock if something fails!
                 if self.cleanLevel=='release':
                     unlockFile (self.lockfile)
@@ -276,7 +274,7 @@ class Psync(object):
             if self.releaseFailed or self.wipe:
                 self.keepOldReleaseFiles ()
             else:
-                if not self.save_space and not self.dry_run and not self.process_old and not self.size:
+                if not self.save_space and not self.dry_run and not self.process_old and not self.showSize:
                     self.updateReleaseDatabases ()
                 # else:
                 #     logger.warn ('got no databases to continue!')
@@ -289,7 +287,7 @@ class Psync(object):
         else:
             logger.warn ("%(repoDir)s/%(distro)s/%(release)s is being processed by another instance; skipping..." % self)
 
-        if not self.size:
+        if not self.showSize:
             print ""
 
     def processModule (self):
@@ -301,7 +299,7 @@ class Psync(object):
         for filename, size in self.files ():
             filename= os.path.normpath (filename)
             self.repoFiles+= 1
-            if not self.size:
+            if not self.showSize:
                 self.getPackage (filename, size)
                 if size is not None:
                     self.moduleSize+= size/MEGABYTE
