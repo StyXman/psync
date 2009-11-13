@@ -77,7 +77,7 @@ def main ():
     conf.debugging= conf.log_level==logging.DEBUG
     conf.verbose= conf.log_level==logging.WARN or conf.debugging
     psync.logLevel= conf.log_level
-    if conf.size:
+    if conf.showSize:
         print "sizes in MiB"
         psync.logLevel= logging.WARN
 

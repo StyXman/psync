@@ -58,6 +58,9 @@ class Psync(object):
         self.archSize= 0
         self.moduleSize= 0
         self.downloadedSize= 0
+        
+        # whuu?
+        self.size= 0
 
     # simulate to be a dict for suitability to % operator
     def __getitem__ (self, key):

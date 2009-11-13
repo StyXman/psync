@@ -74,6 +74,6 @@ class Urpmi (Rpm):
 
         pipe.close ()
 
-    finalReleaseDBs= lambda old: releaseDatabases ()
+    finalReleaseDBs= lambda self, *more: self.releaseDatabases ()
 
 # end
