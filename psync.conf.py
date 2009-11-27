@@ -385,7 +385,7 @@ config.append (dict (
     repoUrl= 'http://ftp.uni-kl.de/pub/linux/fedora/linux/updates',
     repoDir= 'fedora/updates',
     driver= 'Yum',
-    releases= [ '10', '11' ],
+    releases= [ '10', '11', '12' ],
     archs= [ 'i386', 'x86_64' ],
     baseDirTemplate= '%(release)s/%(arch)s',
     rpmDir= '.',
@@ -415,7 +415,7 @@ config1.append (dict (
 # suse
 #######
 # http://mirrors.kernel.org/suse/update/10.1
-config1.append (dict (
+config.append (dict (
     repo= 'suse-updates',
     # repoUrl= 'http://mirrors.kernel.org/suse/update',
     # repoUrl= 'http://www.mirrors.net.ar/pub/suse/i386/update',
@@ -427,14 +427,14 @@ config1.append (dict (
     # releases= [ '9.0', '9.1', '10.1' ],
     # the 9.0 release is not yum based :(
     # the 9.1 release fails decompressing the primary.xml.gz
-    releases= [ '10.1', '10.2' ],
+    releases= [ '10.1', '10.2', '11.2' ],
     archs= [ 'i586' ],
     baseDirTemplate= '%(release)s',
     rpmDir= '.',
     debug= False,
     source= False,
     # relative to repoDir
-    ignore= [ '9.0', '9.1' ],
+    # ignore= [ '9.0', '9.1' ],
 ))
 
 

@@ -48,7 +48,7 @@ class Psync(object):
         self.releaseFailedFiles= [] # files that failed to download for a given release
 
         self.failedFiles= [] # files that failed to download
-        self.keep= set ()
+        self.keep= {}
 
         # counters
         self.repoFiles= 0
@@ -128,7 +128,7 @@ class Psync(object):
 
         # always keep it
         logger.debug ("keeping %s" % _file)
-        self.keep.add (_file)
+        self.keep[_file]= '%(repo)s/%(distro)s/%(release)s' % self
 
         if ans==0x1600:
             # only 404 is relevant here
@@ -158,7 +158,7 @@ class Psync(object):
             if lockFile (self.lockfile):
                 notLocked= True
             logger.debug ("keeping %s" % self.lockfile)
-            self.keep.add (self.lockfile)
+            self.keep[self.lockfile]= '%(repo)s' % self
 
         if notLocked:
             # we gotta clean the lockfile later
@@ -219,7 +219,7 @@ class Psync(object):
             if lockFile (self.lockfile):
                 notLocked= True
             logger.debug ("keeping %s" % self.lockfile)
-            self.keep.add (self.lockfile)
+            self.keep[self.lockfile]= '%(repo)s/%(distro)s/%(release)s' % self
 
         if notLocked:
             # we gotta clean the lockfile later
@@ -356,7 +356,7 @@ class Psync(object):
             for filename, size in self.files ():
                 filename= os.path.normpath (("%(repoDir)s/" % self)+filename)
                 logger.debug ("keeping %s" % filename)
-                self.keep.add (filename)
+                self.keep[filename]= '%(repo)s/%(distro)s/%(release)s' % self
                 # logger.debug (filename+ (' kept for %(repo)s/%(distro)s/%(release)s' % self))
 
         try:
@@ -366,7 +366,7 @@ class Psync(object):
             for (database, critic) in databases:
                 dst= os.path.normpath (("%(repoDir)s/" % self)+database)
                 logger.debug ("keeping %s" % dst)
-                self.keep.add (dst)
+                self.keep[dst]= '%(repo)s/%(distro)s/%(release)s' % self
         except IOError, e:
             # some database does not exist in the mirror
             # so, wipe'em all anyways
@@ -392,7 +392,7 @@ class Psync(object):
                 makedirs (dirname (dst))
                 rename (src, dst, overwrite=True, verbose=self.verbose)
                 logger.debug ("keeping %s" % dst)
-                self.keep.add (dst)
+                self.keep[dst]= '%(repo)s/%(distro)s/%(release)s' % self
             except OSError, e:
                 # better error report!
                 if not critic:
@@ -441,7 +441,7 @@ class Psync(object):
                             # when it's destroying a repo
                             sleep (0.1)
                     else:
-                        logger.debug ('%s found in keep, keeping' % filepath)
+                        logger.debug ('%s found in keep by %s, keeping' % (filepath, self.keep[filepath]))
         logger.debug ('janitor out')
 
 # end
