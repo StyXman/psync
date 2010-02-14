@@ -58,7 +58,7 @@ class Psync(object):
         self.archSize= 0
         self.moduleSize= 0
         self.downloadedSize= 0
-        
+
         # whuu?
         self.size= 0
 
@@ -304,8 +304,9 @@ class Psync(object):
             self.repoFiles+= 1
             if not self.showSize:
                 self.getPackage (filename, size)
-                if size is not None:
-                    self.moduleSize+= size/MEGABYTE
+
+            if size is not None:
+                self.moduleSize+= size/MEGABYTE
 
 
     def walkRelease (self, releaseFunc=None, archFunc=None, moduleFunc=None):
