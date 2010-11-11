@@ -34,10 +34,12 @@ class Debian(Psync):
             packagesGz= packages+".gz"
             packagesBz2= packages+".bz2"
             release= "dists/%(release)s/%(module)s/binary-%(arch)s/Release" % (self)
+            i18n= "dists/%(release)s/%(module)s/i18n/Index" % (self)
             # ans.append ( (packages, True) )
             ans.append ( (packagesGz, True) )
             ans.append ( (packagesBz2, True) )
             ans.append ( (release, False) )
+            ans.append ( (i18n, False) )
 
         self.walkRelease (releaseFunc, archFunc, moduleFunc)
         return ans
@@ -73,6 +75,28 @@ class Debian(Psync):
         o.close ()
         gz.close ()
         # bz2.close ()
+
+        # i18n support
+        i18n= "%(tempDir)s/%(repoDir)s/dists/%(release)s/%(module)s/i18n/Index" % self
+        logger.debug ("opening %s" % i18n)
+        i= open (i18n)
+        line= i.readline ()
+
+        while line:
+            if line[0]!=" ":
+                logger.debug ("skipping %s" % line)
+                line= i.readline ()
+                continue
+
+            #  108e90332397205e5bb036ffd42a1ee0e984dd7f     997 Translation-eo.bz2
+            data= line.split ()
+            size= int (data[1])
+            filename=  ("dists/%(release)s/%(module)s/i18n/" % self) + data[2]
+            logger.debug ('found i18n file %s, size %d' % (filename, size))
+            yield (filename, size)
+
+            line= i.readline ()
+
         self.firstDatabase= True
 
     def finalReleaseDBs (self, old=False):
