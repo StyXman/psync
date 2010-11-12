@@ -46,6 +46,7 @@ class Psync(object):
         # file tracking
         self.releaseFailed= False # something has failed for the release
         self.releaseFailedFiles= [] # files that failed to download for a given release
+        self.databasesFailed= False # some operation with the database failed
 
         self.failedFiles= [] # files that failed to download
         self.keep= {}
@@ -188,7 +189,7 @@ class Psync(object):
                         print u"%(distroSize)10.2f %(repo)s/%(distro)s" % self
                     self.repoSize+= self.distroSize
 
-                if self.cleanLevel=='repo' and not self.showSize:
+                if self.cleanLevel=='repo' and not self.showSize and not self.databasesFailed:
                     self.cleanRepo (self.repoDir)
             except TopmostException, e:
                 logger.debug ("repo except'ed! %s" % e)
@@ -282,7 +283,7 @@ class Psync(object):
                 # else:
                 #     logger.warn ('got no databases to continue!')
 
-            if self.cleanLevel=='release':
+            if self.cleanLevel=='release' and not self.databasesFailed:
                 if self.distro is not None:
                     self.cleanRepo ('%(repoDir)s/%(distro)s/%(release)s' % self)
                 else:
@@ -399,6 +400,7 @@ class Psync(object):
                 if not critic:
                     logger.warn ('[Ign] %s (%s)' % (src, str (e)))
                 else:
+                    self.databasesFailed= True
                     raise e
         # removedirs (dirname (old))
 
