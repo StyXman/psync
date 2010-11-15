@@ -68,7 +68,7 @@ class Debian(Psync):
             if line.startswith ('Size'):
                 size= int(line.split()[1])
                 # logger.debug ('found file %s, size %d' % (filename, size))
-                yield (filename, size)
+                yield (filename, size, True)
 
             line= gz.readline ()
 

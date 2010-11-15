@@ -67,7 +67,7 @@ class Psync(object):
     def __getitem__ (self, key):
         return getattr (self, key)
 
-    def getPackage (self, filename, size):
+    def getPackage (self, filename, size, reget):
         """ Get one package, making sure it's the right size
             and that old versions will end deleted.
             Returns a list of really downloaded files. Could be empty.
@@ -100,6 +100,9 @@ class Psync(object):
                     # bigger? it cannot be bigger! reget!
                     logger.warn ("%s: wrong size %d; should be %d." % (_file, s.st_size, size))
                     logger.warn ("bigger means something went wrong. deleting and downloading.")
+                    os.unlink (_file)
+                    get= True
+                elif s.st_size!=size and reget:
                     os.unlink (_file)
                     get= True
             else:
@@ -300,11 +303,16 @@ class Psync(object):
         Returns a list of strings with a summary of what was done.
         It is for human consumption.
         """
-        for filename, size in self.files ():
+        for t in self.files ():
+            try:
+                filename, size, reget= t
+            except ValueError: # too many values to unpack
+                filename, size= t
+                reget= False
             filename= os.path.normpath (filename)
             self.repoFiles+= 1
             if not self.showSize:
-                self.getPackage (filename, size)
+                self.getPackage (filename, size, reget)
 
             if size is not None:
                 self.moduleSize+= size/MEGABYTE
