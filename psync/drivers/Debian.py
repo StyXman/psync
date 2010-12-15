@@ -68,7 +68,7 @@ class Debian(Psync):
             if line.startswith ('Size'):
                 size= int(line.split()[1])
                 # logger.debug ('found file %s, size %d' % (filename, size))
-                yield (filename, size)
+                yield (filename, size, False)
 
             line= gz.readline ()
 
@@ -82,7 +82,7 @@ class Debian(Psync):
             logger.debug ("opening %s" % i18n)
             i= open (i18n)
         except (OSError, IOError), e:
-            logger.warn ("[Ign] %s (%s)" % (i18n, e))
+            logger.warn ("[Ign] %s ([Error %d] %s)" % (i18n, e.errno, e.strerror))
         else:
             line= i.readline ()
 
@@ -97,7 +97,8 @@ class Debian(Psync):
                 size= int (data[1])
                 filename=  ("dists/%(release)s/%(module)s/i18n/" % self) + data[2]
                 logger.debug ('found i18n file %s, size %d' % (filename, size))
-                yield (filename, size)
+                # with None we force the file to be reget
+                yield (filename, size, True)
 
                 line= i.readline ()
 

@@ -92,9 +92,13 @@ def symlink (src, dst, verbose=False):
         logger.debug ("symlink: %s" % e)
         if e.errno not in (errno.EEXIST, ):
             raise e
-        
-def touch (filename):
-    file (filename, 'a')
+
+def touch (filename, size):
+    f= file (filename, 'w+')
+    # f.seek (size)
+    # f.write ('\000')
+    f.truncate (size)
+    f.close ()
     os.utime (filename, None)
 
 def gunzip (gzFileName, fileName):
@@ -135,7 +139,7 @@ def getFile(url, destination):
                 os.unlink(destination)
             raise
 
-def grab(filename, url, limit=0, cont=True, progress=False, verbose=True):
+def grab(filename, url, limit=0, cont=True, progress=False, verbose=True, reget=False):
     """ Fetchs a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
@@ -147,10 +151,10 @@ def grab(filename, url, limit=0, cont=True, progress=False, verbose=True):
 
     # fix cont semantics
     contStr= ""
-    if cont:
+    if cont and not reget:
         contStr= "--continue-at -"
-    # if file exists and not cont, delete
-    if not cont and stat (filename):
+    # if file exists and not cont, or reget, delete
+    if not cont and stat (filename) or reget:
         unlink (filename)
 
     silentStr= "--silent"
@@ -197,7 +201,7 @@ def grab(filename, url, limit=0, cont=True, progress=False, verbose=True):
         raise e
 
     return curlExitCode
-        
+
 def lockFile (path):
     ans= True
     try:
@@ -208,9 +212,9 @@ def lockFile (path):
             ans= False
         else:
             raise e
-    
+
     return ans
-    
+
 def unlockFile (path):
     logger.debug ("unlocking %s" % path)
     if not stat (path):

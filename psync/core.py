@@ -67,7 +67,7 @@ class Psync(object):
     def __getitem__ (self, key):
         return getattr (self, key)
 
-    def getPackage (self, filename, size):
+    def getPackage (self, filename, size, reget=False):
         """ Get one package, making sure it's the right size
             and that old versions will end deleted.
             Returns a list of really downloaded files. Could be empty.
@@ -81,38 +81,48 @@ class Psync(object):
         tempDir = dirname (_file)
         makedirs (tempDir)
 
-        # logger.debug ('getPackage: asked for %s' % _file)
+        # the desition to wether download a file or not is, unfortunately, complex
         try:
             s= os.stat (_file)
         except OSError, e:
             if e.errno==errno.ENOENT:
                 # the file does not exist; download it
-                # logger.debug ("about to download %s" % _file)
                 get= True
             else:
+                # something else, can't decide
                 raise e
         else:
-            if size is not None and not self.experiment:
-                if s.st_size<size:
-                    logger.warn ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
-                    get= True
-                elif s.st_size>size:
-                    # bigger? it cannot be bigger! reget!
-                    logger.warn ("%s: wrong size %d; should be %d." % (_file, s.st_size, size))
-                    logger.warn ("bigger means something went wrong. deleting and downloading.")
-                    os.unlink (_file)
-                    get= True
-            else:
+            # the file is here
+            if size is None:
+                # we don't know the size, so we assume that the file is ok
                 if self.verbose:
                     # logger.info ("%s: already here, skipping" % _file)
+                    pass
+            else:
+                if not self.experiment:
+                    # we're playing for real now
+                    if reget and s.st_size!=size:
+                        logger.warn ("%s: size differs, regetting")
+                        get= True
+                    if s.st_size<size:
+                        logger.warn ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
+                        get= True
+                    elif s.st_size>size:
+                        # bigger? it cannot be bigger! reget!
+                        logger.warn ("%s: wrong size %d; should be %d." % (_file, s.st_size, size))
+                        logger.warn ("bigger means something went wrong. deleting and downloading.")
+                        os.unlink (_file)
+                        get= True
+                else:
+                    # experimenting, we'll just touch the file somewhere else
                     pass
 
         if get:
             if not self.dry_run:
                 if not self.experiment:
-                    ans= grab (_file, url, limit=self.limit, progress=self.progress)
+                    ans= grab (_file, url, limit=self.limit, progress=self.progress, reget=reget)
                 else:
-                    touch (_file)
+                    touch (_file, size)
                     ans= 0
             if size is None:
                 try:
@@ -300,11 +310,11 @@ class Psync(object):
         Returns a list of strings with a summary of what was done.
         It is for human consumption.
         """
-        for filename, size in self.files ():
+        for filename, size, reget in self.files ():
             filename= os.path.normpath (filename)
             self.repoFiles+= 1
             if not self.showSize:
-                self.getPackage (filename, size)
+                self.getPackage (filename, size, reget)
 
             if size is not None:
                 self.moduleSize+= size/MEGABYTE
