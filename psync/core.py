@@ -99,11 +99,11 @@ class Psync(object):
                     # logger.info ("%s: already here, skipping" % _file)
                     pass
             else:
-                if not self.experiment:
-                    # we're playing for real now
-                    if reget and s.st_size!=size:
-                        logger.warn ("%s: size differs, regetting")
+                if reget:
+                    if s.st_size!=size:
+                        logger.warn ("%s: size differs, regetting" % _file)
                         get= True
+                else:
                     if s.st_size<size:
                         logger.warn ("%s: wrong size %d; should be %d" % (_file, s.st_size, size))
                         get= True
@@ -113,9 +113,6 @@ class Psync(object):
                         logger.warn ("bigger means something went wrong. deleting and downloading.")
                         os.unlink (_file)
                         get= True
-                else:
-                    # experimenting, we'll just touch the file somewhere else
-                    pass
 
         if get:
             if not self.dry_run:
@@ -124,6 +121,7 @@ class Psync(object):
                 else:
                     touch (_file, size)
                     ans= 0
+
             if size is None:
                 try:
                     s= os.stat (_file)
