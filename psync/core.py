@@ -101,7 +101,7 @@ class Psync(object):
             else:
                 if reget:
                     if s.st_size!=size:
-                        logger.warn ("%s: size differs, regetting" % _file)
+                        # logger.warn ("%s: size differs, regetting" % _file)
                         os.unlink (_file)
                         get= True
                 else:

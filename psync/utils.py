@@ -154,7 +154,7 @@ def grab(filename, url, limit=0, cont=True, progress=False, verbose=True, reget=
     if cont and not reget:
         contStr= "--continue-at -"
     # if file exists and not cont, or reget, delete
-    if not cont and stat (filename) or reget:
+    if stat (filename) and (not cont or reget):
         unlink (filename)
 
     silentStr= "--silent"
