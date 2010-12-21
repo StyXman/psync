@@ -309,7 +309,13 @@ class Psync(object):
         Returns a list of strings with a summary of what was done.
         It is for human consumption.
         """
-        for filename, size, reget in self.files ():
+        for data in self.files ():
+            reget= False
+            try:
+                filename, size, reget= data
+            except ValueError:
+                filename, size= data
+
             filename= os.path.normpath (filename)
             self.repoFiles+= 1
             if not self.showSize:
