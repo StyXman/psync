@@ -40,7 +40,7 @@ config.append (dict (
     repoUrl= 'http://security.debian.org/debian-security',
     repoDir= 'debian/debian-security',
     driver= 'Debian',
-    releases= [ 'etch/updates', 'lenny/updates' ],
+    releases= [ 'lenny/updates' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'non-free', 'contrib' ],
     baseDir= '',
@@ -103,11 +103,11 @@ config1.append (dict (
 
 # deb http://www.backports.org/debian/ sarge-backports main
 config.append (dict (
-    repo= 'backports',
+    repo= 'debian-backports',
     repoUrl= 'http://www.backports.org/debian/',
     repoDir= 'debian/backports',
     driver= 'Debian',
-    releases= [ 'etch-backports' ],
+    releases= [ 'lenny-backports' ],
     # archs= [ 'i386', 'sparc', 'amd64' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main' ],
@@ -305,10 +305,11 @@ config.append (dict (
     repoUrl= 'http://archive.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/ubuntu',
     driver= 'Debian',
-    releases= [ 'hardy', 'jaunty', 'karmic' ],
+    releases= [ 'lucid', 'maverick' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'restricted' ],
     baseDirTemplate= '',
+    cleanLevel= 'repo',
 ))
 # ubuntu has updates and security!
 # also, uni and multiverse are supported!
@@ -317,20 +318,22 @@ config.append (dict (
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/updates',
     driver= 'Debian',
-    releases= [ 'hardy-updates', 'jaunty-updates', 'karmic-updates' ],
+    releases= [ 'karmic-updates', 'lucid-updates', 'maverick-updates' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
+    cleanLevel= 'repo',
 ))
 config.append (dict (
     repo= 'ubuntu-security',
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/security',
     driver= 'Debian',
-    releases= [ 'hardy-security', 'jaunty-security', 'karmic-security' ],
+    releases= [ 'karmic-security', 'lucid-security', 'maverick-security' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
+    cleanLevel= 'repo',
 ))
 # also has official backports!
 config.append (dict (
@@ -338,23 +341,25 @@ config.append (dict (
     repoUrl= 'http://security.ubuntu.com/ubuntu',
     repoDir= 'ubuntu/backports',
     driver= 'Debian',
-    releases= [ 'hardy-backports', 'jaunty-backports', 'karmic-backports' ],
+    releases= [ 'lucid-backports', 'maverick-backports' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main', 'restricted', 'universe', 'multiverse' ],
     baseDirTemplate= '',
+    cleanLevel= 'repo',
 ))
 
 # kde3
 # deb http://ppa.launchpad.net/kb9vqf/ubuntu intrepid main
-config.append (dict (
+config1.append (dict (
     repo= 'ubuntu-kde3',
     repoUrl= 'http://ppa.launchpad.net/kb9vqf/ubuntu',
     repoDir= 'ubuntu/kde3',
     driver= 'Debian',
-    releases= [ 'intrepid' ],
+    releases= [ 'karmic' ],
     archs= [ 'i386', 'amd64' ],
     modules= [ 'main' ],
     baseDirTemplate= '',
+    cleanLevel= 'repo',
 ))
 
 #########
@@ -368,7 +373,7 @@ config.append (dict (
     repoUrl= 'http://fedora.tu-chemnitz.de/pub/linux/fedora/linux/releases',
     repoDir= 'fedora',
     driver= 'Yum',
-    releases= [ '10', '11' ],
+    releases= [ '12', '13' ],
     archs= [ 'i386', 'x86_64' ],
     baseDirTemplate= '%(release)s/Fedora/%(arch)s/os',
     # rpmDir= 'Fedora/RPMS',
@@ -385,7 +390,7 @@ config.append (dict (
     repoUrl= 'http://ftp.uni-kl.de/pub/linux/fedora/linux/updates',
     repoDir= 'fedora/updates',
     driver= 'Yum',
-    releases= [ '10', '11', '12' ],
+    releases= [ '12', '13' ],
     archs= [ 'i386', 'x86_64' ],
     baseDirTemplate= '%(release)s/%(arch)s',
     rpmDir= '.',
@@ -456,12 +461,12 @@ config1.append (dict (
 # OpenOffice.org
 #################
 # http://ftp.snt.utwente.nl/pub/software/openoffice/
-config.append (dict (
+config1.append (dict (
     repo= 'ooffice',
     repoUrl= 'http://ftp.snt.utwente.nl/pub/software/openoffice',
     repoDir= 'ooffice',
     driver= 'OpenOfficeOrg',
-    releases= [ '3.0.1' ],
+    releases= [ '3.1.1' ],
     archs= [ 'LinuxIntel', 'Win32Intel', 'SolarisSparc', 'Solarisx86' ],
     exts= [ 'tar.gz', 'exe', 'tar.gz', 'tar.gz' ],
     languages= [ 'es' ],
@@ -478,7 +483,7 @@ config.append (dict (
 config.append (dict (
     repo= 'cpan',
     repoUrl= 'http://ftp.ndlug.nd.edu/pub/perl/',
-    repoDir= 'cpan',
+    repoDir= 'soft/cpan',
     driver= 'Cpan',
 ))
 
@@ -486,7 +491,7 @@ config.append (dict (
 # Mozilla Project
 ##################
 # http://ftp.mozilla.org/pub/mozilla.org/
-config.append (dict (
+config1.append (dict (
     repo= 'mozilla',
     repoUrl= 'http://ftp.mozilla.org/pub/mozilla.org/',
     repoDir= 'mozilla',
