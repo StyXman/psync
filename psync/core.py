@@ -370,7 +370,13 @@ class Psync(object):
 
         def loadFilesAndDatabases (self):
             logger.warn ('loading old databases for %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s' % self)
-            for filename, size in self.files ():
+            for data in self.files ():
+                reget= False
+                try:
+                    filename, size, reget= data
+                except ValueError:
+                    filename, size= data
+
                 filename= os.path.normpath (("%(repoDir)s/" % self)+filename)
                 logger.debug ("keeping %s" % filename)
                 self.keep[filename]= '%(repo)s/%(distro)s/%(release)s' % self
