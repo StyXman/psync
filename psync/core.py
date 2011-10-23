@@ -329,7 +329,8 @@ class Psync(object):
         It is for human consumption.
         """
         moduleStatus= status.getStatus (repo=self.repo, distro=self.distro, release=self.release, arch=self.arch, module=self.module)
-        moduleStatus.lastTried= utils.now ()
+        if not self.dry_run and not self.experiment:
+                moduleStatus.lastTried= utils.now ()
         
         for data in self.files ():
             reget= False
@@ -346,7 +347,8 @@ class Psync(object):
             if size is not None:
                 self.moduleSize+= size/MEGABYTE
 
-        moduleStatus.lastSucceeded= utils.now ()
+        if not self.dry_run and not self.experiment:
+            moduleStatus.lastSucceeded= utils.now ()
 
 
     def walkRelease (self, releaseFunc=None, archFunc=None, moduleFunc=None):
