@@ -86,7 +86,7 @@ def getStatus (repo=None, distro=None, release=None, arch=None, module=None, **k
 def writeStatusFile (status_file, config):
     statusFile= open (status_file, "w+")
     statusFile.write ("<table>\n")
-    statusFile.write ("<tr><th>Repository</th><th>Distro</th><th>Release</th><th>Arch</th><th>Module</th><th>Las Tried</th><th>Last Succeeded</th></tr>\n")
+    statusFile.write ("<tr><th>Repository</th><th>Distro</th><th>Release</th><th>Arch</th><th>Module</th><th>Last Tried</th><th>Last Succeeded</th></tr>\n")
     
     for repo in config:
         distros= repo.get ('distros', [ None ])
