@@ -7,7 +7,8 @@ if sqlalchemy.__version__[:3]=='0.4':
     from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime
     from sqlalchemy.orm import mapper, sessionmaker
 
-    engine= create_engine ('sqlite:///status.sqlt', echo=True)
+    # TODO: echo=True on debug
+    engine= create_engine ('sqlite:///status.sqlt')
     metadata= MetaData ()
 
     table= Table ('status', metadata,
@@ -41,8 +42,9 @@ if sqlalchemy.__version__[:3]=='0.4':
 if sqlalchemy.__version__[:3]=='0.5':
     from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime
     from sqlalchemy.orm import mapper, sessionmaker
-    
-    engine= create_engine ('sqlite:///status.sqlt', echo=True)
+
+    # TODO: echo=True on debug
+    engine= create_engine ('sqlite:///status.sqlt')
     metadata= MetaData ()
 
     table= Table ('status', metadata,
@@ -81,8 +83,25 @@ def getStatus (repo=None, distro=None, release=None, arch=None, module=None, **k
 
     return status
 
-# writeStatusFile (status_file):
-#     statusFile= open (conf.status_file, "w+")
-#     statusFile.write ("<table>\n")
-#     statusFile.write ("</table>\n")
-#     statusFile.close ()
+def writeStatusFile (status_file, config):
+    statusFile= open (status_file, "w+")
+    statusFile.write ("<table>\n")
+    statusFile.write ("<tr><th>Repository</th><th>Distro</th><th>Release</th><th>Arch</th><th>Module</th><th>Las Tried</th><th>Last Succeeded</th></tr>\n")
+    
+    for repo in config:
+        distros= repo.get ('distros', [ None ])
+        for distro in distros:
+            releases= repo.get ('releases', [ None ])
+            for release in releases:
+                archs= repo.get ('archs', [ None ])
+                for arch in archs:
+                    modules= repo.get ('modules', [ None ])
+                    for module in modules:
+                        status= getStatus (repo['repo'], distro, release, arch, module)
+                        if status.lastTried is not None:
+                            # TODO: size, last amount downloaded
+                            statusFile.write ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" %
+                                (repo['repo'], distro, release, arch, module, status.lastTried.strftime ("%a %d %b, %H:%M"), status.lastSucceeded.strftime ("%a %d %b, %H:%M")))
+
+    statusFile.write ("</table>\n")
+    statusFile.close ()
