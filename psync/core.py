@@ -10,7 +10,7 @@ import os
 import errno
 
 from psync.utils import stat, makedirs, grab, rename, touch, lockFile, unlockFile, MEGABYTE
-from pysnc.status import Status
+from psync import status, utils
 
 from psync import logLevel
 import logging
@@ -157,7 +157,7 @@ class Psync(object):
         It is for human consumption.
         """
         logger.info ("=== processing "+self.repo)
-        self.statusFile.write ("<tr class=\"distro\"><td>%s</td></tr>\n" % self.label)
+        # self.statusFile.write ("<tr class=\"distro\"><td>%s</td></tr>\n" % self.label)
         
         self.totalSize= 0
         notLocked= True
@@ -188,13 +188,14 @@ class Psync(object):
                     self.distroSize= 0
                     self.distro= distro
                     if distro is not None:
-                        self.statusFile.write ("<tr><td></td><td>%s</td></tr>\n" % distro)
+                        # self.statusFile.write ("<tr><td></td><td>%s</td></tr>\n" % distro)
+                        pass
                     
                     releases= getattr (self, 'releases', [None])
                     for release in releases:
                         self.releaseSize= 0
                         self.release= release
-                        self.statusFile.write ("<tr><td></td><td></td><td>%s</td></tr>\n" % release)
+                        # self.statusFile.write ("<tr><td></td><td></td><td>%s</td></tr>\n" % release)
                         self.processRelease ()
                         if self.showSize:
                             # in MiB
@@ -296,6 +297,8 @@ class Psync(object):
                 if self.cleanLevel=='release':
                     unlockFile (self.lockfile)
 
+                status.session.commit ()
+
             if self.releaseFailed:
                 # self.statusFile.write ("<tr><td></td><td></td><td class\"failed\">%s</td>\n" % self.release)
                 self.keepOldReleaseFiles ()
@@ -319,14 +322,15 @@ class Psync(object):
         if not self.showSize:
             print ""
 
-        self.statusFile.write ("</tr>\n")
-
     def processModule (self):
         """
         Process one module.
         Returns a list of strings with a summary of what was done.
         It is for human consumption.
         """
+        moduleStatus= status.getStatus (repo=self.repo, distro=self.distro, release=self.release, arch=self.arch, module=self.module)
+        moduleStatus.lastTried= utils.now ()
+        
         for data in self.files ():
             reget= False
             try:
@@ -341,6 +345,8 @@ class Psync(object):
 
             if size is not None:
                 self.moduleSize+= size/MEGABYTE
+
+        moduleStatus.lastSucceeded= utils.now ()
 
 
     def walkRelease (self, releaseFunc=None, archFunc=None, moduleFunc=None):
