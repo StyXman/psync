@@ -14,6 +14,7 @@ import datetime
 import errno
 
 import psync
+from psync import status
 
 from psync import logLevel
 import logging
@@ -48,6 +49,7 @@ def handleOpts ():
     #     help="Send a summary mail to this email account. If not specified, the summary is printed on stdout.")
     parser.add_option ('-n', '--dry-run', action='store_true', default=False,
         help=u"Do a dry run: download databases, process them, but don't download any package. It does the summary. Usefull for foreseeing how much it will download.")
+    # BUG: -o deletes the databases!
     parser.add_option ('-o', '--process-old', action='store_true', default=False,
         help=u"Process databases already downloaded. Mostly for debug purposses.")
     parser.add_option ('-p', '--progress', action='store_true', default=False,
@@ -75,37 +77,37 @@ def handleOpts ():
     return parser.parse_args ()
 
 def main ():
-    (conf, args)= handleOpts ()
-    conf.debugging= conf.log_level==logging.DEBUG
-    conf.verbose= conf.log_level==logging.WARN or conf.debugging
-    psync.logLevel= conf.log_level
-    if conf.showSize:
+    (opts, args)= handleOpts ()
+    opts.debugging= opts.log_level==logging.DEBUG
+    opts.verbose= opts.log_level==logging.WARN or opts.debugging
+    psync.logLevel= opts.log_level
+    if opts.showSize:
         print "sizes in MiB"
         psync.logLevel= logging.WARN
 
     # load config file
     configVars= {}
-    execfile(conf.config_file, configVars)
+    execfile(opts.config_file, configVars)
     config= configVars['config']
     del configVars
 
-    if conf.repos is not None:
+    if opts.repos is not None:
         repos= []
         for repo in config:
             repoName= repo['repo']
-            if repoName in conf.repos:
+            if repoName in opts.repos:
                 repos.append (repo)
-                conf.repos.remove (repoName)
-        if conf.repos != []:
-            logger.warn ("%s: these repos were not found. not processing." % conf.repos)
+                opts.repos.remove (repoName)
+        if opts.repos != []:
+            logger.warn ("%s: these repos were not found. not processing." % opts.repos)
     else:
         repos= config
 
-    if conf.dry_run:
+    if opts.dry_run:
         logger.info ("doing dry run!")
     try:
         for repo in repos:
-            repo.update (confToDict (conf))
+            repo.update (confToDict (opts))
 
             driverName= repo['driver']
 
@@ -113,14 +115,13 @@ def main ():
             DriverClass= getattr(__import__('psync.drivers.'+driverName, {},
                                  {}, [driverName]), driverName)
             driver= DriverClass(**repo)
-            driver.statusFile= statusFile
             try:
                 driver.processRepo ()
                 if driver.size:
                     # in MiB
                     print u"%10.2f %s" % (driver.repo, driver.repoSize)
             except Exception, e:
-                if ( conf.debugging or
+                if ( opts.debugging or
                     (isinstance (e, IOError) and e.errno==errno.ENOSPC) or
                     isinstance (e, KeyboardInterrupt) ):
                     # debugging, out of disk space or keyb int
@@ -132,6 +133,9 @@ def main ():
     except KeyboardInterrupt:
         # curl stays always in the same line
         print
+
+    if not opts.dry_run and not opts.experiment:
+        status.writeStatusFile (opts.status_file, config)
 
 
 if __name__=='__main__':
