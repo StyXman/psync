@@ -69,6 +69,17 @@ if sqlalchemy.__version__[:3]=='0.5':
 
     mapper (Status, table)
 
+    Session = sessionmaker (bind=engine)
+    session = Session ()
+
+
+def getStatus (repo=None, distro=None, release=None, arch=None, module=None, **kwargs):
+    status= session.query (Status).filter_by (repo=repo, distro=distro, release=release, arch=arch, module=module).first ()
+    if status is None:
+        status= Status (repo, distro, release, arch, module, None, None)
+        session.add (status)
+
+    return status
 
 # writeStatusFile (status_file):
 #     statusFile= open (conf.status_file, "w+")
