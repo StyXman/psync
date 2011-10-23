@@ -100,7 +100,7 @@ def writeStatusFile (status_file, config):
                         status= getStatus (repo['repo'], distro, release, arch, module)
                         if status.lastTried is not None:
                             # TODO: size, last amount downloaded
-                            if status.lastSucceeded is not None
+                            if status.lastSucceeded is not None:
                                 statusFile.write ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" %
                                     (repo['repo'], distro, release, arch, module, status.lastTried.strftime ("%a %d %b, %H:%M"), status.lastSucceeded.strftime ("%a %d %b, %H:%M")))
                             else:
