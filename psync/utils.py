@@ -7,6 +7,7 @@ from os import mkdir, unlink, system, utime, strerror
 from os.path import dirname
 from gzip import GzipFile
 import errno
+import datetime
 
 from psync import logLevel
 import logging
@@ -16,7 +17,7 @@ logger.setLevel(logLevel)
 MEGABYTE= 1048576.0
 
 
-def stat(f):
+def stat (f):
     """ Safe replacement for os.stat() """
     ans = True
     try:
@@ -114,7 +115,7 @@ def gunzip (gzFileName, fileName):
     inFile.close ()
     outFile.close ()
 
-def getFile(url, destination):
+def getFile (url, destination):
     file_name = fileFromUrl(url)
     if not os.path.exists(destination):
         try:
@@ -139,7 +140,7 @@ def getFile(url, destination):
                 os.unlink(destination)
             raise
 
-def grab(filename, url, limit=0, cont=True, progress=False, verbose=True, reget=False):
+def grab (filename, url, limit=0, cont=True, progress=False, verbose=True, reget=False):
     """ Fetchs a file if it does not exist or continues downloading
         a previously partially downloaded file.
     """
@@ -221,5 +222,8 @@ def unlockFile (path):
         logger.warn ("lock %s dissapeared!" % path)
     else:
         unlink (path)
+
+def now ():
+    return datetime.datetime.now ()
 
 #end
