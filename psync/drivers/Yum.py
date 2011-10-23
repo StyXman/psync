@@ -1,4 +1,4 @@
-# (c) 2005-2009
+# (c) 2005-2011
 # Marcos Dione <mdione@grulic.org.ar>
 
 from psync.core import DependencyError

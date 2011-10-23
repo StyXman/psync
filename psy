@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# (c) 2004-2008
+# (c) 2004-2011
 # Marcos Dione <mdione@grulic.org.ar>
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
@@ -34,8 +34,8 @@ def confToDict (conf):
 def handleOpts ():
     parser= OptionParser ()
 
-    parser.add_option ('-c', '--continue', action='store_true', dest='cont', default=False,
-        help=u"Continue processing the databases instead of donwloading new ones. Tries to use temp ones first; if they don't exist, tries the actual ones.")
+    # parser.add_option ('-c', '--continue', action='store_true', dest='cont', default=False,
+    #     help=u"Continue processing the databases instead of donwloading new ones. Tries to use temp ones first; if they don't exist, tries the actual ones.")
     parser.add_option ('-d', '--debug', action='store_const', dest='log_level',
         const=logging.DEBUG, help=u"Be *very* verbose on what's being done.")
     parser.add_option ('-f', '--config-file', default='psync.conf.py',
@@ -70,6 +70,8 @@ def handleOpts ():
         help=u"Don't really download the files, just «touch» them. Faster for test.")
     parser.add_option ('-y', '--download-databases', action='store_true', dest='download_db',
         help=u"Force to download new datbases, even if it wouldn't.")
+    parser.add_option ('-z', '--status-file', dest='status_file', default='status.html',
+        help=u"Filename of the HTML file where the mirror status will be written to.")
     return parser.parse_args ()
 
 def main ():
@@ -95,7 +97,7 @@ def main ():
                 repos.append (repo)
                 conf.repos.remove (repoName)
         if conf.repos != []:
-            logger.warn ("%s: this repos were not found. not processing." % conf.repos)
+            logger.warn ("%s: these repos were not found. not processing." % conf.repos)
     else:
         repos= config
 
@@ -111,6 +113,7 @@ def main ():
             DriverClass= getattr(__import__('psync.drivers.'+driverName, {},
                                  {}, [driverName]), driverName)
             driver= DriverClass(**repo)
+            driver.statusFile= statusFile
             try:
                 driver.processRepo ()
                 if driver.size:
@@ -129,6 +132,7 @@ def main ():
     except KeyboardInterrupt:
         # curl stays always in the same line
         print
+
 
 if __name__=='__main__':
     main ()

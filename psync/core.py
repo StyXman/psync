@@ -10,6 +10,7 @@ import os
 import errno
 
 from psync.utils import stat, makedirs, grab, rename, touch, lockFile, unlockFile, MEGABYTE
+from pysnc.status import Status
 
 from psync import logLevel
 import logging
@@ -155,11 +156,13 @@ class Psync(object):
         Returns a list of strings with a summary of what was done.
         It is for human consumption.
         """
-        # summary= []
         logger.info ("=== processing "+self.repo)
+        self.statusFile.write ("<tr class=\"distro\"><td>%s</td></tr>\n" % self.label)
+        
         self.totalSize= 0
         notLocked= True
         logger.debug ("clean level: %s" % self.cleanLevel)
+        
         if self.cleanLevel=='repo':
             # try to lock
             notLocked= False
@@ -184,10 +187,14 @@ class Psync(object):
                 for distro in distros:
                     self.distroSize= 0
                     self.distro= distro
+                    if distro is not None:
+                        self.statusFile.write ("<tr><td></td><td>%s</td></tr>\n" % distro)
+                    
                     releases= getattr (self, 'releases', [None])
                     for release in releases:
                         self.releaseSize= 0
                         self.release= release
+                        self.statusFile.write ("<tr><td></td><td></td><td>%s</td></tr>\n" % release)
                         self.processRelease ()
                         if self.showSize:
                             # in MiB
@@ -247,17 +254,22 @@ class Psync(object):
                         self.arch= arch
                         self.archSize= 0
                         logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
+                        # self.statusFile.write ("<tr><td></td><td></td><td></td><td>%s</td>" % arch)
+                        
                         modules= getattr (self, 'modules', [ None ])
                         for module in modules:
                             # won't log what module we are processing
                             self.module= module
                             self.moduleSize= 0
+                            # self.statusFile.write ("<td>%s</td>" % module)
                             self.processModule ()
 
                             self.archSize+= self.moduleSize
                             if self.showSize:
                                 # in MiB
                                 print u"%(moduleSize)10.2f %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s" % self
+
+                        # self.statusFile.write ("</tr>")
 
                         if self.showSize:
                             # in MiB
@@ -284,9 +296,13 @@ class Psync(object):
                 if self.cleanLevel=='release':
                     unlockFile (self.lockfile)
 
-            if self.releaseFailed or self.wipe:
+            if self.releaseFailed:
+                # self.statusFile.write ("<tr><td></td><td></td><td class\"failed\">%s</td>\n" % self.release)
+                self.keepOldReleaseFiles ()
+            elif self.wipe:
                 self.keepOldReleaseFiles ()
             else:
+                # self.statusFile.write ("<tr><td></td><td></td><td class\"sucess\">%s</td>\n" % self.release)
                 if not self.save_space and not self.dry_run and not self.process_old and not self.showSize:
                     self.updateReleaseDatabases ()
                 # else:
@@ -302,6 +318,8 @@ class Psync(object):
 
         if not self.showSize:
             print ""
+
+        self.statusFile.write ("</tr>\n")
 
     def processModule (self):
         """
