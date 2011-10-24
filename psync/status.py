@@ -85,9 +85,9 @@ def getStatus (repo=None, distro=None, release=None, arch=None, module=None, **k
 
 def writeStatusFile (status_file, config):
     statusFile= open (status_file, "w+")
-    statusFile.write ("<table>\n")
+    statusFile.write ("<table border=\"1\">\n")
     statusFile.write ("<tr><th>Repository</th><th>Distro</th><th>Release</th><th>Arch</th><th>Module</th><th>Last Tried</th><th>Last Succeeded</th></tr>\n")
-    
+
     for repo in config:
         distros= repo.get ('distros', [ None ])
         for distro in distros:
@@ -101,11 +101,13 @@ def writeStatusFile (status_file, config):
                         if status.lastTried is not None:
                             # TODO: size, last amount downloaded
                             if status.lastSucceeded is not None:
-                                statusFile.write ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" %
+                                text= ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" %
                                     (repo['repo'], distro, release, arch, module, status.lastTried.strftime ("%a %d %b, %H:%M"), status.lastSucceeded.strftime ("%a %d %b, %H:%M")))
                             else:
-                                statusFile.write ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td></td></tr>\n" %
+                                text= ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td></td></tr>\n" %
                                     (repo['repo'], distro, release, arch, module, status.lastTried.strftime ("%a %d %b, %H:%M")))
+
+                            statusFile.write (text.replace ("None", ""))
 
     statusFile.write ("</table>\n")
     statusFile.close ()
