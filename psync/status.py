@@ -99,16 +99,21 @@ def writeStatusFile (status_file, config):
                 archs= repo.get ('archs', [ None ])
                 for arch in archs:
                     modules= repo.get ('modules', [ None ])
+                    if modules==[ None ]:
+                        modulesText= "&nbsp;"
+                    else:
+                        modulesText= ", ".join (modules)
+                    
                     firstStatus= getStatus (repo['repo'], distro, release, arch, modules[0])
                     lastStatus= getStatus (repo['repo'], distro, release, arch, modules[-1])
                     if firstStatus.lastTried is not None:
                         # TODO: size, last amount downloaded
                         if lastStatus.lastSucceeded is not None:
                             text= ("<tr><td></td><td colspan='2'>%s</td><td colspan='2'>%s</td><td>%s</td><td>%s</td></tr>\n" %
-                                (arch, ", ".join (modules), firstStatus.lastTried.strftime ("%a %d %b, %H:%M"), lastStatus.lastSucceeded.strftime ("%a %d %b, %H:%M")))
+                                (arch, modulesText, firstStatus.lastTried.strftime ("%a %d %b, %H:%M"), lastStatus.lastSucceeded.strftime ("%a %d %b, %H:%M")))
                         else:
                             text= ("<tr><td></td><td colspan='2'>%s</td><td colspan='2'>%s</td><td>%s</td><td></td></tr>\n" %
-                                (arch, ", ".join (modules), firstStatus.lastTried.strftime ("%a %d %b, %H:%M")))
+                                (arch, modulesText, firstStatus.lastTried.strftime ("%a %d %b, %H:%M")))
 
                         statusFile.write (text.replace ("None", "&nbsp;"))
 
