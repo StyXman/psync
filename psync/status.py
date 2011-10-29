@@ -3,7 +3,7 @@
 
 import sqlalchemy
 
-if sqlalchemy.__version__[:3]=='0.4':
+if sqlalchemy.__version__[:3] in ('0.4', '0.5'):
     from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime
     from sqlalchemy.orm import mapper, sessionmaker
 
@@ -39,27 +39,28 @@ if sqlalchemy.__version__[:3]=='0.4':
     Session.configure (bind=engine)
     session= Session ()
 
-if sqlalchemy.__version__[:3]=='0.5':
+if sqlalchemy.__version__[:3] in ('0.6', '0.7'):
     from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime
+    from sqlalchemy.ext.declarative import declarative_base
     from sqlalchemy.orm import mapper, sessionmaker
 
     # TODO: echo=True on debug
     engine= create_engine ('sqlite:///status.sqlt')
     metadata= MetaData ()
+    Base = declarative_base()
 
-    table= Table ('status', metadata,
-        Column ('id', Integer, primary_key=True),
-        Column ('repo', String (20)),
-        Column ('distro', String (20)),
-        Column ('release', String (20)),
-        Column ('arch', String (20)),
-        Column ('module', String (20)),
-        Column ('lastTried', DateTime),
-        Column ('lastSucceeded', DateTime))
-
-    metadata.create_all (engine, checkfirst=True)
-
-    class Status (object):
+    class Status (Base):
+        __tablename__= 'status'
+        
+        id=            Column (Integer, primary_key=True)
+        repo=          Column (String (20))
+        distro=        Column (String (20))
+        release=       Column (String (20))
+        arch=          Column (String (20))
+        module=        Column (String (20))
+        lastTried=     Column (DateTime)
+        lastSucceeded= Column (DateTime)
+        
         def __init__ (self, repo, distro, release, arch, module, lastTried, lastSucceeded):
             self.repo= repo
             self.distro= distro
@@ -69,7 +70,7 @@ if sqlalchemy.__version__[:3]=='0.5':
             self.lastTried= lastTried
             self.lastSucceeded= lastSucceeded
 
-    mapper (Status, table)
+    Base.metadata.create_all (engine, checkfirst=True)
 
     Session = sessionmaker (bind=engine)
     session = Session ()
