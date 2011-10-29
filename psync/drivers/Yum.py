@@ -4,7 +4,7 @@
 
 import yum
 yumMajVers= yum.__version__.split ('.')[0]
-if yumMajVers==2:
+if yumMajVers=='2':
     from yum.mdcache import RepodataParser
 else:
     from yum.mdparser import MDParser
@@ -77,7 +77,7 @@ class Yum (Rpm):
         repodataDir= "%(tempDir)s/%(repoDir)s/%(baseDir)s" % self
         primaryGz= repodataDir+'/'+self.primaries[self.arch]
 
-        if yumMajVers==2:
+        if yumMajVers=='2':
             parser= RepodataParser (repodataDir)
             if self.verbose:
                 parser.debug= True
