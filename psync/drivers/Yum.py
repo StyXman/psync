@@ -1,11 +1,14 @@
 # (c) 2005-2011
 # Marcos Dione <mdione@grulic.org.ar>
 
-from psync.core import DependencyError
-try:
+
+import yum
+yumMajVers= yum.__version__.split ('.')[0]
+if yumMajVers==2:
     from yum.mdcache import RepodataParser
-except Exception, e:
-    raise DependencyError (package='yum', )
+else:
+    from yum.mdparser import MDParser
+    
 
 from os import listdir
 from os.path import basename
@@ -72,42 +75,62 @@ class Yum (Rpm):
         # hack
         self.baseDir= self.baseDirTemplate % self
         repodataDir= "%(tempDir)s/%(repoDir)s/%(baseDir)s" % self
-
-        self.parser= RepodataParser (repodataDir)
-        if self.verbose:
-            self.parser.debug= True
-
         primaryGz= repodataDir+'/'+self.primaries[self.arch]
-        primary= primaryGz[:-3]
-        logger.debug ("processing database %s" % primaryGz)
-        # decompress the gz file
-        gunzip (primaryGz, primary)
+
+        if yumMajVers==2:
+            parser= RepodataParser (repodataDir)
+            if self.verbose:
+                parser.debug= True
+            
+            primary= primaryGz[:-3]
+            logger.debug ("processing database %s" % primaryGz)
+            # decompress the gz file
+            gunzip (primaryGz, primary)
+            
+            databank= parser.parseDataFromXml (primary)
+            packages= databank.values()
+        else:
+            packages= MDParser (primaryGz)
 
         try:
             self.rpmList= listdir ("%(repoDir)s/%(baseDir)s/%(rpmDir)s" % self)
         except OSError:
             self.rpmList= []
 
-        databank= self.parser.parseDataFromXml (primary)
-        for i in databank.values():
-            if self.verbose:
+        for i in packages:
+            if self.verbose and yumMajVers==2:
                 # i.dump ()
                 pass
-            # nevra= (name, epoch, version, release, arch)
-            isDebug= 'debuginfo' in i.location['href']
-            isSource= i.nevra[4]=='src'
 
-            if not (i.nevra[4]==self.arch or i.nevra[4]=='noarch') and self.verbose:
+            if yumMajVers==2:
+                # nevra= (name, epoch, version, release, arch)
+                location= i.location['href']
+                size= i.size['package']
+                arch= i.nevra[4]
+
+            else:
+                location= i['location_href']
+                size= i['size_package']
+                arch= i['arch']
+                # fuck Fedora, the repo says it's i386, but the packages are i686
+                if arch=='i686':
+                    arch= 'i386'
+
+            if not (arch==self.arch or arch=='noarch') and self.verbose:
                 logger.warning ('possible wrong arch '+i.location['href'])
+
+            isDebug= 'debuginfo' in location
+            isSource= arch=='src'
 
             if ( (self.source and not isDebug) or
                  (self.debug and not isSource) or
                  (self.source and self.debug) or
                  (not isSource and not isDebug) ):
-                relUrl= ("%(baseDir)s/%(rpmDir)s/" % self)+i.location['href']
+                     
+                relUrl= ("%(baseDir)s/%(rpmDir)s/" % self)+location
                 # logger.debug ("found: %s" % relUrl)
                 # (filename, size)
-                yield ( relUrl, int(i.size['package']) )
+                yield ( relUrl, int(size) )
 
     def finalReleaseDBs (self, old=False):
         if not old:
