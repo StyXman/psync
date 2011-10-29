@@ -38,7 +38,7 @@ class Yum (Rpm):
             if download:
                 # download repomd.xml and take from there
                 code= grab (filename, url,
-                            cont=False, progress=self.progress)
+                            cont=False, progress=self.progress, verbose=False)
                 if code!=0:
                     raise ProtocolError (proto=url[:url.index (':')].upper (), code=code, url=url)
             if includeRepomd:
@@ -102,7 +102,7 @@ class Yum (Rpm):
                 # i.dump ()
                 pass
 
-            if yumMajVers==2:
+            if yumMajVers=='2':
                 # nevra= (name, epoch, version, release, arch)
                 location= i.location['href']
                 size= i.size['package']
