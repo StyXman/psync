@@ -19,7 +19,10 @@ if sqlalchemy.__version__[:3] in ('0.4', '0.5'):
         Column ('arch', String (20)),
         Column ('module', String (20)),
         Column ('lastTried', DateTime),
-        Column ('lastSucceeded', DateTime))
+        Column ('lastSucceeded', DateTime),
+        Column ('lastDownloaded', Integer),
+        Column ('size', Integer),
+        )
 
     metadata.create_all (engine, checkfirst=True)
 
@@ -52,14 +55,16 @@ if sqlalchemy.__version__[:3] in ('0.6', '0.7'):
     class Status (Base):
         __tablename__= 'status'
         
-        id=            Column (Integer, primary_key=True)
-        repo=          Column (String (20))
-        distro=        Column (String (20))
-        release=       Column (String (20))
-        arch=          Column (String (20))
-        module=        Column (String (20))
-        lastTried=     Column (DateTime)
-        lastSucceeded= Column (DateTime)
+        id=             Column (Integer, primary_key=True)
+        repo=           Column (String (20))
+        distro=         Column (String (20))
+        release=        Column (String (20))
+        arch=           Column (String (20))
+        module=         Column (String (20))
+        lastTried=      Column (DateTime)
+        lastSucceeded=  Column (DateTime)
+        lastDownloaded= Column (Integer)
+        size=           Column (Integer)
         
         def __init__ (self, repo, distro, release, arch, module, lastTried, lastSucceeded):
             self.repo= repo
