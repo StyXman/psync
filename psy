@@ -134,7 +134,7 @@ def main ():
         # curl stays always in the same line
         print
 
-    if not opts.dry_run and not opts.experiment:
+    if not opts.dry_run: # and not opts.experiment:
         status.writeStatusFile (opts.status_file, config)
 
 

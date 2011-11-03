@@ -135,7 +135,7 @@ class Psync(object):
             else:
                 size= 0
 
-            self.downloadedSize+= size/MEGABYTE
+            self.downloadedSize+= size
 
         # always keep it
         logger.debug ("keeping %s" % _file)
@@ -188,14 +188,12 @@ class Psync(object):
                     self.distroSize= 0
                     self.distro= distro
                     if distro is not None:
-                        # self.statusFile.write ("<tr><td></td><td>%s</td></tr>\n" % distro)
                         pass
                     
                     releases= getattr (self, 'releases', [None])
                     for release in releases:
                         self.releaseSize= 0
                         self.release= release
-                        # self.statusFile.write ("<tr><td></td><td></td><td>%s</td></tr>\n" % release)
                         self.processRelease ()
                         if self.showSize:
                             # in MiB
@@ -255,22 +253,18 @@ class Psync(object):
                         self.arch= arch
                         self.archSize= 0
                         logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
-                        # self.statusFile.write ("<tr><td></td><td></td><td></td><td>%s</td>" % arch)
                         
                         modules= getattr (self, 'modules', [ None ])
                         for module in modules:
                             # won't log what module we are processing
                             self.module= module
                             self.moduleSize= 0
-                            # self.statusFile.write ("<td>%s</td>" % module)
                             self.processModule ()
 
                             self.archSize+= self.moduleSize
                             if self.showSize:
                                 # in MiB
                                 print u"%(moduleSize)10.2f %(repo)s/%(distro)s/%(release)s/%(arch)s/%(module)s" % self
-
-                        # self.statusFile.write ("</tr>")
 
                         if self.showSize:
                             # in MiB
@@ -300,12 +294,10 @@ class Psync(object):
                 status.session.commit ()
 
             if self.releaseFailed:
-                # self.statusFile.write ("<tr><td></td><td></td><td class\"failed\">%s</td>\n" % self.release)
                 self.keepOldReleaseFiles ()
             elif self.wipe:
                 self.keepOldReleaseFiles ()
             else:
-                # self.statusFile.write ("<tr><td></td><td></td><td class\"sucess\">%s</td>\n" % self.release)
                 if not self.save_space and not self.dry_run and not self.process_old and not self.showSize:
                     self.updateReleaseDatabases ()
                 # else:
@@ -329,7 +321,7 @@ class Psync(object):
         It is for human consumption.
         """
         moduleStatus= status.getStatus (repo=self.repo, distro=self.distro, release=self.release, arch=self.arch, module=self.module)
-        if not self.dry_run and not self.experiment:
+        if not self.dry_run: # and not self.experiment:
                 moduleStatus.lastTried= utils.now ()
         
         for data in self.files ():
@@ -345,9 +337,10 @@ class Psync(object):
                 self.getPackage (filename, size, reget)
 
             if size is not None:
-                self.moduleSize+= size/MEGABYTE
+                self.moduleSize+= size
 
-        if not self.dry_run and not self.experiment:
+        moduleStatus.size= self.moduleSize
+        if not self.dry_run: # and not self.experiment:
             moduleStatus.lastSucceeded= utils.now ()
 
 
