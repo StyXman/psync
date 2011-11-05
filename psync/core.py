@@ -50,7 +50,7 @@ class Psync(object):
         self.databasesFailed= False # some operation with the database failed
 
         self.failedFiles= [] # files that failed to download
-        self.keep= {}
+        self.keep= {} # files to keep
 
         # counters
         self.repoFiles= 0
@@ -88,6 +88,7 @@ class Psync(object):
         except OSError, e:
             if e.errno==errno.ENOENT:
                 # the file does not exist; download it
+                logger.debug ("%s not present, marking for download" % _file)
                 get= True
             else:
                 # something else, can't decide
@@ -99,10 +100,11 @@ class Psync(object):
                 if self.verbose:
                     # logger.info ("%s: already here, skipping" % _file)
                     pass
+                logger.debug ("%s: no size given, file present, so assuming ok" % _file)
             else:
                 if reget:
                     if s.st_size!=size:
-                        # logger.warn ("%s: size differs, regetting" % _file)
+                        logger.debug ("%s: size differs, regetting" % _file)
                         os.unlink (_file)
                         get= True
                 else:
@@ -116,7 +118,9 @@ class Psync(object):
                         os.unlink (_file)
                         get= True
 
+        logger.debug ("getPackage(): %s, %d, get: %s, reget: %s" % (_file, size, get, reget))
         if get:
+            logger.debug ("getting %s" % _file)
             if not self.dry_run:
                 if not self.experiment:
                     ans= grab (_file, url, limit=self.limit, progress=self.progress, reget=reget)
@@ -132,9 +136,8 @@ class Psync(object):
                         size= 0
                 else:
                     size= s.st_size
-            else:
-                size= 0
 
+            logger.debug ("size: %d" % size)
             self.downloadedSize+= size
 
         # always keep it
@@ -157,7 +160,6 @@ class Psync(object):
         It is for human consumption.
         """
         logger.info ("=== processing "+self.repo)
-        # self.statusFile.write ("<tr class=\"distro\"><td>%s</td></tr>\n" % self.label)
         
         self.totalSize= 0
         notLocked= True
@@ -321,8 +323,9 @@ class Psync(object):
         It is for human consumption.
         """
         moduleStatus= status.getStatus (repo=self.repo, distro=self.distro, release=self.release, arch=self.arch, module=self.module)
+        self.downloadedSize= 0
         if not self.dry_run: # and not self.experiment:
-                moduleStatus.lastTried= utils.now ()
+            moduleStatus.lastTried= utils.now ()
         
         for data in self.files ():
             reget= False
@@ -330,6 +333,7 @@ class Psync(object):
                 filename, size, reget= data
             except ValueError:
                 filename, size= data
+            logger.debug ("%s, %d, %s" % (filename, size, reget))
 
             filename= os.path.normpath (filename)
             self.repoFiles+= 1
@@ -340,6 +344,7 @@ class Psync(object):
                 self.moduleSize+= size
 
         moduleStatus.size= self.moduleSize
+        moduleStatus.lastDownloaded= self.downloadedSize
         if not self.dry_run: # and not self.experiment:
             moduleStatus.lastSucceeded= utils.now ()
 
