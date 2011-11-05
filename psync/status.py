@@ -3,6 +3,8 @@
 
 import sqlalchemy
 
+MEGABYTE= 1048576.0
+
 if sqlalchemy.__version__[:3] in ('0.4', '0.5'):
     from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime
     from sqlalchemy.orm import mapper, sessionmaker
@@ -27,7 +29,7 @@ if sqlalchemy.__version__[:3] in ('0.4', '0.5'):
     metadata.create_all (engine, checkfirst=True)
 
     class Status (object):
-        def __init__ (self, repo, distro, release, arch, module, lastTried, lastSucceeded):
+        def __init__ (self, repo, distro, release, arch, module, lastTried, lastSucceeded, lastDownloaded, size):
             self.repo= repo
             self.distro= distro
             self.release= release
@@ -35,6 +37,8 @@ if sqlalchemy.__version__[:3] in ('0.4', '0.5'):
             self.module= module
             self.lastTried= lastTried
             self.lastSucceeded= lastSucceeded
+            self.lastDownloaded= lastDownloaded
+            self.size= size
 
     mapper (Status, table)
 
@@ -66,7 +70,7 @@ if sqlalchemy.__version__[:3] in ('0.6', '0.7'):
         lastDownloaded= Column (Integer)
         size=           Column (Integer)
         
-        def __init__ (self, repo, distro, release, arch, module, lastTried, lastSucceeded):
+        def __init__ (self, repo, distro, release, arch, module, lastTried, lastSucceeded, lastDownloaded, size):
             self.repo= repo
             self.distro= distro
             self.release= release
@@ -74,6 +78,8 @@ if sqlalchemy.__version__[:3] in ('0.6', '0.7'):
             self.module= module
             self.lastTried= lastTried
             self.lastSucceeded= lastSucceeded
+            self.lastDownloaded= lastDownloaded
+            self.size= size
 
     Base.metadata.create_all (engine, checkfirst=True)
 
@@ -84,7 +90,7 @@ if sqlalchemy.__version__[:3] in ('0.6', '0.7'):
 def getStatus (repo=None, distro=None, release=None, arch=None, module=None, **kwargs):
     status= session.query (Status).filter_by (repo=repo, distro=distro, release=release, arch=arch, module=module).first ()
     if status is None:
-        status= Status (repo, distro, release, arch, module, None, None)
+        status= Status (repo, distro, release, arch, module, None, None, 0, 0)
         session.add (status)
 
     return status
@@ -92,18 +98,13 @@ def getStatus (repo=None, distro=None, release=None, arch=None, module=None, **k
 def writeStatusFile (status_file, config):
     statusFile= open (status_file, "w+")
     statusFile.write ("<table border=\"1\">\n")
-    statusFile.write ("<tr><th>Repository</th><th>Distro</th><th>Release</th><th>Arch</th><th>Modules</th><th>Last Tried</th><th>Last Succeeded</th>\n")
+    statusFile.write ("<tr><th>Repository</th><th>Distro</th><th>Release</th><th>Arch</th><th>Modules</th><th>Last Tried</th><th>Last Succeeded</th><th>Size</th><th>Last Update Size</th>\n")
 
     for repo in config:
-        # statusFile.write ("<tr><th>Repository</th><th>Distro</th><th>Release</th><th>Arch</th><th>Modules</th><th>Last Tried</th><th>Last Succeeded</th>\n")
         distros= repo.get ('distros', [ None ])
         for distro in distros:
             releases= repo.get ('releases', [ None ])
-            # statusFile.write ("<tr><th colspan='2'>Repository</th><th colspan='2'>Distro</th><th colspan='3'>Release</th>\n")
-            # statusFile.write ("<tr><th></th><th colspan='2'>Arch</th><th colspan='2'>Modules</th><th>Last Tried</th><th>Last Succeeded</th>\n")
             for release in releases:
-                # text= "<tr><td colspan='2'>%s</td><td colspan='2'>%s</td><td colspan='3'>%s</td>\n" % (repo['repo'], distro, release)
-                # statusFile.write (text.replace ("None", "&nbsp;"))
                 archs= repo.get ('archs', [ None ])
                 for arch in archs:
                     modules= repo.get ('modules', [ None ])
@@ -111,21 +112,24 @@ def writeStatusFile (status_file, config):
                         modulesText= "&nbsp;"
                     else:
                         modulesText= ", ".join (modules)
+
+                    size= 0
+                    lastDownloaded= 0
+                    for module in modules:
+                        status= getStatus (repo['repo'], distro, release, arch, module)
+                        size+= status.size
+                        lastDownloaded+= status.lastDownloaded
                     
                     firstStatus= getStatus (repo['repo'], distro, release, arch, modules[0])
                     lastStatus= getStatus (repo['repo'], distro, release, arch, modules[-1])
                     if firstStatus.lastTried is not None:
                         # TODO: size, last amount downloaded
                         if lastStatus.lastSucceeded is not None:
-                            # text= ("<tr><td></td><td colspan='2'>%s</td><td colspan='2'>%s</td><td>%s</td><td>%s</td></tr>\n" %
-                            #     (arch, modulesText, firstStatus.lastTried.strftime ("%a %d %b, %H:%M"), lastStatus.lastSucceeded.strftime ("%a %d %b, %H:%M")))
-                            text= ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" %
-                                (repo['repo'], distro, release, arch, modulesText, firstStatus.lastTried.strftime ("%a %d %b, %H:%M"), lastStatus.lastSucceeded.strftime ("%a %d %b, %H:%M")))
+                            text= ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%7.2f MiB</td><td>%7.2f MiB</td></tr>\n" %
+                                (repo['repo'], distro, release, arch, modulesText, firstStatus.lastTried.strftime ("%a %d %b, %H:%M"), lastStatus.lastSucceeded.strftime ("%a %d %b, %H:%M"), size/MEGABYTE, lastDownloaded/MEGABYTE))
                         else:
-                            # text= ("<tr><td></td><td colspan='2'>%s</td><td colspan='2'>%s</td><td>%s</td><td></td></tr>\n" %
-                            #     (arch, modulesText, firstStatus.lastTried.strftime ("%a %d %b, %H:%M")))
-                            text= ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>&nbsp;</td></tr>\n" %
-                                (repo['repo'], distro, release, arch, modulesText, firstStatus.lastTried.strftime ("%a %d %b, %H:%M")))
+                            text= ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>&nbsp;</td><td>%7.2f MiB</td><td>%7.2f MiB</td></tr>\n" %
+                                (repo['repo'], distro, release, arch, modulesText, firstStatus.lastTried.strftime ("%a %d %b, %H:%M"), size/MEGABYTE, lastDownloaded/MEGABYTE))
 
                         statusFile.write (text.replace ("None", "&nbsp;"))
 
