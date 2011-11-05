@@ -129,13 +129,13 @@ def main ():
                     raise e
             print ""
 
+            if not opts.dry_run: # and not opts.experiment:
+                status.writeStatusFile (opts.status_file, config)
 
     except KeyboardInterrupt:
         # curl stays always in the same line
         print
 
-    if not opts.dry_run: # and not opts.experiment:
-        status.writeStatusFile (opts.status_file, config)
 
 
 if __name__=='__main__':
