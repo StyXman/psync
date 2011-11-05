@@ -9,7 +9,7 @@ from time import sleep
 import os
 import errno
 
-from psync.utils import stat, makedirs, grab, rename, touch, lockFile, unlockFile, MEGABYTE
+from psync.utils import stat, makedirs, grab, rename, touch, lockFile, unlockFile
 from psync import status, utils
 
 from psync import logLevel

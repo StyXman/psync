@@ -14,9 +14,6 @@ import logging
 logger = logging.getLogger('psync.utils')
 logger.setLevel(logLevel)
 
-MEGABYTE= 1048576.0
-
-
 def stat (f):
     """ Safe replacement for os.stat() """
     ans = True
