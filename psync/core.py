@@ -1,4 +1,4 @@
-# (c) 2005
+# (c) 2005-12
 # Marcos Dione <mdione@grulic.org.ar>
 # Marcelo "xanthus" Ramos <mramos@adinet.com.uy>
 
@@ -147,11 +147,12 @@ class Psync(object):
         if ans==0x1600:
             # only 404 is relevant here
             logger.warn ('failed')
-            self.failedFiles.append (_file)
-            self.releaseFailed= True
+            self.failedFiles.append ((basename (_file), size))
         elif ans==0x02:
             # curl is not here
             raise DependencyError (package='curl')
+
+        return ans
 
     def processRepo (self):
         """
@@ -160,11 +161,11 @@ class Psync(object):
         It is for human consumption.
         """
         logger.info ("=== processing "+self.repo)
-        
+
         self.totalSize= 0
         notLocked= True
         logger.debug ("clean level: %s" % self.cleanLevel)
-        
+
         if self.cleanLevel=='repo':
             # try to lock
             notLocked= False
@@ -184,14 +185,14 @@ class Psync(object):
                     logger.debug ("not cont: working on %s" % self.tempDir)
                 else:
                     self.tempDir= '.'
+                for i in xrange (int (getattr (self, 'retries', '1'))):
+                    distros= getattr (self, 'distros', [None])
+                    for distro in distros:
+                        self.distroSize= 0
+                        self.distro= distro
+                        if distro is not None:
+                            pass
 
-                distros= getattr (self, 'distros', [None])
-                for distro in distros:
-                    self.distroSize= 0
-                    self.distro= distro
-                    if distro is not None:
-                        pass
-                    
                     releases= getattr (self, 'releases', [None])
                     for release in releases:
                         self.releaseSize= 0
@@ -255,7 +256,7 @@ class Psync(object):
                         self.arch= arch
                         self.archSize= 0
                         logger.info ('----- processing %(repo)s/%(distro)s/%(release)s/%(arch)s' % self)
-                        
+
                         modules= getattr (self, 'modules', [ None ])
                         for module in modules:
                             # won't log what module we are processing
@@ -319,32 +320,62 @@ class Psync(object):
     def processModule (self):
         """
         Process one module.
-        Returns a list of strings with a summary of what was done.
-        It is for human consumption.
         """
         moduleStatus= status.getStatus (repo=self.repo, distro=self.distro, release=self.release, arch=self.arch, module=self.module)
         self.downloadedSize= 0
         if not self.dry_run: # and not self.experiment:
             moduleStatus.lastTried= utils.now ()
-        
-        for data in self.files ():
-            reget= False
-            try:
-                filename, size, reget= data
-            except ValueError:
-                filename, size= data
-            logger.debug ("%s, %d, %s" % (filename, size, reget))
 
-            filename= os.path.normpath (filename)
-            self.repoFiles+= 1
-            if not self.showSize:
-                self.getPackage (filename, size, reget)
+        retries= getattr (self, 'retries', 1)
+        remainingFiles= self.files()
 
-            if size is not None:
-                self.moduleSize+= size
+        for retry in xrange (retries):
+            self.moduleFailed= False
+            if retry>0:
+                logger.debug ("remaining: %s" % remainingFiles)
 
-        moduleStatus.size= self.moduleSize
-        moduleStatus.lastDownloaded= self.downloadedSize
+            for data in remainingFiles:
+                reget= False
+                try:
+                    filename, size, reget= data
+                except ValueError:
+                    filename, size= data
+                logger.debug ("%s, %d, %s" % (filename, size, reget))
+
+                filename= os.path.normpath (filename)
+                self.repoFiles+= 1
+                if not self.showSize:
+                    if self.getPackage (filename, size, reget)==0:
+                        # try to remove it from the list of failed files
+                        try:
+                            self.failedFiles.remove ((filename, size))
+                        except ValueError:
+                            pass
+                        logger.debug (remainingFiles)
+                    else:
+                        # NOK
+                        self.moduleFailed= True
+
+                if size is not None and retry==0:
+                    self.moduleSize+= size
+
+            moduleStatus.size= self.moduleSize
+            moduleStatus.lastDownloaded= self.downloadedSize
+
+            if self.moduleFailed:
+                remainingFiles= self.failedFiles[:]
+                logger.debug ("module failed: %s" % remainingFiles)
+                if retry!=retries-1:
+                    # TODO: configurable?
+                    logger.debug ("pause before retrying")
+                    sleep (30)
+                else:
+                    logger.debug ("last retry, sorry")
+            else:
+                logger.debug ("module successful")
+                break
+
+        self.releaseFailed&= self.moduleFailed
         if not self.dry_run: # and not self.experiment:
             moduleStatus.lastSucceeded= utils.now ()
 
