@@ -1,3 +1,5 @@
+A repository mirroring tool with consistency in mind.
+
 Works like this:
 
 1. downloads new versions of the databases that define the contents of a repo in a temp directory
